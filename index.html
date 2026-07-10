@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>KITENGO GAMING</title>
+	<link rel="icon" href="yutong2.jpg">
+<style>
+	/* Global Styles */
+	
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+    
+    /* Mchanganyiko wa Rangi */
+    background: linear-gradient(-45deg, #ff0000, #FF7F00, #00FF00, #0000FF,#4B0082,#9400D3 );
+    background-size: 400% 400%;
+    
+    /* Motion ya Background (Sekunde 10) */
+    animation: rainbowMotion 10s ease infinite;
+    
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+@keyframes rainbowMotion {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* Glowing Orbs */
+body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    filter: blur(80px);
+    z-index: -1; 
+    animation: floatingOrbs 20s ease-in-out infinite;
+}
+body::after {
+    background: rgba(47, 107, 255, 0.3);
+    width: 400px;
+    height: 400px;
+    animation-delay: -10s; 
+}
+@keyframes floatingOrbs {
+    0%, 100% { top: -10%; left: 10%; }
+    33% { top: 60%; left: 80%; }
+    66% { top: 80%; left: -10%; }
+}
+	/* Navigation Menu Styles */
+	.navbar {
+		background-color: #111;
+		display: flex;
+		justify-content: center;
+		padding: 15px 0;
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+		box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+	}
+	.navbar a {
+		color: white;
+		text-align: center;
+		padding: 10px 20px;
+		text-decoration: none;
+		font-size: 16px;
+		font-weight: bold;
+		text-transform: uppercase;
+		transition: 0.3s;
+		cursor: pointer;
+	}
+	.navbar a:hover {
+		background: linear-gradient(135deg, #2f6bff, #7139e8);
+		border-radius: 20px;
+	}
+	/* Typography & Headers */
+	h1 {
+		text-align: center;
+		background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d);
+		margin: 0;
+		padding: 20px;
+	}
+	h2 {
+		text-align: center;
+		color: #333;
+		padding: 10px;
+	}
+	p {
+		color: BLACK;
+		text-align: center;
+		line-height: 1.6;
+		padding: 0 20px;
+	}	
+	/* Main Layout Container */
+	.hero-section {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 20px;
+	}
+	/* Card & Form Grid Setup */
+	.cat-grid { 
+		display: grid; 
+		grid-template-columns: repeat(3, 1fr); 
+		gap: 20px; 
+		padding: 20px; 
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+	/* Responsive Grid */
+	@media (max-width: 900px) {
+		.cat-grid { grid-template-columns: repeat(2, 1fr); }
+	}
+	@media (max-width: 600px) {
+		.cat-grid { grid-template-columns: 1fr; }
+	}
+	/* Component Styles */
+	.card {
+		margin: 0 auto;
+		padding: 20px;
+		border-radius: 35px; 
+		background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
+		color: white; 
+		text-align: center; 
+		width: 250px;
+		box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+	}
+	.reg, .log {
+		margin: 50px auto;
+		padding: 20px;
+		border-radius: 35px; 
+		background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
+		color: white; 
+		text-align: center; 
+		width: 250px;
+	}
+	/* Button Styles */
+	button {
+		border-radius: 40px;
+		background: rgba(80, 40, 170, 0.7); 
+		color: white;
+		cursor: pointer; 
+		border: none; 
+		padding: 10px 35px;
+		margin-top: 20px;
+		font-weight: bold;
+		transition: 0.3s;
+	}
+	button:hover {
+		background: rgba(255, 61, 141, 0.9);
+	}
+	button a {
+		color: white;
+		text-decoration: none;
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+	}
+	.divider {
+		border: 0;
+		height: 2px;
+		background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+		margin: 20px 0;
+	}
+</style>
+</head>
+<body>
+<div class="navbar" id="navicon" style="display:none;">
+	<a href="javascript:void(0);" onclick="showcat();">Home</a>
+	<a href="javascript:void(0);" onclick="alertAbout();">About Us</a>
+	<a href="javascript:void(0);" onclick="alertServices();">Our Services</a>
+	<a href="javascript:void(0);" onclick="alertContact();">Contact Us</a>
+</div>
+<div id="cat" style="display:none;">
+	<div class="hero-section">
+		<h1>KITENGO GAMING</h1>
+		<br>
+		<img src="logo.jpg" alt="image" style="display: block; margin:0 auto; width: 100%; max-width: 800px; border-radius: 15px;">
+		<br>
+		<p id="about">......welcome kitengo gaming for highly realistic gaming experience & ENJOY, our updates are coming after two days, join with us in <a href="">TELEGRAM</a>, <a href="">FACEBOOK</a>, <a href="">INSTAGRAM</a>, <a href="">TIKTOK</a>, <a href="">WHATSAPP</a>, <a href="">YOUTUBE</a> as our main launching platforms. dont forget to subscribe our <a href="">YOUTUBE CHANNEL</a>, so as to be the first one to get our updates daily.....</p>
+		
+		<hr class="divider">
+		<h2 id="services">OUR SERVICES</h2>
+		<p style="margin-bottom: 30px;">Tunatoa mod kali na za kisasa kabisa za Euro Truck Simulator 2 (ETS2) wenye muonekano halisi wa mabasi ya Kitanzania na Afrika Mashariki kwa ujumla. Chagua basi upendalo hapa chini:</p>
+	</div>
+	<div class="cat-grid">
+		<div class="card"><p>YUTONG MOD (15,000/=)</p> <img src="yutong1.jpg" style="width: 180px; border-radius: 10px;"> <br><button onclick="showyutong()">CHAGUA HAPA</button> </div>
+		<div class="card"><p>ZHONGTONG MOD (17,000/=)</p> <img src="ZHONGTONG10.jpg" style="width: 180px; border-radius: 10px;"><br><br><button onclick="showzhongtong()">CHAGUA HAPA</button> </div>
+		<div class="card"><p>GOLDEN DRAGON MOD (17,500/=)</p> <img src="DRAGON5.jpg" style="width: 180px; border-radius: 10px;"> <br><br><button onclick="showdragon()">CHAGUA HAPA</button> </div>
+		<div class="card"><p>COSTA MOD (12,000/=)</p> <img src="COSTA5.jpg" style="width: 180px; border-radius: 10px;"><br><br><button onclick="showcosta()">CHAGUA HAPA</button> </div>
+		<div class="card"><p>HIGER MOD (15,000/=)</p> <img src="HIGER7.jpg" style="width: 180px; border-radius: 10px;" ><br><br><button onclick="showhiger()">CHAGUA HAPA</button> </div>
+		<div class="card"><p>SCANIA MOD (18,000/=)</p> <img src="SCANIA1.jpg" style="width: 180px; border-radius: 10px;"><br><br><button onclick="showscania()">CHAGUA HAPA</button> </div>
+	</div>
+	<div class="hero-section" id="contact" style="margin-top: 50px;">
+		<hr class="divider">
+		<h2>CONTACT US</h2>
+		<p>Kama una maswali, unahitaji msaada wa kurejesha akaunti, au unataka kufanya malipo ya moja kwa moja, wasiliana nasi kwa simu namba: <strong>0615304000</strong> au kupitia mitandao yetu ya kijamii iliyowekwa hapo juu.</p>
+		<br><br>
+	</div>
+</div>
+<div class="yutong" id="yutong" style="display:none;"><h2 style="background-color: ghostwhite;">YUTONG BUSES</h2>
+	<div class="cat-grid">
+		<div class="card"><p>BUS1</p> <img src="yutong8.jpg" style="width: 180px;"> <br>  <button> <a href="https://www.mediafire.com/file/ez6m9b73loam8w0/D14+GOD+FIRST+LUXURY.bussidmod.zip/file" target="_blank" onclick="showmessage()">DOWNLOAD</a> </button> </div>
+		<div class="card"><p>BUS2</p> <img src="yutong2.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/qscy9c7hchrbdol/yutong+f12+marangu+coach+by+pinodeire+v0.2.bussidmod.7z/file?dkey=rwpvsyz8djz&r=1668" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS3</p> <img src="yutong3.jpg" style="width: 180px;"> <br><br><button><a href="https://www.mediafire.com/file/bu6jvu69yd6z2vo/BM_YUTONG_KD_._MALEO.bussidmod/file" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS4</p> <img src="yutong4.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/yizsgts5yfn3i6f/EXTRA_LUXURY_COACH_.bussidmod/file" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS5</p> <img src="yutong5.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/gtb3k5ge0vyyic8/HIGER%F0%9F%9A%A6+KLQ6136DF%F0%9F%8E%B0+HAPPY+NENGA+V1.0.bussidmod.7z/file?dkey=noi5z2n6is3&r=645" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS6</p> <img src="yutong6.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/1o0swjwupnypihg/D14_ABOOD_V2+by+musasamu.bussidmod/file?dkey=eu9hjgrfp7p&r=1583" target="_blank">DOWNLOAD</a></button> </div>
+	</div>
+</div>
+<div class="zhongtong" id="zhongtong" style="display:none;"><h2 style="background-color: ghostwhite;">ZHONGTONG BUSES</h2>
+	<div class="cat-grid">
+		<div class="card"><p>BUS1</p> <img src="ZHONGTONG1.jpg" style="width: 180px;"> <br><button><a href="https://www.mediafire.com/file/fuml6eiffh3kb2p/D14-BM_OACH.bussidmod.7z/file" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS2</p> <img src="ZHONGTONG2.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/eodlcvic2ey40wq/DODOMA_MOROGORO_TZ_MAP.bussidmod.7z/file?dkey=qdk9olgyggj&r=727" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS3</p> <img src="ZHONGTONG3.jpg" style="width: 180px;"> <br><br><button><a href="https://www.mediafire.com/file/85psc01ntrxbvj8/HIGER_KLQ6136DF__KIMBINYIKO__V1.3.bussidmod/file" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS4</p> <img src="ZHONGTONG4.jpg" style="width:180px"><br><br><button><a href="https://download1588.mediafire.com/3gki1urlykmg_ySNeqOBkIYqBe4QWn_xNm1wUtWLh53tOSPggLXy4wNTSh0CEeo3OOtQIeQ_NeeXeQr8etJcWEbRtAPLE5-1_cZ9VdWUd3f5gOUud2XCYmzpGKCE-kSLHgzQpybqkP4LVJK7rhrn3PWxYzTQ7fEh_gyOJdeYBO8/4emeg7gm9vou6sn/KILIMANJARO_g7_x1200_v1.1.bussidmod.zip" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS5</p> <img src="ZHONGTONG5.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/m8miv6yh8jpsmko/D14_IJUKA+LUX+COACH.bussidmod/file?dkey=u19ealtojhu&r=21ij" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS6</p> <img src="download1522.mediafire.com/b8i3j082eligqTNPB1TTVB8vAB_2waiaMLIdWSExgPDB2LzyJH7qO9updvqZqmArRkWzgZdHOD5hTVv4mO1C_gvVkfTlyZoT4nRf0N7DTnn3tlHlarnvRnBs-N_fdze5PdNJJ1ez4VWCN0-t43uDaJPUUsP33Vz7vAS34PrVYojC/cysir7f13agkngz/ksk_zhongtong_.bussidmod" target="_blank">DOWNLOAD</a></button> </div>
+	</div>
+</div>
+<div class="higer" id="higer" style="display:none;"><h2 style="background-color: ghostwhite;">HIGER LIST</h2>
+	<div class="cat-grid">
+		<div class="card"><p>BUS1</p> <img src="higer1.jpg" style="width: 180px;"> <br><button><a href="https://www.mediafire.com/file/ksvdw19zkxi2b1l/marcopolo_g7_x1200_v1.0.bussidmod/file" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS2</p> <img src="higer2.jpg" style="width:180px"><br><br><button><a href="https://download2263.mediafire.com/od5dc2ceamkgLMZyW4FRsazUnsT2D9p3856P8oyGvfp39hMJig6bdORuX_6U7o5CSn5hyt0UviDCWPSHaEkHOkRLzqO05QKxBq-Ec_Us-zF2ua_XN7e2PzLoc4FT3gdRKLbc0Vz5giJYtahorTfnbAoOno82VrModMUPFMf1hN4/ksvdw19zkxi2b1l/marcopolo_g7_x1200_v1.0.bussidmod" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS3</p> <img src="higer3.jpg" style="width: 180px;"> <br><br><button><a href="https://www.mediafire.com/file/sse1e0iqjnnfcw6/Rock_City_tz_1_mod_map_by_PINODEIRE%2528Copy%2529%25282%2529.bussidmod/file?dkey=7ug1dmit024&r=569" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS4</p> <img src="higer4.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/huhevkbxdu1r9mv/D14_ABC_UPPER_CLASS.bussidmod/file?dkey=c5qw7dmkl73&r=845" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS5</p> <img src="higer5.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/1o0swjwupnypihg/D14_ABOOD_V2_by_musasamu.bussidmod/file?dkey=44byug1admw&r=441" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS6</p> <img src="download2294.mediafire.com/zl0mp1238vggxbn1uSFmzQDEq6ui6WygEkqCEBSjtvQCZVgAM0U1bJYj2snQmQAUHpOQFHC1X6yk8BIJR_BnL6w5MDJ6Ilkqvu1TtuxK8hFKbWJtlOChoLvY-rKx0QPtcKRzNIX-RWcwo1nMva19j572a9cWh8wg-7n3Qva2YrJN/esxnil3blroeix4/golden+dragon.bussidmod" target="_blank">DOWNLOAD</a></button> </div>
+	</div>
+</div>
+<div class="costa" id="costa" style="display:none;"><h2 style="background-color: ghostwhite;">COSTA LISTS</h2>
+	<div class="cat-grid">
+		<div class="card"><p>BUS1</p> <img src="costa1.jpg" style="width: 180px;"> <br><button><a href="https://www.mediafire.com/file/qscy9c7hchrbdol/yutong+f12+marangu+coach+by+pinodeire+v0.2.bussidmod.7z/file?dkey=rwpvsyz8djz&r=1668" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS2</p> <img src="costa2.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/z8bmat2s0r0wl2o/NBS_YUTONG.bussidmod/file?dkey=w8f4uao2jo5&r=1393" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS3</p> <img src="costa3.jpg" style="width: 180px;"> <br><br><button><a href="https://www.mediafire.com/file/zvnm8nyrvbxx3pj/D14_SAMALUXURY+wasap0620882657+.bussidmod.7z/file?dkey=q3zub7hw5bw&r=233" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS4</p> <img src="costa4.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/zvnm8nyrvbxx3pj/D14_SAMALUXURY+wasap0620882657+.bussidmod.7z/file?dkey=q3zub7hw5bw&r=233" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS5</p> <img src="costa5.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/huhevkbxdu1r9mv/D14_ABC_UPPER_CLASS.bussidmod/file?dkey=c5qw7dmkl73&r=845" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS6</p> <img src="https://mega.nz/file/2ANGnISR#3wWHsJHjWvz_29rzv4pW1zkq4pGIaOojejxxzrgi-i4" target="_blank">DOWNLOAD</a></button> </div>
+	</div>
+</div>
+<div class="dragon" id="dragon" style="display:none;"><h2 style="background-color: ghostwhite;">GOLDEN DRAGON LIST</h2>
+	<div class="cat-grid">
+		<div class="card"><p>BUS1</p> <img src="DRAGON1.jpg" style="width: 180px;"> <br><button><a href="https://www.mediafire.com/file/huhevkbxdu1r9mv/D14_ABC_UPPER_CLASS.bussidmod/file?dkey=xex8wrmq7wm&r=7" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS2</p> <img src="DRAGON2.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/wsnk30uj1106310/Rock_City_tz_1_mod_map_by_PINODEIRE(Copy).bussidmod/file?dkey=v59qkjgs26e&r=341" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS3</p> <img src="DRAGON3.jpg" style="width: 180px;"> <br><br><button><a href="https://www.mediafire.com/file/fuml6eiffh3kb2p/D14-BM+OACH.bussidmod.7z/file?dkey=ml6nmvtmg6k&r=1143" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS4</p> <img src="DRAGON4.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/ydllw9g7ion0x0q/TANGA_TO_ARUSHA_MD.7z/file?dkey=ihjxdpba3lz&r=343" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS5</p> <img src="DRAGON5.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/zvnm8nyrvbxx3pj/D14_SAMALUXURY+wasap0620882657+.bussidmod.7z/file?dkey=q3zub7hw5bw&r=233" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS6</p> <img src="DRAGON56.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/yizsgts5yfn3i6f/EXTRA_LUXURY_COACH_.bussidmod/file?dkey=pjgtts1q7bv&r=401" target="_blank">DOWNLOAD</a></button> </div>
+	</div>
+</div>
+ 
+<div class="scania" id="scania" style="display:none;"><h2 style="background-color: ghostwhite;">SCANIA LIST</h2>
+	<div class="cat-grid">
+		<div class="card"><p>BUS1</p> <img src="SCANIA1.jpg" style="width: 180px;"> <br><button><a href="https://www.mediafire.com/file/gtb3k5ge0vyyic8/HIGER%25F0%259F%259A%25A6_KLQ6136DF%25F0%259F%258E%25B0_HAPPY_NENGA_V1.0.bussidmod.7z/file?dkey=anb2l0bno8m&r=1947" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS2</p> <img src="scania2(2).jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/m8miv6yh8jpsmko/D14_IJUKA+LUX+COACH.bussidmod/file?dkey=u19ealtojhu&r=213" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS3</p> <img src="scania3.jpg" style="width: 180px;"> <br><br><button><a href="https://www.mediafire.com/file/2n7pglsv9nvc757/D14_TASHRIFF_V8.bussidmod/file?dkey=cp261s4am3a&r=118" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS4</p> <img src="scania4.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/wwq0vl8ef49lg0o/Mikumi_tour_by_pinodeire.bussidmod?dkey=14taqk8gaht&r=1142" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS5</p> <img src="scania5.jpg" style="width:180px"><br><br><button><a href="https://www.mediafire.com/file/1o0swjwupnypihg/D14_ABOOD_V2_by_musasamu.bussidmod/file?dkey=44byug1admw&r=441" target="_blank">DOWNLOAD</a></button> </div>
+		<div class="card"><p>BUS6</p> <img src="https://www.mediafire.com/file/5rg5ph6yjaakqhx/SATCO_YUTONG.bussidmod.zip/file?dkey=9kizd0qfldp&r=1058" target="_blank">DOWNLOAD</a></button> </div>
+	</div>
+</div>
+<div id="log" class="log" style="display:none">
+	<h1>LOGIN</h1> <br>
+	<input type="text" id="logname" placeholder="username" style="padding: 10px; border-radius: 10px;"><br><br>
+	<input type="password" id="logpassword" placeholder="password" style="padding: 10px; border-radius: 10px;"><br><br>
+	<button onclick="login()">LOGIN</button><br><br>
+	<p>i don have an account <a href="javascript:void(0);" onclick="showregister()">REGISTER HERE</a></p>
+</div>
+<div id="reg" class="reg" style="display:block">
+	<h1>REGISTER</h1> <br>
+	<input type="text" id="regname" placeholder="username" style="padding: 10px; border-radius: 10px;"><br><br>
+	<input type="email" id="regemail" placeholder="email" style="padding: 10px; border-radius: 10px;"><br><br>
+	<input type="password" id="regpassword" placeholder="password" style="padding: 10px; border-radius: 10px;"><br><br>
+	<button onclick="register()">REGISTER</button><br><br>
+	<p>already have an account? <a href="javascript:void(0);" onclick="showlogin()">LOGIN</a></p>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

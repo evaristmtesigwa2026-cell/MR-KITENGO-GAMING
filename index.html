@@ -122,7 +122,7 @@
 </div>
 
 <div id="bus-view-section" style="display:none;">
-    <h2 id="dynamic-bus-title" style="background-color: ghostwhite; text-transform: uppercase; padding: 10px; color: black;">MABASI</h2>
+    <h2 id="dynamic-bus-title" style="background-color: ghostwhite; text-transform: uppercase; padding: 10px; color: black; text-align: center;">MABASI</h2>
     <div class="cat-grid" id="dynamic-bus-list"></div>
 </div>
 
@@ -153,12 +153,12 @@
     <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
     <input type="text" id="newCatImg" placeholder="Jina la Picha (Mfano: YUTONG1.jpg)">
     <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
+    <button onclick="window.deleteCategory()" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY</button>
     <hr>
 
     <h3>2. UPLOAD BUS MPYA</h3>
     <label>Chagua Category:</label>
-    <select id="uploadCategory">
-        </select>
+    <select id="uploadCategory"></select>
     <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
     <input type="text" id="uploadImg" placeholder="Jina la Picha (Mfano: ABOOD.jpg)">
     <input type="text" id="uploadLink" placeholder="Link ya Mediafire">

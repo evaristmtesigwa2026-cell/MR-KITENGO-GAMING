@@ -13,7 +13,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// --- PELEKA FUNCTIONS KWENYE WINDOW ILI ONCLICK ISOMEKE KIKAMILIFU ---
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
     sections.forEach(id => {
@@ -57,7 +56,6 @@ window.showcat = function(isBackAction = false) {
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 }
 
-// --- KUSIKILIZA DYNAMIC CATEGORIES TOKA FIREBASE ---
 window.loadCategories = function() {
     const container = document.getElementById("categories-container");
     const selectDropdown = document.getElementById("uploadCategory");
@@ -68,7 +66,7 @@ window.loadCategories = function() {
         
         const data = snapshot.val();
         if (!data) {
-            if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Hakuna kundi lililowekwa bado. Tumia fomu ya admin kuongeza.</p>";
+            if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Hakuna kundi lililowekwa bado.</p>";
             if (selectDropdown) {
                 let opt = document.createElement('option');
                 opt.textContent = "-- Hakuna Kundi --";
@@ -77,7 +75,6 @@ window.loadCategories = function() {
             return;
         }
 
-        // Kujaza dropdown na kadi upya
         if (selectDropdown) {
             let defaultOpt = document.createElement('option');
             defaultOpt.value = "";
@@ -87,8 +84,6 @@ window.loadCategories = function() {
 
         Object.keys(data).forEach((id) => {
             const cat = data[id];
-            
-            // 1. Kadi za Home Page
             if (container) {
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -101,7 +96,6 @@ window.loadCategories = function() {
                 container.appendChild(card);
             }
 
-            // 2. Kujaza Dropdown ya Admin Panel
             if (selectDropdown) {
                 const option = document.createElement('option');
                 option.value = id;
@@ -109,7 +103,6 @@ window.loadCategories = function() {
                 selectDropdown.appendChild(option);
             }
 
-            // Kama tupo Admin (kwenye URL kuna #admin), onyesha vitufe vya kufuta Group
             if(window.location.hash === "#admin") {
                 setTimeout(() => {
                     let btn = document.getElementById(`del-cat-${id}`);
@@ -120,7 +113,6 @@ window.loadCategories = function() {
     });
 }
 
-// --- ONYESHA MABASI YA KUNDI MAALUM ---
 window.showBusCategory = function(categoryId, categoryName, isBackAction = false) {
     window.hideAllSections();
     document.getElementById("bus-view-section").style.display = "block";
@@ -152,7 +144,6 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             `;
             busContainer.appendChild(card);
 
-            // Kama tupo Admin, onyesha vitufe vya kufuta mabasi
             if(window.location.hash === "#admin") {
                 setTimeout(() => {
                     let btn = document.getElementById(`del-bus-${key}`);
@@ -163,7 +154,6 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
-// --- USIMAMIZI WA ADMIN (ONGEZA CATEGORY) ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
@@ -172,32 +162,47 @@ window.addCategory = function() {
     const name = document.getElementById("newCatName").value.trim();
     const img = document.getElementById("newCatImg").value.trim();
 
-    if (id === "" || name === "" || img === "") { alert("Tafadhali jaza nafasi zote za Category!"); return; }
+    if (id === "" || name === "" || img === "") { alert("Tafadhali jaza nafasi zote!"); return; }
 
-    database.ref('categories/' + id).set({
-        name: name,
-        image: img
-    }).then(() => {
-        alert("Group jipya limeongezwa kikamilifu!");
+    database.ref('categories/' + id).set({ name: name, image: img })
+    .then(() => {
+        alert("Group jipya limeongezwa!");
         document.getElementById("newCatId").value = "";
         document.getElementById("newCatName").value = "";
         document.getElementById("newCatImg").value = "";
-    }).catch(err => alert("Kosa limetokea: " + err.message));
+    }).catch(err => alert("Kosa: " + err.message));
 }
 
-// --- USIMAMIZI WA ADMIN (FUTA CATEGORY) ---
 window.deleteCategory = function(categoryId) {
-    if(confirm("Je, una uhakika unataka kufuta GROUP hili pamoja na mabasi yake yote yaliyomo ndani yake?")) {
+    if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
+    if(confirm("Je, una uhakika unataka kufuta GROUP la '" + categoryId + "' na kila kitu chake?")) {
         database.ref('categories/' + categoryId).remove()
         .then(() => { 
             database.ref('buses/' + categoryId).remove(); 
-            alert("Group na mabasi yake yamefutwa kabisa!"); 
-        })
-        .catch(err => alert("Imeshindwa kufuta: " + err.message));
+            alert("Vimefutwa!"); 
+        }).catch(err => alert("Kosa: " + err.message));
     }
 }
 
-// --- USIMAMIZI WA ADMIN (UPLOAD BUS MPYA / ITEM) ---
+// --- MASTER RESET: FUNCTION YA KUFUTA DATABASE YOTE KIUJUMLA ---
+window.clearEntireDatabase = function() {
+    const secret = document.getElementById("adminSecret").value;
+    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi! Huwezi kufuta mfumo."); return; }
+
+    let confirmationText = prompt("ONYO KALI: Kitendo hiki kitafuta Categories zote na Mabasi yote kwenye mfumo wako wa Kitengo Gaming milele.\n\nKama una uhakika, andika neno FUTA hapa chini:");
+    
+    if (confirmationText === "FUTA") {
+        // Kufuta node zote kuu kwa mkupuo mmoja
+        database.ref().remove()
+        .then(() => {
+            alert("Database yote imesafishwa na kufutwa kabisa! Mfumo umerudi kuwa mweupe.");
+        })
+        .catch(err => alert("Kosa limetokea wakati wa ku-reset: " + err.message));
+    } else {
+        alert("Zoezi limesitishwa. Hukuingiza neno sahihi la 'FUTA'.");
+    }
+}
+
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -207,28 +212,24 @@ window.uploadBus = function() {
     const img = document.getElementById("uploadImg").value.trim();
     const link = document.getElementById("uploadLink").value.trim();
 
-    if (cat === "" || cat === "-- Hakuna Kundi --") { alert("Tafadhali chagua au tengeneza Category kwanza!"); return; }
-    if (name === "" || img === "" || link === "") { alert("Jaza nafasi zote za basi!"); return; }
+    if (cat === "") { alert("Chagua Category kwanza!"); return; }
+    if (name === "" || img === "" || link === "") { alert("Jaza nafasi zote!"); return; }
 
     const newBusRef = database.ref('buses/' + cat).push();
-    newBusRef.set({
-        name: name,
-        image: img,
-        link: link
-    }).then(() => {
-        alert("Basi jipya limeongezwa kikamilifu kwenye kundi hili!");
+    newBusRef.set({ name: name, image: img, link: link })
+    .then(() => {
+        alert("Basi limeongezwa!");
         document.getElementById("uploadName").value = "";
         document.getElementById("uploadImg").value = "";
         document.getElementById("uploadLink").value = "";
     }).catch(err => alert("Kosa: " + err.message));
 }
 
-// --- USIMAMIZI WA ADMIN (FUTA BUS) ---
 window.deleteBus = function(category, key) {
     if(confirm("Unataka kufuta basi hili?")) {
         database.ref('buses/' + category + '/' + key).remove()
         .then(() => alert("Basi limefutwa!"))
-        .catch(err => alert("Kosa limetokea wakati wa kufuta: " + err.message));
+        .catch(err => alert("Kosa: " + err.message));
     }
 }
 
@@ -239,7 +240,7 @@ window.checkCurrentLocation = function() {
     if (hash === "#admin") { 
         window.hideAllSections(); 
         document.getElementById("adminSection").style.display = "block"; 
-        window.loadCategories(); // Pakia upya ili vitufe vya kufuta vitokee
+        window.loadCategories();
         return; 
     }
     if (!dbname) { window.hideAllSections(); if (hash === "#login") window.showlogin(); else window.showregister(); } 

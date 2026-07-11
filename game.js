@@ -1,4 +1,4 @@
-// USANIDI WA FIREBASE (Msisi Project)
+// USANIDI WA FIREBASE (Msisi Project)[span_3](start_span)[span_3](end_span)
 const firebaseConfig = {
   apiKey: "AIzaSyDA0ty5dOoBiPJx5fRdFI_hvddJyUbb6B4",
   authDomain: "msisi-38c20.firebaseapp.com",
@@ -9,12 +9,12 @@ const firebaseConfig = {
   measurementId: "G-NFT0FB6V2T"
 };
 
-// Kuanzisha Firebase
+// Kuanzisha Firebase[span_4](start_span)[span_4](end_span)
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Hapa ndipo tunapoweka API Key ya ImgBB kwa ajili ya kupokea picha zako
-const IMGBB_API_KEY = "647ef51df6d944c6883ba56f082e0e1b"; 
+// API Key Yako Mpya ya ImgBB iliyopachikwa kwa usalama
+const IMGBB_API_KEY = "6d207e02198a847aa98d0a2a901485a5"; 
 
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
@@ -172,13 +172,11 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha mtandaoni (ImgBB)...";
+    statusDiv.textContent = "Inapakia picha kwenye mtandao (ImgBB)...";
 
-    // Kazi ya kutengeneza Data ya picha kwa ajili ya kurusha mtandaoni
     const formData = new FormData();
     formData.append("image", fileInput.files[0]);
 
-    // Tunasafirisha picha kwenda ImgBB
     fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
         method: "POST",
         body: formData
@@ -186,9 +184,8 @@ window.addCategory = function() {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            const imageUrl = result.data.url; // Hii ndio link ya picha yetu mpya!
+            const imageUrl = result.data.url;
             
-            // Sasa tunaiifadhi kwenye Firebase Database ya kawaida
             database.ref('categories/' + id).set({ name: name, image: imageUrl })
             .then(() => {
                 alert("Category mpya imeongezwa kikamilifu!");
@@ -198,7 +195,7 @@ window.addCategory = function() {
                 statusDiv.style.display = "none";
             });
         } else {
-            alert("ImgBB Imekataa kupokea picha.");
+            alert("ImgBB Imekataa kupokea picha. Angalia kama faili ni sahihi.");
             statusDiv.style.display = "none";
         }
     })
@@ -248,7 +245,7 @@ window.uploadBus = function() {
                 statusDiv.style.display = "none";
             });
         } else {
-            alert("ImgBB Imekataa kupokea picha.");
+            alert("ImgBB Imekataa kupokea picha ya basi.");
             statusDiv.style.display = "none";
         }
     })

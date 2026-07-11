@@ -11,7 +11,7 @@
             margin: 0;
             font-family: Arial, sans-serif;
             color: white;
-            background: linear-gradient(-45deg, #ff0000, #FF7F00, #00FF00,white, #9400D3 );
+            background: linear-gradient(-45deg, #ff0000, #FF7F00, #00FF00, #9400D3);
             background-size: 400% 400%;
             animation: rainbowMotion 10s ease infinite;
             position: relative;
@@ -153,7 +153,7 @@
     <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
     <input type="text" id="newCatImg" placeholder="Jina la Picha (Mfano: YUTONG1.jpg)">
     <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
-    <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY NZIMA</button>
+    <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
     <hr>
 
     <h3>2. UPLOAD BUS MPYA</h3>
@@ -163,6 +163,11 @@
     <input type="text" id="uploadImg" placeholder="Jina la Picha (Mfano: ABOOD.jpg)">
     <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
     <button onclick="window.uploadBus()">UPLOAD ITEM</button>
+    <hr>
+
+    <h3>3. RESET SYSTEM</h3>
+    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta kila kitu kwenye database!</p>
+    <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 90%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>

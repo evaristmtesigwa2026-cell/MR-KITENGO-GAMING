@@ -13,7 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// --- PELEKA FUNCTIONS KWENYE WINDOW ILI ONCLICK ISOMEKE ---
+// --- PELEKA FUNCTIONS KWENYE WINDOW ILI ONCLICK ISOMEKE KIKAMILIFU ---
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
     sections.forEach(id => {
@@ -77,10 +77,18 @@ window.loadCategories = function() {
             return;
         }
 
+        // Kujaza dropdown na kadi upya
+        if (selectDropdown) {
+            let defaultOpt = document.createElement('option');
+            defaultOpt.value = "";
+            defaultOpt.textContent = "-- Chagua Category --";
+            selectDropdown.appendChild(defaultOpt);
+        }
+
         Object.keys(data).forEach((id) => {
             const cat = data[id];
             
-            // 1. Kadi za Home
+            // 1. Kadi za Home Page
             if (container) {
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -93,7 +101,7 @@ window.loadCategories = function() {
                 container.appendChild(card);
             }
 
-            // 2. Dropdown ya Admin Panel (HAPA NDIPO PANAPOREKEBIHA SHIDA YAKO)
+            // 2. Kujaza Dropdown ya Admin Panel
             if (selectDropdown) {
                 const option = document.createElement('option');
                 option.value = id;
@@ -101,7 +109,7 @@ window.loadCategories = function() {
                 selectDropdown.appendChild(option);
             }
 
-            // Kama tupo Admin, onyesha vitufe vya kufuta
+            // Kama tupo Admin (kwenye URL kuna #admin), onyesha vitufe vya kufuta Group
             if(window.location.hash === "#admin") {
                 setTimeout(() => {
                     let btn = document.getElementById(`del-cat-${id}`);
@@ -144,6 +152,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             `;
             busContainer.appendChild(card);
 
+            // Kama tupo Admin, onyesha vitufe vya kufuta mabasi
             if(window.location.hash === "#admin") {
                 setTimeout(() => {
                     let btn = document.getElementById(`del-bus-${key}`);
@@ -154,61 +163,72 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
-// --- USIMAMIZI WA ADMIN (ADD / DELETE) ---
+// --- USIMAMIZI WA ADMIN (ONGEZA CATEGORY) ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi siyo sahihi!"); return; }
+    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
 
     const id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     const name = document.getElementById("newCatName").value.trim();
     const img = document.getElementById("newCatImg").value.trim();
 
-    if (id === "" || name === "" || img === "") { alert("Jaza nafasi zote!"); return; }
+    if (id === "" || name === "" || img === "") { alert("Tafadhali jaza nafasi zote za Category!"); return; }
 
-    database.ref('categories/' + id).set({ name: name, image: img })
-    .then(() => {
-        alert("Group jipya limeongezwa!");
+    database.ref('categories/' + id).set({
+        name: name,
+        image: img
+    }).then(() => {
+        alert("Group jipya limeongezwa kikamilifu!");
         document.getElementById("newCatId").value = "";
         document.getElementById("newCatName").value = "";
         document.getElementById("newCatImg").value = "";
-    }).catch(err => alert("Kosa: " + err.message));
+    }).catch(err => alert("Kosa limetokea: " + err.message));
 }
 
+// --- USIMAMIZI WA ADMIN (FUTA CATEGORY) ---
 window.deleteCategory = function(categoryId) {
-    if(confirm("Futa GROUP hili na mabasi yake yote?")) {
+    if(confirm("Je, una uhakika unataka kufuta GROUP hili pamoja na mabasi yake yote yaliyomo ndani yake?")) {
         database.ref('categories/' + categoryId).remove()
-        .then(() => { database.ref('buses/' + categoryId).remove(); alert("Group limefutwa!"); })
-        .catch(err => alert("Imeshindwa: " + err.message));
+        .then(() => { 
+            database.ref('buses/' + categoryId).remove(); 
+            alert("Group na mabasi yake yamefutwa kabisa!"); 
+        })
+        .catch(err => alert("Imeshindwa kufuta: " + err.message));
     }
 }
 
+// --- USIMAMIZI WA ADMIN (UPLOAD BUS MPYA / ITEM) ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi siyo sahihi!"); return; }
+    if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
 
     const cat = document.getElementById("uploadCategory").value;
     const name = document.getElementById("uploadName").value.trim();
     const img = document.getElementById("uploadImg").value.trim();
     const link = document.getElementById("uploadLink").value.trim();
 
-    if (cat === "" || cat === "-- Hakuna Kundi --") { alert("Tafadhali tengeneza/chagua Category kwanza!"); return; }
-    if (name === "" || img === "" || link === "") { alert("Jaza nafasi zote!"); return; }
+    if (cat === "" || cat === "-- Hakuna Kundi --") { alert("Tafadhali chagua au tengeneza Category kwanza!"); return; }
+    if (name === "" || img === "" || link === "") { alert("Jaza nafasi zote za basi!"); return; }
 
     const newBusRef = database.ref('buses/' + cat).push();
-    newBusRef.set({ name: name, image: img, link: link })
-    .then(() => {
-        alert("Basi limeongezwa kikamilifu!");
+    newBusRef.set({
+        name: name,
+        image: img,
+        link: link
+    }).then(() => {
+        alert("Basi jipya limeongezwa kikamilifu kwenye kundi hili!");
         document.getElementById("uploadName").value = "";
         document.getElementById("uploadImg").value = "";
         document.getElementById("uploadLink").value = "";
     }).catch(err => alert("Kosa: " + err.message));
 }
 
+// --- USIMAMIZI WA ADMIN (FUTA BUS) ---
 window.deleteBus = function(category, key) {
     if(confirm("Unataka kufuta basi hili?")) {
         database.ref('buses/' + category + '/' + key).remove()
         .then(() => alert("Basi limefutwa!"))
-        .catch(err => alert("Kosa: " + err.message));
+        .catch(err => alert("Kosa limetokea wakati wa kufuta: " + err.message));
     }
 }
 
@@ -216,7 +236,12 @@ window.checkCurrentLocation = function() {
     let hash = window.location.hash;
     let dbname = localStorage.getItem("name");
     
-    if (hash === "#admin") { window.hideAllSections(); document.getElementById("adminSection").style.display = "block"; return; }
+    if (hash === "#admin") { 
+        window.hideAllSections(); 
+        document.getElementById("adminSection").style.display = "block"; 
+        window.loadCategories(); // Pakia upya ili vitufe vya kufuta vitokee
+        return; 
+    }
     if (!dbname) { window.hideAllSections(); if (hash === "#login") window.showlogin(); else window.showregister(); } 
     else { window.showcat(true); }
 }

@@ -80,6 +80,7 @@
             color: white; text-align: center; width: 280px;
         }
         .admin-panel input, .admin-panel select { padding: 10px; border-radius: 10px; width: 90%; margin-bottom: 10px; border: none; font-size: 16px;}
+        .file-label { display: block; background: #333; padding: 10px; border-radius: 10px; margin-bottom: 10px; width: 90%; margin-left: auto; margin-right: auto; cursor: pointer; font-size: 14px; font-weight: bold; box-sizing: border-box; }
         button {
             border-radius: 40px; background: rgba(80, 40, 170, 0.7); color: white; cursor: pointer; 
             border: none; padding: 10px 35px; margin-top: 20px; font-weight: bold; transition: 0.3s;
@@ -88,6 +89,7 @@
         button a { color: white; text-decoration: none; display: inline-block; width: 100%; height: 100%; }
         .divider { border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0)); margin: 20px 0; }
         .btn-delete { background-color: #ff0000 !important; margin-top: 5px; padding: 5px 15px; font-size: 12px; }
+        .status-msg { font-size: 13px; color: lightgreen; font-weight: bold; display: none; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -151,7 +153,12 @@
     <h3>1. USIMAMIZI WA CATEGORIES</h3>
     <input type="text" id="newCatId" placeholder="ID ya Category (Mfano: yutong)">
     <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
-    <input type="text" id="newCatImg" placeholder="Jina la Picha (Mfano: YUTONG1.jpg)">
+    
+    <!-- Kitufe cha kuchagua picha kutoka simuni -->
+    <label class="file-label" for="newCatImg">📁 CHAGUA PICHA YA KUNDI</label>
+    <input type="file" id="newCatImg" accept="image/*" style="display: none;">
+    <div id="cat-upload-status" class="status-msg">Inapakia picha kwenye mtandao...</div>
+    
     <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
     <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
     <hr>
@@ -160,7 +167,12 @@
     <label>Chagua Category:</label>
     <select id="uploadCategory"></select>
     <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
-    <input type="text" id="uploadImg" placeholder="Jina la Picha (Mfano: ABOOD.jpg)">
+    
+    <!-- Kitufe cha kuchagua picha ya Basi kutoka simuni -->
+    <label class="file-label" for="uploadImg">📁 CHAGUA PICHA YA BASI</label>
+    <input type="file" id="uploadImg" accept="image/*" style="display: none;">
+    <div id="bus-upload-status" class="status-msg">Inapakia picha kwenye mtandao...</div>
+    
     <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
     <button onclick="window.uploadBus()">UPLOAD ITEM</button>
     <hr>
@@ -170,6 +182,7 @@
     <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 90%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
 </div>
 
+<!-- Firebase Compat (Database pekee inatosha sasa) -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <script src="game.js"></script>

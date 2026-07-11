@@ -13,9 +13,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// API Key mpya kabisa ya FreeImage.host (Haitasumbua kwenye GitHub Pages)
-const FREEIMAGE_API_KEY = "6d207e02198a847aa98d0a2a901485a5"; 
-
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
     sections.forEach(id => {
@@ -137,7 +134,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
         }
 
         Object.keys(busesData).forEach((key) => {
-            const item = busesData[key];
+            const item = snapshot.val()[key];
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -158,7 +155,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
-// --- ONGEZA CATEGORY KUPITIA FREEIMAGE ---
+// --- ONGEZA CATEGORY KUPITIA BASE64 (DREKT FIREBASE DATABASE) ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
@@ -172,42 +169,31 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha kwenye FreeImage...";
+    statusDiv.textContent = "Inatayarisha na kuhifadhi picha salama...";
 
-    const formData = new FormData();
-    formData.append("source", fileInput.files[0]); // Seva hii inatumia 'source' badala ya 'image'
-    formData.append("action", "upload");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-    fetch(`https://freeimage.host/api/1/upload?key=${FREEIMAGE_API_KEY}`, {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
-        // FreeImage inarudisha status_code ya 200 ikikubali
-        if (result.status_code === 200) {
-            const imageUrl = result.image.url;
-            
-            database.ref('categories/' + id).set({ name: name, image: imageUrl })
-            .then(() => {
-                alert("Category mpya imeongezwa kikamilifu!");
-                document.getElementById("newCatId").value = "";
-                document.getElementById("newCatName").value = "";
-                fileInput.value = "";
-                statusDiv.style.display = "none";
-            });
-        } else {
-            alert("FreeImage imekataa picha. Jaribu picha nyingine.");
+    reader.onloadend = function() {
+        const base64Image = reader.result; // Hapa picha inakuwa maandishi thabiti ya kikodi
+        
+        database.ref('categories/' + id).set({ name: name, image: base64Image })
+        .then(() => {
+            alert("Category mpya imeongezwa kikamilifu!");
+            document.getElementById("newCatId").value = "";
+            document.getElementById("newCatName").value = "";
+            fileInput.value = "";
             statusDiv.style.display = "none";
-        }
-    })
-    .catch(err => {
-        alert("Tatizo la mtandao: " + err.message);
-        statusDiv.style.display = "none";
-    });
+        }).catch(err => {
+            alert("Kosa la Firebase: " + err.message);
+            statusDiv.style.display = "none";
+        });
+    };
+
+    reader.readAsDataURL(file);
 }
 
-// --- UPLOAD BUS MPYA KUPITIA FREEIMAGE ---
+// --- UPLOAD BUS MPYA KUPITIA BASE64 (DREKT FIREBASE DATABASE) ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -223,39 +209,29 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha ya basi kwenye FreeImage...";
+    statusDiv.textContent = "Inahifadhi basi na picha yake kwenye mfumo...";
 
-    const formData = new FormData();
-    formData.append("source", fileInput.files[0]); // Mfumo unatumia 'source'
-    formData.append("action", "upload");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-    fetch(`https://freeimage.host/api/1/upload?key=${FREEIMAGE_API_KEY}`, {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.status_code === 200) {
-            const imageUrl = result.image.url;
-            
-            const newBusRef = database.ref('buses/' + cat).push();
-            newBusRef.set({ name: name, image: imageUrl, link: link })
-            .then(() => {
-                alert("Basi jipya limeongezwa kwa mafanikio!");
-                document.getElementById("uploadName").value = "";
-                document.getElementById("uploadLink").value = "";
-                fileInput.value = "";
-                statusDiv.style.display = "none";
-            });
-        } else {
-            alert("FreeImage imekataa picha ya basi.");
+    reader.onloadend = function() {
+        const base64Image = reader.result;
+        
+        const newBusRef = database.ref('buses/' + cat).push();
+        newBusRef.set({ name: name, image: base64Image, link: link })
+        .then(() => {
+            alert("Basi jipya limeongezwa kwa mafanikio!");
+            document.getElementById("uploadName").value = "";
+            document.getElementById("uploadLink").value = "";
+            fileInput.value = "";
             statusDiv.style.display = "none";
-        }
-    })
-    .catch(err => {
-        alert("Tatizo la mtandao: " + err.message);
-        statusDiv.style.display = "none";
-    });
+        }).catch(err => {
+            alert("Kosa la Firebase: " + err.message);
+            statusDiv.style.display = "none";
+        });
+    };
+
+    reader.readAsDataURL(file);
 }
 
 window.deleteCategory = function(categoryId) {

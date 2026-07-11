@@ -3,15 +3,18 @@ const firebaseConfig = {
   apiKey: "AIzaSyDA0ty5dOoBiPJx5fRdFI_hvddJyUbb6B4",
   authDomain: "msisi-38c20.firebaseapp.com",
   projectId: "msisi-38c20",
-  storageBucket: "msisi-38c20.firebasestorage.app",
+  databaseURL: "https://msisi-38c20-default-rtdb.firebaseio.com",
   messagingSenderId: "881060609707",
   appId: "1:881060609707:web:bd9028db2b20c75d72c1ee",
   measurementId: "G-NFT0FB6V2T"
 };
 
-// Kuanzisha Firebase Compat
+// Kuanzisha Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+
+// Hapa ndipo tunapoweka API Key ya ImgBB kwa ajili ya kupokea picha zako
+const IMGBB_API_KEY = "647ef51df6d944c6883ba56f082e0e1b"; 
 
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
@@ -69,6 +72,7 @@ window.loadCategories = function() {
             if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Hakuna kundi lililowekwa bado.</p>";
             if (selectDropdown) {
                 let opt = document.createElement('option');
+                opt.value = "";
                 opt.textContent = "-- Hakuna Kundi --";
                 selectDropdown.appendChild(opt);
             }
@@ -154,23 +158,104 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
+// --- ONGEZA CATEGORY KWA KUTUMIA IMGBB (BILA FIREBASE STORAGE) ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
 
     const id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     const name = document.getElementById("newCatName").value.trim();
-    const img = document.getElementById("newCatImg").value.trim();
+    const fileInput = document.getElementById("newCatImg");
 
-    if (id === "" || name === "" || img === "") { alert("Tafadhali jaza nafasi zote!"); return; }
+    if (id === "" || name === "") { alert("Tafadhali jaza ID na Jina la Category!"); return; }
+    if (fileInput.files.length === 0) { alert("Tafadhali chagua picha kutoka kwenye simu!"); return; }
 
-    database.ref('categories/' + id).set({ name: name, image: img })
-    .then(() => {
-        alert("Group jipya limeongezwa!");
-        document.getElementById("newCatId").value = "";
-        document.getElementById("newCatName").value = "";
-        document.getElementById("newCatImg").value = "";
-    }).catch(err => alert("Kosa: " + err.message));
+    const statusDiv = document.getElementById("cat-upload-status");
+    statusDiv.style.display = "block";
+    statusDiv.textContent = "Inapakia picha mtandaoni (ImgBB)...";
+
+    // Kazi ya kutengeneza Data ya picha kwa ajili ya kurusha mtandaoni
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    // Tunasafirisha picha kwenda ImgBB
+    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            const imageUrl = result.data.url; // Hii ndio link ya picha yetu mpya!
+            
+            // Sasa tunaiifadhi kwenye Firebase Database ya kawaida
+            database.ref('categories/' + id).set({ name: name, image: imageUrl })
+            .then(() => {
+                alert("Category mpya imeongezwa kikamilifu!");
+                document.getElementById("newCatId").value = "";
+                document.getElementById("newCatName").value = "";
+                fileInput.value = "";
+                statusDiv.style.display = "none";
+            });
+        } else {
+            alert("ImgBB Imekataa kupokea picha.");
+            statusDiv.style.display = "none";
+        }
+    })
+    .catch(err => {
+        alert("Tatizo la mtandao: " + err.message);
+        statusDiv.style.display = "none";
+    });
+}
+
+// --- UPLOAD BUS MPYA KWA KUTUMIA IMGBB ---
+window.uploadBus = function() {
+    const secret = document.getElementById("adminSecret").value;
+    if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
+
+    const cat = document.getElementById("uploadCategory").value;
+    const name = document.getElementById("uploadName").value.trim();
+    const fileInput = document.getElementById("uploadImg");
+    const link = document.getElementById("uploadLink").value.trim();
+
+    if (cat === "") { alert("Chagua Category kwanza!"); return; }
+    if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
+    if (fileInput.files.length === 0) { alert("Tafadhali chagua picha ya basi!"); return; }
+
+    const statusDiv = document.getElementById("bus-upload-status");
+    statusDiv.style.display = "block";
+    statusDiv.textContent = "Inapakia picha ya basi (ImgBB)...";
+
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            const imageUrl = result.data.url;
+            
+            const newBusRef = database.ref('buses/' + cat).push();
+            newBusRef.set({ name: name, image: imageUrl, link: link })
+            .then(() => {
+                alert("Basi jipya limeongezwa kwa mafanikio!");
+                document.getElementById("uploadName").value = "";
+                document.getElementById("uploadLink").value = "";
+                fileInput.value = "";
+                statusDiv.style.display = "none";
+            });
+        } else {
+            alert("ImgBB Imekataa kupokea picha.");
+            statusDiv.style.display = "none";
+        }
+    })
+    .catch(err => {
+        alert("Tatizo la mtandao: " + err.message);
+        statusDiv.style.display = "none";
+    });
 }
 
 window.deleteCategory = function(categoryId) {
@@ -184,45 +269,16 @@ window.deleteCategory = function(categoryId) {
     }
 }
 
-// --- MASTER RESET: FUNCTION YA KUFUTA DATABASE YOTE KIUJUMLA ---
 window.clearEntireDatabase = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi! Huwezi kufuta mfumo."); return; }
+    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
 
-    let confirmationText = prompt("ONYO KALI: Kitendo hiki kitafuta Categories zote na Mabasi yote kwenye mfumo wako wa Kitengo Gaming milele.\n\nKama una uhakika, andika neno FUTA hapa chini:");
-    
+    let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
     if (confirmationText === "FUTA") {
-        // Kufuta node zote kuu kwa mkupuo mmoja
         database.ref().remove()
-        .then(() => {
-            alert("Database yote imesafishwa na kufutwa kabisa! Mfumo umerudi kuwa mweupe.");
-        })
-        .catch(err => alert("Kosa limetokea wakati wa ku-reset: " + err.message));
-    } else {
-        alert("Zoezi limesitishwa. Hukuingiza neno sahihi la 'FUTA'.");
-    }
-}
-
-window.uploadBus = function() {
-    const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
-
-    const cat = document.getElementById("uploadCategory").value;
-    const name = document.getElementById("uploadName").value.trim();
-    const img = document.getElementById("uploadImg").value.trim();
-    const link = document.getElementById("uploadLink").value.trim();
-
-    if (cat === "") { alert("Chagua Category kwanza!"); return; }
-    if (name === "" || img === "" || link === "") { alert("Jaza nafasi zote!"); return; }
-
-    const newBusRef = database.ref('buses/' + cat).push();
-    newBusRef.set({ name: name, image: img, link: link })
-    .then(() => {
-        alert("Basi limeongezwa!");
-        document.getElementById("uploadName").value = "";
-        document.getElementById("uploadImg").value = "";
-        document.getElementById("uploadLink").value = "";
-    }).catch(err => alert("Kosa: " + err.message));
+        .then(() => alert("Database yote imesafishwa!"))
+        .catch(err => alert("Kosa: " + err.message));
+    } else { alert("Zoezi limesitishwa."); }
 }
 
 window.deleteBus = function(category, key) {

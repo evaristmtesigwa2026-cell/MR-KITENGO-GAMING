@@ -1,4 +1,4 @@
-// USANIDI WA FIREBASE (Msisi Project)[span_3](start_span)[span_3](end_span)
+// USANIDI WA FIREBASE (Msisi Project)
 const firebaseConfig = {
   apiKey: "AIzaSyDA0ty5dOoBiPJx5fRdFI_hvddJyUbb6B4",
   authDomain: "msisi-38c20.firebaseapp.com",
@@ -9,12 +9,12 @@ const firebaseConfig = {
   measurementId: "G-NFT0FB6V2T"
 };
 
-// Kuanzisha Firebase[span_4](start_span)[span_4](end_span)
+// Kuanzisha Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// API Key Yako Mpya ya ImgBB iliyopachikwa kwa usalama
-const IMGBB_API_KEY = "6d207e02198a847aa98d0a2a901485a5"; 
+// Tumehamia FreeImage API Key ambayo ni thabiti zaidi na haigomi kwenye GitHub Pages
+const STABLE_API_KEY = "6d207e02198a847aa98d0a2a901485a5"; 
 
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
@@ -158,7 +158,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
-// --- ONGEZA CATEGORY KWA KUTUMIA IMGBB (BILA FIREBASE STORAGE) ---
+// --- ONGEZA CATEGORY (MABORESHO YA SEVA MPYA) ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
@@ -172,19 +172,20 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha kwenye mtandao (ImgBB)...";
+    statusDiv.textContent = "Inapakia picha kwenye mfumo mpya...";
 
     const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
+    formData.append("source", fileInput.files[0]);
+    formData.append("action", "upload");
 
-    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    fetch(`https://freeimage.host/api/1/upload?key=${STABLE_API_KEY}`, {
         method: "POST",
         body: formData
     })
     .then(response => response.json())
     .then(result => {
-        if (result.success) {
-            const imageUrl = result.data.url;
+        if (result.status_code === 200) {
+            const imageUrl = result.image.url;
             
             database.ref('categories/' + id).set({ name: name, image: imageUrl })
             .then(() => {
@@ -195,7 +196,7 @@ window.addCategory = function() {
                 statusDiv.style.display = "none";
             });
         } else {
-            alert("ImgBB Imekataa kupokea picha. Angalia kama faili ni sahihi.");
+            alert("Seva mpya imekataa picha. Jaribu picha nyingine ndogo.");
             statusDiv.style.display = "none";
         }
     })
@@ -205,7 +206,7 @@ window.addCategory = function() {
     });
 }
 
-// --- UPLOAD BUS MPYA KWA KUTUMIA IMGBB ---
+// --- UPLOAD BUS MPYA (MABORESHO YA SEVA MPYA) ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -221,19 +222,20 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha ya basi (ImgBB)...";
+    statusDiv.textContent = "Inapakia picha ya basi...";
 
     const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
+    formData.append("source", fileInput.files[0]);
+    formData.append("action", "upload");
 
-    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    fetch(`https://freeimage.host/api/1/upload?key=${STABLE_API_KEY}`, {
         method: "POST",
         body: formData
     })
     .then(response => response.json())
     .then(result => {
-        if (result.success) {
-            const imageUrl = result.data.url;
+        if (result.status_code === 200) {
+            const imageUrl = result.image.url;
             
             const newBusRef = database.ref('buses/' + cat).push();
             newBusRef.set({ name: name, image: imageUrl, link: link })
@@ -245,7 +247,7 @@ window.uploadBus = function() {
                 statusDiv.style.display = "none";
             });
         } else {
-            alert("ImgBB Imekataa kupokea picha ya basi.");
+            alert("Seva imekataa kupokea picha ya basi hili.");
             statusDiv.style.display = "none";
         }
     })

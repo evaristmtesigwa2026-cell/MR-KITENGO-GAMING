@@ -134,7 +134,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
         }
 
         Object.keys(busesData).forEach((key) => {
-            const item = snapshot.val()[key];
+            const item = busesData[key];
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -155,7 +155,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
-// --- ONGEZA CATEGORY KUPITIA BASE64 (DREKT FIREBASE DATABASE) ---
+// --- ONGEZA CATEGORY KUPITIA BASE64 ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
@@ -169,13 +169,13 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inatayarisha na kuhifadhi picha salama...";
+    statusDiv.textContent = "Inahifadhi picha moja kwa moja kwenye Firebase...";
 
     const file = fileInput.files[0];
     const reader = new FileReader();
 
     reader.onloadend = function() {
-        const base64Image = reader.result; // Hapa picha inakuwa maandishi thabiti ya kikodi
+        const base64Image = reader.result;
         
         database.ref('categories/' + id).set({ name: name, image: base64Image })
         .then(() => {
@@ -193,7 +193,7 @@ window.addCategory = function() {
     reader.readAsDataURL(file);
 }
 
-// --- UPLOAD BUS MPYA KUPITIA BASE64 (DREKT FIREBASE DATABASE) ---
+// --- UPLOAD BUS MPYA KUPITIA BASE64 ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -209,7 +209,7 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inahifadhi basi na picha yake kwenye mfumo...";
+    statusDiv.textContent = "Inapakia basi na picha kwenye Firebase...";
 
     const file = fileInput.files[0];
     const reader = new FileReader();

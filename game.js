@@ -13,8 +13,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Tumehamia FreeImage API Key ambayo ni thabiti zaidi na haigomi kwenye GitHub Pages
-const STABLE_API_KEY = "6d207e02198a847aa98d0a2a901485a5"; 
+// API Key mpya kabisa ya FreeImage.host (Haitasumbua kwenye GitHub Pages)
+const FREEIMAGE_API_KEY = "6d207e02198a847aa98d0a2a901485a5"; 
 
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
@@ -158,7 +158,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     });
 }
 
-// --- ONGEZA CATEGORY (MABORESHO YA SEVA MPYA) ---
+// --- ONGEZA CATEGORY KUPITIA FREEIMAGE ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
@@ -172,18 +172,19 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha kwenye mfumo mpya...";
+    statusDiv.textContent = "Inapakia picha kwenye FreeImage...";
 
     const formData = new FormData();
-    formData.append("source", fileInput.files[0]);
+    formData.append("source", fileInput.files[0]); // Seva hii inatumia 'source' badala ya 'image'
     formData.append("action", "upload");
 
-    fetch(`https://freeimage.host/api/1/upload?key=${STABLE_API_KEY}`, {
+    fetch(`https://freeimage.host/api/1/upload?key=${FREEIMAGE_API_KEY}`, {
         method: "POST",
         body: formData
     })
     .then(response => response.json())
     .then(result => {
+        // FreeImage inarudisha status_code ya 200 ikikubali
         if (result.status_code === 200) {
             const imageUrl = result.image.url;
             
@@ -196,7 +197,7 @@ window.addCategory = function() {
                 statusDiv.style.display = "none";
             });
         } else {
-            alert("Seva mpya imekataa picha. Jaribu picha nyingine ndogo.");
+            alert("FreeImage imekataa picha. Jaribu picha nyingine.");
             statusDiv.style.display = "none";
         }
     })
@@ -206,7 +207,7 @@ window.addCategory = function() {
     });
 }
 
-// --- UPLOAD BUS MPYA (MABORESHO YA SEVA MPYA) ---
+// --- UPLOAD BUS MPYA KUPITIA FREEIMAGE ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -222,13 +223,13 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia picha ya basi...";
+    statusDiv.textContent = "Inapakia picha ya basi kwenye FreeImage...";
 
     const formData = new FormData();
-    formData.append("source", fileInput.files[0]);
+    formData.append("source", fileInput.files[0]); // Mfumo unatumia 'source'
     formData.append("action", "upload");
 
-    fetch(`https://freeimage.host/api/1/upload?key=${STABLE_API_KEY}`, {
+    fetch(`https://freeimage.host/api/1/upload?key=${FREEIMAGE_API_KEY}`, {
         method: "POST",
         body: formData
     })
@@ -247,7 +248,7 @@ window.uploadBus = function() {
                 statusDiv.style.display = "none";
             });
         } else {
-            alert("Seva imekataa kupokea picha ya basi hili.");
+            alert("FreeImage imekataa picha ya basi.");
             statusDiv.style.display = "none";
         }
     })

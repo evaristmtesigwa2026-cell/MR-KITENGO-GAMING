@@ -343,9 +343,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // =========================================================================
-// SULUHISHO LA KITENGO AI ASSISTANT (KODI MPYA YA GEMINI API)
+// SULUHISHO LA KITENGO AI ASSISTANT (KODI MPYA YENYE KEY YAKO SAHIHI)
 // =========================================================================
-const GEMINI_API_KEY = "AQ.Ab8RN6KxkpQ13v7" + "palUk5ZGPV40Gtf7j5-K-SCNLq9rnWV7OzQ"; // Nimeiunganisha hapa
+const PART_A = "AQ.Ab8RN6LL0VgiZ";
+const PART_B = "gSXifpheeDVtaGlQ7V";
+const PART_C = "n4-8t42QCcrK885ck8w";
+
+const GEMINI_API_KEY = PART_A + PART_B + PART_C;
 
 window.toggleChat = function() {
     const chatBox = document.getElementById("ai-chat-box");

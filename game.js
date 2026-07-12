@@ -1,4 +1,4 @@
-// USANIDI WA FIREBASE (Msisi Project)
+// CONFIGURATION YA FIREBASE (Ihakiki na mradi wako wa Msisi)
 const firebaseConfig = {
   apiKey: "AIzaSyDA0ty5dOoBiPJx5fRdFI_hvddJyUbb6B4",
   authDomain: "msisi-38c20.firebaseapp.com",
@@ -9,9 +9,14 @@ const firebaseConfig = {
   measurementId: "G-NFT0FB6V2T"
 };
 
-// Kuanzisha Firebase
+// Kuanzisha Huduma za Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+const auth = firebase.auth();
+const storage = firebase.storage();
+
+// Array ya kimataifa (Global array) kwa ajili ya kurahisisha Search Filter ya mabasi
+let currentBusesData = [];
 
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
@@ -25,37 +30,59 @@ window.hideAllSections = function() {
 window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; }
 window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; }
 
+// 1. MFUMO WA AKAUNTI: Msajili Mpya
 window.register = function() {
-    let name = document.getElementById("regname").value;
     let email = document.getElementById("regemail").value;
     let password = document.getElementById("regpassword").value;
-    if (name == "" || email == "" || password == "") { alert("Jaza nafasi zote!"); } 
-    else { 
-        localStorage.setItem("name", name); localStorage.setItem("email", email); localStorage.setItem("password", password);
-        alert("Sajili imekamilika!"); window.showlogin();
-    }
+    let name = document.getElementById("regname").value;
+    
+    if (name === "" || email === "" || password === "") { alert("Tafadhali jaza nafasi zote!"); return; } 
+    
+    auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        return userCredential.user.updateProfile({ displayName: name });
+    })
+    .then(() => {
+        alert("Hongera! Usajili wa akaunti umekamilika kiprofessional.");
+        window.showlogin();
+    })
+    .catch(err => alert("Kosa la Usajili: " + err.message));
 }
 
+// 2. MFUMO WA AKAUNTI: Kuingia Kwenye Mfumo (Login)
 window.login = function() {
-    let name = document.getElementById("logname").value;
+    let email = document.getElementById("logname").value; 
     let password = document.getElementById("logpassword").value;
-    let dbname = localStorage.getItem("name");
-    let dbpassword = localStorage.getItem("password");
-    if (name == "" || password == "") { alert("Jaza nafasi zote!"); } 
-    else if (name == dbname && password == dbpassword) {
-        alert("Umeingia kikamilifu!"); history.replaceState({ page: "home" }, "Home", "#home"); window.showcat(true); 
-    } else { alert("Taarifa si sahihi!"); }
+    
+    if (email === "" || password === "") { alert("Weka Email na Password yako!"); return; } 
+    
+    auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+        alert("Umeingia kikamilifu!"); 
+        history.replaceState({ page: "home" }, "Home", "#home"); 
+        window.showcat(true); 
+    })
+    .catch(err => alert("Barua pepe au Password si sahihi! " + err.message));
+}
+
+// 3. MFUMO WA AKAUNTI: Kujiondoa (Logout)
+window.logout = function() {
+    auth.signOut().then(() => {
+        alert("Umetoka kwenye mfumo.");
+        window.showlogin();
+    });
 }
 
 window.showcat = function(isBackAction = false) {
-    let dbname = localStorage.getItem("name");
-    if(!dbname) { window.showregister(); return; }
+    let user = auth.currentUser;
+    if(!user) { window.showregister(); return; }
     window.hideAllSections();
     document.getElementById("cat").style.display = "block";
     document.getElementById("navicon").style.display = "flex"; 
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 }
 
+// 4. KUPAKIA KUNDI LA MABASI
 window.loadCategories = function() {
     const container = document.getElementById("categories-container");
     const selectDropdown = document.getElementById("uploadCategory");
@@ -67,12 +94,6 @@ window.loadCategories = function() {
         const data = snapshot.val();
         if (!data) {
             if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Hakuna kundi lililowekwa bado.</p>";
-            if (selectDropdown) {
-                let opt = document.createElement('option');
-                opt.value = "";
-                opt.textContent = "-- Hakuna Kundi --";
-                selectDropdown.appendChild(opt);
-            }
             return;
         }
 
@@ -90,9 +111,9 @@ window.loadCategories = function() {
                 card.className = 'card';
                 card.innerHTML = `
                     <p>${cat.name}</p> 
-                    <img src="${cat.image}" style="width: 180px; height: 110px; border-radius: 10px; object-fit: cover;"> <br>
-                    <button onclick="window.showBusCategory('${id}', '${cat.name}')">CHAGUA HAPA</button>
-                    <button class="btn-delete" style="display:none; background-color:red;" id="del-cat-${id}" onclick="window.deleteCategory('${id}')">FUTA GROUP</button>
+                    <img src="${cat.image}"> <br>
+                    <button onclick="window.showBusCategory('${id}', '${cat.name}')">FUNGUA MABASI</button>
+                    <button style="display:none; background-color:red; margin-top:5px;" id="del-cat-${id}" onclick="window.deleteCategory('${id}')">FUTA</button>
                 `;
                 container.appendChild(card);
             }
@@ -114,89 +135,130 @@ window.loadCategories = function() {
     });
 }
 
+// 5. KUPAKIA MABASI NDANI YA CATEGORY
 window.showBusCategory = function(categoryId, categoryName, isBackAction = false) {
     window.hideAllSections();
     document.getElementById("bus-view-section").style.display = "block";
     document.getElementById("navicon").style.display = "flex";
-    document.getElementById("dynamic-bus-title").textContent = categoryName + " BUSES";
+    document.getElementById("dynamic-bus-title").textContent = categoryName + " MODS";
+    document.getElementById("busSearch").value = ""; // Kusafisha sanduku la kutafuta
 
     if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, `#${categoryId}`);
     
     const busContainer = document.getElementById("dynamic-bus-list");
-    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inapakia...</p>";
+    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inapakia mabasi...</p>";
 
     database.ref('buses/' + categoryId).on('value', (snapshot) => {
-        busContainer.innerHTML = "";
+        currentBusesData = []; // Kusafisha array ya zamani
         const busesData = snapshot.val();
+        
         if (!busesData) {
-            busContainer.innerHTML = "<p style='color:white; text-align:center;'>Hakuna basi kundi hili.</p>";
+            busContainer.innerHTML = "<p style='color:white; text-align:center;'>Hakuna basi lililowekwa kwenye kundi hili bado.</p>";
             return;
         }
 
+        // Kuhifadhi data kwenye array ili itumike kwenye Search Filter
         Object.keys(busesData).forEach((key) => {
-            const item = busesData[key];
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <p>${item.name}</p>
-                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover;"><br><br>
-                <button><a href="${item.link}" target="_blank">DOWNLOAD</a></button>
-                <button class="btn-delete" id="del-bus-${key}" style="display:none;" onclick="window.deleteBus('${categoryId}', '${key}')">FUTA</button>
-            `;
-            busContainer.appendChild(card);
-
-            if(window.location.hash === "#admin") {
-                setTimeout(() => {
-                    let btn = document.getElementById(`del-bus-${key}`);
-                    if(btn) btn.style.display = "inline-block";
-                }, 200);
-            }
+            currentBusesData.push({
+                key: key,
+                categoryId: categoryId,
+                name: busesData[key].name,
+                image: busesData[key].image,
+                link: busesData[key].link
+            });
         });
+
+        window.renderBusesList(currentBusesData);
     });
 }
 
-// --- ONGEZA CATEGORY KUPITIA BASE64 ---
+// 6. SEARCH FILTER LOGIC (Kipengele cha 3)
+window.renderBusesList = function(busesArray) {
+    const busContainer = document.getElementById("dynamic-bus-list");
+    busContainer.innerHTML = "";
+
+    if(busesArray.length === 0) {
+        busContainer.innerHTML = "<p style='color:var(--text-muted); text-align:center;'>Hakuna basi linaloendana na utafutaji wako.</p>";
+        return;
+    }
+
+    busesArray.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <p>${item.name}</p>
+            <img src="${item.image}"><br><br>
+            <button onclick="window.openModal('${item.name}', '${item.image}', '${item.link}')">ANGALIA MOD</button>
+            <button class="btn-delete" id="del-bus-${item.key}" style="display:none; background-color:red; margin-top:5px;" onclick="window.deleteBus('${item.categoryId}', '${item.key}')">FUTA</button>
+        `;
+        busContainer.appendChild(card);
+
+        if(window.location.hash === "#admin") {
+            setTimeout(() => {
+                let btn = document.getElementById(`del-bus-${item.key}`);
+                if(btn) btn.style.display = "inline-block";
+            }, 200);
+        }
+    });
+}
+
+window.filterBuses = function() {
+    const query = document.getElementById("busSearch").value.toLowerCase();
+    const filtered = currentBusesData.filter(bus => bus.name.toLowerCase().includes(query));
+    window.renderBusesList(filtered);
+}
+
+// 7. POPUP MODAL LOGIC (Kipengele cha 5 - Kurasa za Ndani)
+window.openModal = function(name, image, link) {
+    document.getElementById("modalBusName").textContent = name;
+    document.getElementById("modalBusImg").src = image;
+    document.getElementById("modalDownloadLink").href = link;
+    document.getElementById("busDetailModal").style.display = "flex";
+}
+
+window.closeModal = function() {
+    document.getElementById("busDetailModal").style.display = "none";
+}
+
+// 8. STORAGE & DATABASE: Kuongeza Group Jipya la Picha halisi
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
+    if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
 
     const id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     const name = document.getElementById("newCatName").value.trim();
     const fileInput = document.getElementById("newCatImg");
 
-    if (id === "" || name === "") { alert("Tafadhali jaza ID na Jina la Category!"); return; }
-    if (fileInput.files.length === 0) { alert("Tafadhali chagua picha kutoka kwenye simu!"); return; }
+    if (id === "" || name === "") { alert("Jaza ID na Jina la Category!"); return; }
+    if (fileInput.files.length === 0) { alert("Chagua picha ya group!"); return; }
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inahifadhi picha moja kwa moja kwenye Firebase...";
+    statusDiv.textContent = "Inapakia picha kwenye Firebase Storage...";
 
     const file = fileInput.files[0];
-    const reader = new FileReader();
+    const storageRef = storage.ref('categories/' + id + '_' + file.name);
 
-    reader.onloadend = function() {
-        const base64Image = reader.result;
-        
-        database.ref('categories/' + id).set({ name: name, image: base64Image })
-        .then(() => {
-            alert("Category mpya imeongezwa kikamilifu!");
-            document.getElementById("newCatId").value = "";
-            document.getElementById("newCatName").value = "";
-            fileInput.value = "";
-            statusDiv.style.display = "none";
-        }).catch(err => {
-            alert("Kosa la Firebase: " + err.message);
-            statusDiv.style.display = "none";
-        });
-    };
-
-    reader.readAsDataURL(file);
+    storageRef.put(file).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+    }).then(downloadURL => {
+        return database.ref('categories/' + id).set({ name: name, image: downloadURL });
+    }).then(() => {
+        alert("Group jipya limehifadhiwa kwa mafanikio ya kiprofessional!");
+        document.getElementById("newCatId").value = "";
+        document.getElementById("newCatName").value = "";
+        fileInput.value = "";
+        statusDiv.style.display = "none";
+    }).catch(err => {
+        alert("Kosa lililotokea: " + err.message);
+        statusDiv.style.display = "none";
+    });
 }
 
-// --- UPLOAD BUS MPYA KUPITIA BASE64 ---
+// 9. STORAGE & DATABASE: Kuupload Basi Jipya
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
+    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
 
     const cat = document.getElementById("uploadCategory").value;
     const name = document.getElementById("uploadName").value.trim();
@@ -204,70 +266,63 @@ window.uploadBus = function() {
     const link = document.getElementById("uploadLink").value.trim();
 
     if (cat === "") { alert("Chagua Category kwanza!"); return; }
-    if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
-    if (fileInput.files.length === 0) { alert("Tafadhali chagua picha ya basi!"); return; }
+    if (name === "" || link === "") { alert("Jaza jina na link vizuri!"); return; }
+    if (fileInput.files.length === 0) { alert("Chagua picha ya basi husika!"); return; }
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia basi na picha kwenye Firebase...";
+    statusDiv.textContent = "Inapakia mod kwenye mtandao...";
 
     const file = fileInput.files[0];
-    const reader = new FileReader();
+    const timestamp = Date.now();
+    const storageRef = storage.ref('buses/' + cat + '/' + timestamp + '_' + file.name);
 
-    reader.onloadend = function() {
-        const base64Image = reader.result;
-        
+    storageRef.put(file).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+    }).then(downloadURL => {
         const newBusRef = database.ref('buses/' + cat).push();
-        newBusRef.set({ name: name, image: base64Image, link: link })
-        .then(() => {
-            alert("Basi jipya limeongezwa kwa mafanikio!");
-            document.getElementById("uploadName").value = "";
-            document.getElementById("uploadLink").value = "";
-            fileInput.value = "";
-            statusDiv.style.display = "none";
-        }).catch(err => {
-            alert("Kosa la Firebase: " + err.message);
-            statusDiv.style.display = "none";
-        });
-    };
-
-    reader.readAsDataURL(file);
+        return newBusRef.set({ name: name, image: downloadURL, link: link });
+    }).then(() => {
+        alert("Basi jipya limeongezwa kikamilifu!");
+        document.getElementById("uploadName").value = "";
+        document.getElementById("uploadLink").value = "";
+        fileInput.value = "";
+        statusDiv.style.display = "none";
+    }).catch(err => {
+        alert("Kosa: " + err.message);
+        statusDiv.style.display = "none";
+    });
 }
 
 window.deleteCategory = function(categoryId) {
-    if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
-    if(confirm("Je, una uhakika unataka kufuta GROUP la '" + categoryId + "' na kila kitu chake?")) {
+    if(confirm("Je, una uhakika unataka kufuta Group hili na mabasi yake yote?")) {
         database.ref('categories/' + categoryId).remove()
-        .then(() => { 
-            database.ref('buses/' + categoryId).remove(); 
-            alert("Vimefutwa!"); 
-        }).catch(err => alert("Kosa: " + err.message));
+        .then(() => { database.ref('buses/' + categoryId).remove(); alert("Group limefutwa!"); })
+        .catch(err => alert("Kosa: " + err.message));
+    }
+}
+
+window.deleteBus = function(category, key) {
+    if(confirm("Unataka kufuta mod hii ya basi?")) {
+        database.ref('buses/' + category + '/' + key).remove()
+        .then(() => alert("Basi limefutwa rasmi!"))
+        .catch(err => alert("Kosa: " + err.message));
     }
 }
 
 window.clearEntireDatabase = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
+    if (secret !== "1234") { alert("Kodi ya siri haipo sahihi!"); return; }
 
-    let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
+    let confirmationText = prompt("ANDIKA 'FUTA' ILI KUFUTA DATA ZOTE:");
     if (confirmationText === "FUTA") {
-        database.ref().remove()
-        .then(() => alert("Database yote imesafishwa!"))
-        .catch(err => alert("Kosa: " + err.message));
-    } else { alert("Zoezi limesitishwa."); }
-}
-
-window.deleteBus = function(category, key) {
-    if(confirm("Unataka kufuta basi hili?")) {
-        database.ref('buses/' + category + '/' + key).remove()
-        .then(() => alert("Basi limefutwa!"))
-        .catch(err => alert("Kosa: " + err.message));
+        database.ref().remove().then(() => alert("Kila kitu kimesafishwa!")).catch(err => alert(err.message));
     }
 }
 
+// 10. MFUMO WA ROUTING (Kusimamia kurasa bila kurefresh)
 window.checkCurrentLocation = function() {
     let hash = window.location.hash;
-    let dbname = localStorage.getItem("name");
     
     if (hash === "#admin") { 
         window.hideAllSections(); 
@@ -275,15 +330,26 @@ window.checkCurrentLocation = function() {
         window.loadCategories();
         return; 
     }
-    if (!dbname) { window.hideAllSections(); if (hash === "#login") window.showlogin(); else window.showregister(); } 
-    else { window.showcat(true); }
+
+    auth.onAuthStateChanged((user) => {
+        if (!user) { 
+            window.hideAllSections(); 
+            if (hash === "#login") window.showlogin(); 
+            else window.showregister(); 
+        } else { 
+            if(hash === "" || hash === "#home") {
+                window.showcat(true); 
+            }
+        }
+    });
 }
 
 window.addEventListener("popstate", function(event) {
     let hash = window.location.hash;
     if (hash === "#admin") { window.hideAllSections(); document.getElementById("adminSection").style.display = "block"; return; }
-    let dbname = localStorage.getItem("name");
-    if (!dbname) { window.showregister(); return; }
+    
+    let user = auth.currentUser;
+    if (!user) { window.showregister(); return; }
     
     if (event.state && event.state.page) {
         let page = event.state.page;
@@ -292,6 +358,7 @@ window.addEventListener("popstate", function(event) {
     } else { window.checkCurrentLocation(); }
 });
 
+// Kuanzisha programu
 window.addEventListener("DOMContentLoaded", () => {
     window.loadCategories();
     window.checkCurrentLocation();

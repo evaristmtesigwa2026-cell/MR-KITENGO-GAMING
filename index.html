@@ -74,12 +74,36 @@
             background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
             color: white; text-align: center; width: 250px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+        
+        /* FOMU ZA LOGIN NA REGISTER */
         .reg, .log, .admin-panel {
             margin: 50px auto; padding: 20px; border-radius: 35px; 
             background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
             color: white; text-align: center; width: 280px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .admin-panel input, .admin-panel select { padding: 10px; border-radius: 10px; width: 90%; margin-bottom: 10px; border: none; font-size: 16px;}
+        
+        /* Mtindo wa Input zote za Mfumo ili zionekane vizuri */
+        .log input, .reg input, .admin-panel input, .admin-panel select { 
+            padding: 12px; 
+            border-radius: 10px; 
+            width: 90%; 
+            margin-bottom: 15px; 
+            border: none; 
+            font-size: 16px;
+            color: black;
+            box-sizing: border-box;
+        }
+        
+        /* Kurekebisha maandishi ya maelezo ndani ya Login/Register yasiwe Meusi */
+        .log p, .reg p {
+            color: white !important;
+        }
+        .log a, .reg a {
+            color: yellow;
+            font-weight: bold;
+        }
+
         .file-label { display: block; background: #333; padding: 10px; border-radius: 10px; margin-bottom: 10px; width: 90%; margin-left: auto; margin-right: auto; cursor: pointer; font-size: 14px; font-weight: bold; box-sizing: border-box; }
         button {
             border-radius: 40px; background: rgba(80, 40, 170, 0.7); color: white; cursor: pointer; 
@@ -130,17 +154,17 @@
 
 <div id="log" class="log" style="display:none">
     <h1>LOGIN</h1> <br>
-    <input type="text" id="logname" placeholder="username"><br><br>
-    <input type="password" id="logpassword" placeholder="password"><br><br>
+    <input type="text" id="logname" placeholder="username"><br>
+    <input type="password" id="logpassword" placeholder="password"><br>
     <button onclick="window.login()">LOGIN</button><br><br>
-    <p>I don't have an account <a href="javascript:void(0);" onclick="window.showregister()">REGISTER HERE</a></p>
+    <p>I don't have an account? <a href="javascript:void(0);" onclick="window.showregister()">REGISTER HERE</a></p>
 </div>
 
 <div id="reg" class="reg" style="display:none;">
     <h1>REGISTER</h1> <br>
-    <input type="text" id="regname" placeholder="username"><br><br>
-    <input type="email" id="regemail" placeholder="email"><br><br>
-    <input type="password" id="regpassword" placeholder="password"><br><br>
+    <input type="text" id="regname" placeholder="username"><br>
+    <input type="email" id="regemail" placeholder="email"><br>
+    <input type="password" id="regpassword" placeholder="password"><br>
     <button onclick="window.register()">REGISTER</button><br><br>
     <p>Already have an account? <a href="javascript:void(0);" onclick="window.showlogin()">LOGIN</a></p>
 </div>

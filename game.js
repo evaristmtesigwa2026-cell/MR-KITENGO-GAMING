@@ -13,22 +13,33 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+let currentOpenCategoryId = "";
+let currentOpenCategoryName = "";
+let currentOpenModId = "";
+
 window.hideAllSections = function() {
-    const sections = ["cat", "bus-view-section", "log", "reg", "adminSection"];
+    const sections = ["cat", "bus-view-section", "single-mod-section", "log", "reg", "adminSection"];
     sections.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.style.display = "none";
     });
     document.getElementById("navicon").style.display = "none";
+    document.getElementById("main-search-bar").style.display = "none";
 }
 
 window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; }
 window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; }
 
+window.logout = function() {
+    localStorage.clear();
+    alert("Umetoka kwenye akaunti!");
+    window.showlogin();
+}
+
 window.register = function() {
-    let name = document.getElementById("regname").value;
-    let email = document.getElementById("regemail").value;
-    let password = document.getElementById("regpassword").value;
+    let name = document.getElementById("regname").value.trim();
+    let email = document.getElementById("regemail").value.trim();
+    let password = document.getElementById("regpassword").value.trim();
     if (name == "" || email == "" || password == "") { alert("Jaza nafasi zote!"); } 
     else { 
         localStorage.setItem("name", name); localStorage.setItem("email", email); localStorage.setItem("password", password);
@@ -37,8 +48,8 @@ window.register = function() {
 }
 
 window.login = function() {
-    let name = document.getElementById("logname").value;
-    let password = document.getElementById("logpassword").value;
+    let name = document.getElementById("logname").value.trim();
+    let password = document.getElementById("logpassword").value.trim();
     let dbname = localStorage.getItem("name");
     let dbpassword = localStorage.getItem("password");
     if (name == "" || password == "") { alert("Jaza nafasi zote!"); } 
@@ -53,7 +64,25 @@ window.showcat = function(isBackAction = false) {
     window.hideAllSections();
     document.getElementById("cat").style.display = "block";
     document.getElementById("navicon").style.display = "flex"; 
+    document.getElementById("main-search-bar").style.display = "block";
+    document.getElementById("searchInput").value = "";
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
+    window.loadCategories();
+}
+
+// --- SEARCH FILTER METHODO ---
+window.filterItems = function() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let cards = document.querySelectorAll(".cat-grid .card");
+    
+    cards.forEach(card => {
+        let title = card.querySelector(".card-title").textContent.toLowerCase();
+        if(title.includes(input)) {
+            card.style.display = "flex";
+        } else {
+            card.style.display = "none";
+        }
+    });
 }
 
 window.loadCategories = function() {
@@ -67,12 +96,6 @@ window.loadCategories = function() {
         const data = snapshot.val();
         if (!data) {
             if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Hakuna kundi lililowekwa bado.</p>";
-            if (selectDropdown) {
-                let opt = document.createElement('option');
-                opt.value = "";
-                opt.textContent = "-- Hakuna Kundi --";
-                selectDropdown.appendChild(opt);
-            }
             return;
         }
 
@@ -89,10 +112,14 @@ window.loadCategories = function() {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <p>${cat.name}</p> 
-                    <img src="${cat.image}" style="width: 180px; height: 110px; border-radius: 10px; object-fit: cover;"> <br>
-                    <button onclick="window.showBusCategory('${id}', '${cat.name}')">CHAGUA HAPA</button>
-                    <button class="btn-delete" style="display:none; background-color:red;" id="del-cat-${id}" onclick="window.deleteCategory('${id}')">FUTA GROUP</button>
+                    <div class="card-img-wrapper">
+                        <img src="${cat.image}">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${cat.name}</div>
+                        <button onclick="window.showBusCategory('${id}', '${cat.name}')">FUNGUA MODS</button>
+                        <button class="btn-delete" style="display:none;" id="del-cat-${id}" onclick="window.deleteCategory('${id}')">FUTA GROUP</button>
+                    </div>
                 `;
                 container.appendChild(card);
             }
@@ -115,15 +142,20 @@ window.loadCategories = function() {
 }
 
 window.showBusCategory = function(categoryId, categoryName, isBackAction = false) {
+    currentOpenCategoryId = categoryId;
+    currentOpenCategoryName = categoryName;
+
     window.hideAllSections();
     document.getElementById("bus-view-section").style.display = "block";
     document.getElementById("navicon").style.display = "flex";
+    document.getElementById("main-search-bar").style.display = "block";
+    document.getElementById("searchInput").value = "";
     document.getElementById("dynamic-bus-title").textContent = categoryName + " BUSES";
 
     if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, `#${categoryId}`);
     
     const busContainer = document.getElementById("dynamic-bus-list");
-    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inapakia...</p>";
+    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inapakia mabasi...</p>";
 
     database.ref('buses/' + categoryId).on('value', (snapshot) => {
         busContainer.innerHTML = "";
@@ -138,10 +170,14 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <p>${item.name}</p>
-                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover;"><br><br>
-                <button><a href="${item.link}" target="_blank">DOWNLOAD</a></button>
-                <button class="btn-delete" id="del-bus-${key}" style="display:none;" onclick="window.deleteBus('${categoryId}', '${key}')">FUTA</button>
+                <div class="card-img-wrapper">
+                    <img src="${item.image}">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">${item.name}</div>
+                    <button onclick="window.openSingleMod('${categoryId}', '${key}')">TAZAMA / DOWNLOAD</button>
+                    <button class="btn-delete" id="del-bus-${key}" style="display:none;" onclick="window.deleteBus('${categoryId}', '${key}')">FUTA</button>
+                </div>
             `;
             busContainer.appendChild(card);
 
@@ -151,6 +187,94 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
                     if(btn) btn.style.display = "inline-block";
                 }, 200);
             }
+        });
+    });
+}
+
+// --- UKURASA MPYA MAALUM WA NDANI YA MOD (Single Mod View) ---
+window.openSingleMod = function(categoryId, modId) {
+    currentOpenCategoryId = categoryId;
+    currentOpenModId = modId;
+
+    window.hideAllSections();
+    document.getElementById("single-mod-section").style.display = "block";
+    document.getElementById("navicon").style.display = "flex";
+
+    database.ref('buses/' + categoryId + '/' + modId).on('value', (snapshot) => {
+        const item = snapshot.val();
+        if(!item) return;
+
+        document.getElementById("single-mod-title").textContent = item.name;
+        document.getElementById("single-mod-img").src = item.image;
+        document.getElementById("single-mod-link").href = item.link;
+
+        // Pakia Votes (Likes/Dislikes)
+        let likes = item.likes ? Object.keys(item.likes).length : 0;
+        let dislikes = item.dislikes ? Object.keys(item.dislikes).length : 0;
+        document.getElementById("like-count").textContent = likes;
+        document.getElementById("dislike-count").textContent = dislikes;
+    });
+
+    // Pakia Maoni (Comments)
+    window.loadComments(categoryId, modId);
+}
+
+window.goBackToCategory = function() {
+    window.showBusCategory(currentOpenCategoryId, currentOpenCategoryName);
+}
+
+// --- MFUMO WA KUPIGA KURA (Votes API) ---
+window.voteMod = function(type) {
+    let username = localStorage.getItem("name") || "Anoymous";
+    let cleanUserKey = username.replace(/[^a-zA-Z0-9]/g, "");
+
+    if(type === 'like') {
+        database.ref('buses/' + currentOpenCategoryId + '/' + currentOpenModId + '/likes/' + cleanUserKey).set(true);
+        database.ref('buses/' + currentOpenCategoryId + '/' + currentOpenModId + '/dislikes/' + cleanUserKey).remove();
+    } else {
+        database.ref('buses/' + currentOpenCategoryId + '/' + currentOpenModId + '/dislikes/' + cleanUserKey).set(true);
+        database.ref('buses/' + currentOpenCategoryId + '/' + currentOpenModId + '/likes/' + cleanUserKey).remove();
+    }
+}
+
+// --- MFUMO WA MAONI (Comments Engine) ---
+window.postComment = function() {
+    let textarea = document.getElementById("commentInput");
+    let text = textarea.value.trim();
+    let username = localStorage.getItem("name") || "Mtumiaji";
+
+    if(text === "") { alert("Andika kitu kwanza mkuu!"); return; }
+
+    let commentData = {
+        user: username,
+        text: text,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    database.ref('comments/' + currentOpenModId).push(commentData)
+    .then(() => {
+        textarea.value = "";
+    });
+}
+
+window.loadComments = function(categoryId, modId) {
+    const list = document.getElementById("comments-list");
+    database.ref('comments/' + modId).on('value', (snapshot) => {
+        list.innerHTML = "";
+        const data = snapshot.val();
+        if(!data) {
+            list.innerHTML = "<p style='color:gray; text-align:left; padding:0;'>Hakuna maoni bado. Kuwa wa kwanza kutoa maoni!</p>";
+            return;
+        }
+        Object.keys(data).forEach(key => {
+            let c = data[key];
+            let div = document.createElement('div');
+            div.className = 'comment-box';
+            div.innerHTML = `
+                <div class="comment-user"><i class="fa-solid fa-user"></i> ${c.user}</div>
+                <p class="comment-text">${c.text}</p>
+            `;
+            list.appendChild(div);
         });
     });
 }
@@ -169,27 +293,25 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inahifadhi picha moja kwa moja kwenye Firebase...";
+    statusDiv.textContent = "Inapakia kundi jipya...";
 
     const file = fileInput.files[0];
     const reader = new FileReader();
 
     reader.onloadend = function() {
         const base64Image = reader.result;
-        
         database.ref('categories/' + id).set({ name: name, image: base64Image })
         .then(() => {
-            alert("Category mpya imeongezwa kikamilifu!");
+            alert("Category mpya imeongezwa!");
             document.getElementById("newCatId").value = "";
             document.getElementById("newCatName").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
         }).catch(err => {
-            alert("Kosa la Firebase: " + err.message);
+            alert("Kosa: " + err.message);
             statusDiv.style.display = "none";
         });
     };
-
     reader.readAsDataURL(file);
 }
 
@@ -209,59 +331,52 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia basi na picha kwenye Firebase...";
+    statusDiv.textContent = "Inapakia basi jipya...";
 
     const file = fileInput.files[0];
     const reader = new FileReader();
 
     reader.onloadend = function() {
         const base64Image = reader.result;
-        
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ name: name, image: base64Image, link: link })
         .then(() => {
-            alert("Basi jipya limeongezwa kwa mafanikio!");
+            alert("Basi jipya limeongezwa!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadLink").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
         }).catch(err => {
-            alert("Kosa la Firebase: " + err.message);
+            alert("Kosa: " + err.message);
             statusDiv.style.display = "none";
         });
     };
-
     reader.readAsDataURL(file);
 }
 
 window.deleteCategory = function(categoryId) {
-    if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
-    if(confirm("Je, una uhakika unataka kufuta GROUP la '" + categoryId + "' na kila kitu chake?")) {
+    if (!categoryId) { alert("Weka ID ya category."); return; }
+    if(confirm("Je, una uhakika unataka kufuta group hili?")) {
         database.ref('categories/' + categoryId).remove()
         .then(() => { 
             database.ref('buses/' + categoryId).remove(); 
             alert("Vimefutwa!"); 
-        }).catch(err => alert("Kosa: " + err.message));
+        });
     }
 }
 
 window.clearEntireDatabase = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
-
-    let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
-    if (confirmationText === "FUTA") {
-        database.ref().remove()
-        .then(() => alert("Database yote imesafishwa!"))
-        .catch(err => alert("Kosa: " + err.message));
-    } else { alert("Zoezi limesitishwa."); }
+    if (confirm("Je, una uhakika unataka kufuta database nzima?")) {
+        database.ref().remove().then(() => alert("Kila kitu kimefutwa!"));
+    }
 }
 
 window.deleteBus = function(category, key) {
     if(confirm("Unataka kufuta basi hili?")) {
         database.ref('buses/' + category + '/' + key).remove()
-        .then(() => alert("Basi limefutwa!"))
-        .catch(err => alert("Kosa: " + err.message));
+        .then(() => alert("Basi limefutwa!"));
     }
 }
 
@@ -279,20 +394,6 @@ window.checkCurrentLocation = function() {
     else { window.showcat(true); }
 }
 
-window.addEventListener("popstate", function(event) {
-    let hash = window.location.hash;
-    if (hash === "#admin") { window.hideAllSections(); document.getElementById("adminSection").style.display = "block"; return; }
-    let dbname = localStorage.getItem("name");
-    if (!dbname) { window.showregister(); return; }
-    
-    if (event.state && event.state.page) {
-        let page = event.state.page;
-        if (page === "home") window.showcat(true);
-        else window.showBusCategory(page, event.state.catName || page, true);
-    } else { window.checkCurrentLocation(); }
-});
-
 window.addEventListener("DOMContentLoaded", () => {
-    window.loadCategories();
     window.checkCurrentLocation();
 });

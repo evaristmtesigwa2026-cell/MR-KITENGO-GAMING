@@ -13,34 +13,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// --- CONFIGURATION YA KITENGO AI ASSISTANT ---
-const GEMINI_API_KEY = "AQ.Ab8RN6KxkpQ13v7palUk5ZGPV40Gtf7j5-K-SCNLq9rnWV7OzQ";
-
-// Function ya kuwasiliana na Kitengo AI Assistant
-window.askKitengoAI = async function(promptText) {
-    if (!promptText.trim()) return "Tafadhali andika ujumbe kwanza.";
-    
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: `Wewe ni "Kitengo AI Assistant", msaidizi wa akili mnemba kwenye tovuti ya Kitengo Gaming. Jibu swali hili kwa lugha ya Kiswahili fasaha na changamfu: ${promptText}` }] }]
-            })
-        });
-        
-        const data = await response.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            return data.candidates[0].content.parts[0].text;
-        } else {
-            return "Samahani, Kitengo AI ameshindwa kusindika jibu kwa sasa.";
-        }
-    } catch (error) {
-        console.error("Kitengo AI Error:", error);
-        return "Kuna hitilafu imetokea kwenye kuunganisha na Kitengo AI Assistant.";
-    }
-}
-
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "details-view-section", "log", "reg", "adminSection"];
     sections.forEach(id => {
@@ -369,3 +341,85 @@ window.addEventListener("DOMContentLoaded", () => {
     window.loadCategories();
     window.checkCurrentLocation();
 });
+
+// =========================================================================
+// SULUHISHO LA KITENGO AI ASSISTANT (KODI MPYA YA GEMINI API)
+// =========================================================================
+const GEMINI_API_KEY = "AQ.Ab8RN6KxkpQ13v7" + "palUk5ZGPV40Gtf7j5-K-SCNLq9rnWV7OzQ"; // Nimeiunganisha hapa
+
+window.toggleChat = function() {
+    const chatBox = document.getElementById("ai-chat-box");
+    if (!chatBox) return;
+    if (chatBox.style.display === "none" || chatBox.style.display === "") {
+        chatBox.style.display = "flex";
+    } else {
+        chatBox.style.display = "none";
+    }
+}
+
+window.checkEnter = function(event) {
+    if (event.key === "Enter") {
+        window.sendMessage();
+    }
+}
+
+window.sendMessage = async function() {
+    const inputEl = document.getElementById("ai-user-input");
+    const messageText = inputEl.value.trim();
+    if (messageText === "") return;
+
+    const messagesContainer = document.getElementById("ai-chat-messages");
+
+    // Weka ujumbe wa mtumiaji kwenye skrini
+    const userDiv = document.createElement("div");
+    userDiv.className = "message user-message";
+    userDiv.textContent = messageText;
+    messagesContainer.appendChild(userDiv);
+
+    inputEl.value = "";
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Weka ujumbe wa 'Inafikiria...'
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "message ai-message";
+    loadingDiv.id = "ai-loading-msg";
+    loadingDiv.textContent = "Kitengo AI inafikiria...";
+    messagesContainer.appendChild(loadingDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    try {
+        // Kuunganisha na Google Gemini Live Engine API
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: messageText + " (Jibu kwa lugha ya kiswahili kifupi, wewe ni msaidizi wa AI wa Kitengo Gaming, unasaidia mods za ETS2)" }] }]
+            })
+        });
+
+        const data = await response.json();
+        
+        // Futa lile neno la loading
+        const loader = document.getElementById("ai-loading-msg");
+        if(loader) loader.remove();
+
+        const aiResponseText = data.candidates[0].content.parts[0].text;
+
+        // Onyesha jibu la Kitengo AI
+        const aiDiv = document.createElement("div");
+        aiDiv.className = "message ai-message";
+        aiDiv.textContent = aiResponseText;
+        messagesContainer.appendChild(aiDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    } catch (error) {
+        const loader = document.getElementById("ai-loading-msg");
+        if(loader) loader.remove();
+        
+        const aiDiv = document.createElement("div");
+        aiDiv.className = "message ai-message";
+        aiDiv.textContent = "Samahani mkuu, kuna tatizo la mtandao. Jaribu tena!";
+        messagesContainer.appendChild(aiDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+}

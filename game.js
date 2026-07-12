@@ -13,6 +13,34 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// --- CONFIGURATION YA KITENGO AI ASSISTANT ---
+const GEMINI_API_KEY = "AQ.Ab8RN6KxkpQ13v7palUk5ZGPV40Gtf7j5-K-SCNLq9rnWV7OzQ";
+
+// Function ya kuwasiliana na Kitengo AI Assistant
+window.askKitengoAI = async function(promptText) {
+    if (!promptText.trim()) return "Tafadhali andika ujumbe kwanza.";
+    
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: `Wewe ni "Kitengo AI Assistant", msaidizi wa akili mnemba kwenye tovuti ya Kitengo Gaming. Jibu swali hili kwa lugha ya Kiswahili fasaha na changamfu: ${promptText}` }] }]
+            })
+        });
+        
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            return data.candidates[0].content.parts[0].text;
+        } else {
+            return "Samahani, Kitengo AI ameshindwa kusindika jibu kwa sasa.";
+        }
+    } catch (error) {
+        console.error("Kitengo AI Error:", error);
+        return "Kuna hitilafu imetokea kwenye kuunganisha na Kitengo AI Assistant.";
+    }
+}
+
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "details-view-section", "log", "reg", "adminSection"];
     sections.forEach(id => {

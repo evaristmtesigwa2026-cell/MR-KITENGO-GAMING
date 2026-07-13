@@ -56,8 +56,8 @@ window.showcat = function(isBackAction = false) {
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 }
 
-// LOGIC MPYA YA KUONESHA PICHA NA MAELEZO YA NDANI (POPUP / DETAILS ENGINE)
-window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '') {
+// LOGIC MPYA YENYE KICHUNGI CHA PREMIUM VS FREE + PESAPAL UI PREPARATION
+window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0) {
     window.hideAllSections();
     document.getElementById("details-view-section").style.display = "block";
     document.getElementById("navicon").style.display = "flex";
@@ -78,15 +78,70 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         window.currentDetailsBack = function() { window.showcat(); };
     } else {
         let btn = document.createElement("button");
-        let a = document.createElement("a");
-        a.href = targetLinkOrId;
-        a.target = "_blank";
-        a.textContent = "DOWNLOAD NOW";
-        btn.appendChild(a);
-        btnContainer.appendChild(btn);
         
+        // Angalia kama basi lina bei (Premium) au ni la Bure (Free)
+        if (price && parseInt(price) > 0) {
+            btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
+            btn.onclick = function() {
+                window.openPaymentModal(title, price, targetLinkOrId);
+            };
+        } else {
+            let a = document.createElement("a");
+            a.href = targetLinkOrId;
+            a.target = "_blank";
+            a.textContent = "DOWNLOAD NOW";
+            btn.appendChild(a);
+        }
+        
+        btnContainer.appendChild(btn);
         window.currentDetailsBack = function() { window.showBusCategory(currentCatId, currentCatName); };
     }
+}
+
+// POPUP YA UI YA MALIPO YA PESAPAL (MAJARIBIO YA STK PUSH)
+window.openPaymentModal = function(itemName, itemPrice, downloadLink) {
+    document.getElementById("pay-item-name").textContent = itemName;
+    document.getElementById("pay-item-price").textContent = "Tsh " + itemPrice;
+    document.getElementById("pay-target-link").value = downloadLink;
+    document.getElementById("payment-modal-screen").style.display = "flex";
+}
+
+window.closePaymentModal = function() {
+    document.getElementById("payment-modal-screen").style.display = "none";
+    document.getElementById("pay-phone").value = "";
+    document.getElementById("pay-status-log").style.display = "none";
+}
+
+window.processPaymentSimulation = function() {
+    let phone = document.getElementById("pay-phone").value.trim();
+    let link = document.getElementById("pay-target-link").value;
+    let statusLog = document.getElementById("pay-status-log");
+    
+    if(phone.length < 10) {
+        alert("Tafadhali weka namba sahihi ya Halotel/Simu!");
+        return;
+    }
+    
+    statusLog.style.display = "block";
+    statusLog.style.color = "yellow";
+    statusLog.textContent = "Inatuma maombi PesaPal (STK Push)... Angalia simu yako.";
+    
+    // UIGIZAJI (SIMULATION) WA INFRASTRUCTURE YA KIPEKEE YA MALIPO
+    setTimeout(() => {
+        statusLog.textContent = "Tafadhali ingiza PIN yako kwenye pop-up ya simu kisha subiri...";
+        
+        setTimeout(() => {
+            statusLog.style.color = "lightgreen";
+            statusLog.textContent = "Malipo Yamefanikiwa! Mfumo unakupeleka Mediafire...";
+            
+            setTimeout(() => {
+                window.closePaymentModal();
+                window.open(link, "_blank");
+            }, 1500);
+            
+        }, 3500); // Muda wa kusubiri mteja aweke PIN
+        
+    }, 2000); // Muda wa kuongea na PesaPal API
 }
 
 window.goBackFromDetails = function() {
@@ -178,10 +233,17 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             const item = busesData[key];
             const card = document.createElement('div');
             card.className = 'card';
+            
+            // Tunapitisha na bei 'item.price' kwenye kadi na details view
             card.innerHTML = `
-                <p>${item.name}</p>
-                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover; cursor: pointer;" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}')"><br><br>
-                <button><a href="${item.link}" target="_blank">DOWNLOAD</a></button>
+                <p>${item.name} ${item.price ? `<span style='color:yellow;font-size:12px;'><br>(Tsh ${item.price})</span>` : ''}</p>
+                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover; cursor: pointer;" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}', '${item.price || 0}')"><br><br>
+                
+                ${item.price && parseInt(item.price) > 0 ? 
+                  `<button onclick="window.openPaymentModal('${item.name}', '${item.price}', '${item.link}')">BUY MOD</button>` : 
+                  `<button><a href="${item.link}" target="_blank">DOWNLOAD</a></button>`
+                }
+                
                 <button class="btn-delete" id="del-bus-${key}" style="display:none;" onclick="window.deleteBus('${categoryId}', '${key}')">FUTA</button>
             `;
             busContainer.appendChild(card);
@@ -236,7 +298,7 @@ window.addCategory = function() {
     reader.readAsDataURL(file);
 }
 
-// --- UPLOAD BUS MPYA KUPITIA BASE64 + MAELEZO MAALUM ---
+// --- UPLOAD BUS MPYA KUPITIA BASE64 + MAELEZO MAALUM + BEI (PREMIUM REGULATION) ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -246,6 +308,7 @@ window.uploadBus = function() {
     const desc = document.getElementById("uploadDesc").value.trim();
     const fileInput = document.getElementById("uploadImg");
     const link = document.getElementById("uploadLink").value.trim();
+    const price = document.getElementById("uploadPrice").value.trim(); // Sehemu mpya ya bei
 
     if (cat === "") { alert("Chagua Category kwanza!"); return; }
     if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
@@ -262,12 +325,14 @@ window.uploadBus = function() {
         const base64Image = reader.result;
         
         const newBusRef = database.ref('buses/' + cat).push();
-        newBusRef.set({ name: name, image: base64Image, link: link, desc: desc })
+        // Tunahifadhi bei kwenye Firebase pia
+        newBusRef.set({ name: name, image: base64Image, link: link, desc: desc, price: price ? parseInt(price) : 0 })
         .then(() => {
             alert("Basi jipya limeongezwa kwa mafanikio!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
+            document.getElementById("uploadPrice").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
         }).catch(err => {

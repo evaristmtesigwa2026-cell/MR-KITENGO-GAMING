@@ -121,6 +121,25 @@
         }
 
         /* ========================================================================= */
+        /* MTINDO WA POPUP MENU YA MALIPO YA PESAPAL (HALOTEL INTEGRATION) */
+        /* ========================================================================= */
+        .payment-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); display: none; justify-content: center;
+            align-items: center; z-index: 1000000;
+        }
+        .payment-card {
+            background: linear-gradient(135deg, #111111, #222222);
+            border: 2px solid #ff3d8d; padding: 30px; border-radius: 25px;
+            width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .payment-card h3 { margin-top: 0; color: #00FF00; font-size: 20px; text-transform: uppercase; }
+        .payment-card input {
+            width: 90%; padding: 12px; margin: 15px 0; border-radius: 10px;
+            border: none; font-size: 16px; text-align: center; font-weight: bold;
+        }
+
+        /* ========================================================================= */
         /* MTINDO MAALUM WA KITENGO AI (HAUINGILIANI NA VITU VYAKO VYENGINE) */
         /* ========================================================================= */
         #ai-chat-icon {
@@ -136,7 +155,7 @@
             align-items: center !important;
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5) !important;
             cursor: pointer !important;
-            z-index: 999999 !important; /* Inahakikisha inakaa juu kuliko kila kitu */
+            z-index: 999999 !important;
         }
         #ai-chat-icon img { width: 30px; height: 30px; filter: invert(1); }
         #ai-chat-box {
@@ -257,12 +276,35 @@
     <div id="bus-upload-status" class="status-msg">Inapakia picha kwenye mtandao...</div>
     
     <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
+    <!-- INPUT MPYA YA KUWEKA BEI YA PREMIUM MOD -->
+    <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
+    
     <button onclick="window.uploadBus()">UPLOAD ITEM</button>
     <hr>
 
     <h3>3. RESET SYSTEM</h3>
     <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta kila kitu kwenye database!</p>
     <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 90%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
+</div>
+
+<!-- ========================================================================= -->
+<!-- DIRISHA LA POPUP LA MALIPO YA KIOTOMATIKI (PESAPAL/HALOTEL INTERFACE) -->
+<!-- ========================================================================= -->
+<div id="payment-modal-screen" class="payment-modal">
+    <div class="payment-card">
+        <h3>PesaPal Fast Pay</h3>
+        <p style="color: white !important; font-size: 14px; margin: 5px 0;">Unafanya malipo ya:</p>
+        <div id="pay-item-name" style="font-weight: bold; color: yellow; font-size: 16px;"></div>
+        <div id="pay-item-price" style="font-weight: bold; color: #ff3d8d; font-size: 22px; margin-top: 5px;"></div>
+        
+        <input type="hidden" id="pay-target-link">
+        <input type="text" id="pay-phone" placeholder="Namba ya Halotel (Mfano: 062XXXXXXX)">
+        
+        <div id="pay-status-log" style="font-size: 12px; margin: 10px 0; display: none;"></div>
+        
+        <button onclick="window.processPaymentSimulation()" style="width: 100%; background: #00FF00; color: black;">LIPIA SASA</button>
+        <button onclick="window.closePaymentModal()" style="width: 100%; background: #333; color: white; margin-top: 5px;">GHAIRI</button>
+    </div>
 </div>
 
 <!-- ========================================================================= -->

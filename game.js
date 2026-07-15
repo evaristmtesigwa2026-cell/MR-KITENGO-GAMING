@@ -146,7 +146,7 @@ window.verifyPasswordAndDownload = function() {
     statusLog.style.color = "yellow";
     statusLog.textContent = "Inahakiki password yako kwenye database yetu...";
     
-    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama
+    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama (Kasi ya juu kwa once)
     database.ref(`buses/${catId}/${busKey}/password`).once('value')
     .then((snapshot) => {
         const correctPassword = snapshot.val();
@@ -178,11 +178,51 @@ window.goBackFromDetails = function() {
     }
 }
 
+// CHOMBO CHA USHINDILIAJI PICHA KIOTOMATIKI (KUZUIA MB KUBWA)
+window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // Kokotoa vipimo ili picha isiharibike uwiano (aspect ratio)
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Geuza picha kuwa JPEG iliyoshindiliwa kwa kiwango kilichochaguliwa
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            callback(compressedBase64);
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// INAPAKIA CATEGORIES KWA KASI YA KIWANGO CHA JUU KUTUMIA .ONCE
 window.loadCategories = function() {
     const container = document.getElementById("categories-container");
     const selectDropdown = document.getElementById("uploadCategory");
     
-    database.ref('categories').on('value', (snapshot) => {
+    if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Inapakia makundi kwa kasi ya mwanga...</p>";
+
+    database.ref('categories').once('value').then((snapshot) => {
         if (container) container.innerHTML = "";
         if (selectDropdown) selectDropdown.innerHTML = "";
         
@@ -233,9 +273,12 @@ window.loadCategories = function() {
                 }, 200);
             }
         });
+    }).catch(err => {
+        if (container) container.innerHTML = "<p style='color:red;'>Tatizo la mtandao: " + err.message + "</p>";
     });
 }
 
+// INAPAKIA MABASI YA KUNDI MAALUM KWA MILISEKUNDE KUTUMIA .ONCE
 window.showBusCategory = function(categoryId, categoryName, isBackAction = false) {
     window.hideAllSections();
     document.getElementById("bus-view-section").style.display = "block";
@@ -245,13 +288,13 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, `#${categoryId}`);
     
     const busContainer = document.getElementById("dynamic-bus-list");
-    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inapakia...</p>";
+    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inatengeneza muonekano...</p>";
 
-    database.ref('buses/' + categoryId).on('value', (snapshot) => {
+    database.ref('buses/' + categoryId).once('value').then((snapshot) => {
         busContainer.innerHTML = "";
         const busesData = snapshot.val();
         if (!busesData) {
-            busContainer.innerHTML = "<p style='color:white; text-align:center;'>Hakuna basi kundi hili.</p>";
+            busContainer.innerHTML = "<p style='color:white; text-align:center;'>Hakuna basi kundi hili bado.</p>";
             return;
         }
 
@@ -260,7 +303,6 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             const card = document.createElement('div');
             card.className = 'card';
             
-            // Tunapitisha na bei 'item.price' na 'key' ya basi kwenye kadi na details view
             card.innerHTML = `
                 <p>${item.name} ${item.price ? `<span style='color:yellow;font-size:12px;'><br>(Tsh ${item.price})</span>` : ''}</p>
                 <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover; cursor: pointer;" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}', '${item.price || 0}', '${key}')"><br><br>
@@ -281,10 +323,12 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
                 }, 200);
             }
         });
+    }).catch(err => {
+        busContainer.innerHTML = "<p style='color:red;'>Tatizo la mtandao: " + err.message + "</p>";
     });
 }
 
-// --- ONGEZA CATEGORY KUPITIA BASE64 + MAELEZO MAALUM ---
+// --- ONGEZA CATEGORY KUPITIA BASE64 ILIYOSHINDILIWA ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
@@ -299,32 +343,29 @@ window.addCategory = function() {
 
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inahifadhi picha moja kwa moja kwenye Firebase...";
+    statusDiv.textContent = "Inashindilia picha kuwa nyepesi na kuhifadhi kwenye Firebase...";
 
     const file = fileInput.files[0];
-    const reader = new FileReader();
 
-    reader.onloadend = function() {
-        const base64Image = reader.result;
-        
-        database.ref('categories/' + id).set({ name: name, image: base64Image, desc: desc })
+    // Kupunguza picha hadi pixel 500 max width na ubora wa 0.7 (nyepesi ajabu)
+    window.compressImage(file, 500, 500, 0.7, function(compressedBase64) {
+        database.ref('categories/' + id).set({ name: name, image: compressedBase64, desc: desc })
         .then(() => {
-            alert("Category mpya imeongezwa kikamilifu!");
+            alert("Category mpya imeongezwa kikamilifu kwa kasi sana!");
             document.getElementById("newCatId").value = "";
             document.getElementById("newCatName").value = "";
             document.getElementById("newCatDesc").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
+            window.loadCategories(); // Reload haraka
         }).catch(err => {
             alert("Kosa la Firebase: " + err.message);
             statusDiv.style.display = "none";
         });
-    };
-
-    reader.readAsDataURL(file);
+    });
 }
 
-// --- UPLOAD BUS MPYA KUPITIA BASE64 + MAELEZO MAALUM + BEI NA PASSWORD YAKE ---
+// --- UPLOAD BUS MPYA KUPITIA BASE64 ILIYOSHINDILIWA + BEI NA PASSWORD YAKE ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -335,7 +376,7 @@ window.uploadBus = function() {
     const fileInput = document.getElementById("uploadImg");
     const link = document.getElementById("uploadLink").value.trim();
     const price = document.getElementById("uploadPrice").value.trim(); 
-    const password = document.getElementById("uploadPassword").value.trim(); // Sehemu mpya ya kuweka Password kule Admin Panel
+    const password = document.getElementById("uploadPassword").value.trim();
 
     if (cat === "") { alert("Chagua Category kwanza!"); return; }
     if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
@@ -344,26 +385,23 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inapakia basi na picha kwenye Firebase...";
+    statusDiv.textContent = "Inashindilia picha ya basi kuwa nyepesi na kupakia Firebase...";
 
     const file = fileInput.files[0];
-    const reader = new FileReader();
 
-    reader.onloadend = function() {
-        const base64Image = reader.result;
-        
+    // Kupunguza picha ya basi hadi pixel 600 max width na ubora wa 0.7
+    window.compressImage(file, 600, 600, 0.7, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
-        // Tunahifadhi bei pamoja na password yake kwenye Firebase
         newBusRef.set({ 
             name: name, 
-            image: base64Image, 
+            image: compressedBase64, 
             link: link, 
             desc: desc, 
             price: price ? parseInt(price) : 0,
             password: password ? password : "" 
         })
         .then(() => {
-            alert("Basi jipya limeongezwa kwa mafanikio!");
+            alert("Basi jipya limeongezwa kwa ufanisi mkubwa!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
@@ -371,13 +409,12 @@ window.uploadBus = function() {
             document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
+            window.showBusCategory(cat, "MABASI", true); // Reload category hiyo husika kwa kasi
         }).catch(err => {
             alert("Kosa la Firebase: " + err.message);
             statusDiv.style.display = "none";
         });
-    };
-
-    reader.readAsDataURL(file);
+    });
 }
 
 window.deleteCategory = function(categoryId) {
@@ -387,6 +424,7 @@ window.deleteCategory = function(categoryId) {
         .then(() => { 
             database.ref('buses/' + categoryId).remove(); 
             alert("Vimefutwa!"); 
+            window.loadCategories();
         }).catch(err => alert("Kosa: " + err.message));
     }
 }
@@ -398,7 +436,7 @@ window.clearEntireDatabase = function() {
     let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
     if (confirmationText === "FUTA") {
         database.ref().remove()
-        .then(() => alert("Database yote imesafishwa!"))
+        .then(() => { alert("Database yote imesafishwa!"); window.loadCategories(); })
         .catch(err => alert("Kosa: " + err.message));
     } else { alert("Zoezi limesitishwa."); }
 }
@@ -406,7 +444,10 @@ window.clearEntireDatabase = function() {
 window.deleteBus = function(category, key) {
     if(confirm("Unataka kufuta basi hili?")) {
         database.ref('buses/' + category + '/' + key).remove()
-        .then(() => alert("Basi limefutwa!"))
+        .then(() => {
+            alert("Basi limefutwa!");
+            window.showBusCategory(category, "MABASI", true);
+        })
         .catch(err => alert("Kosa: " + err.message));
     }
 }
@@ -444,7 +485,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // =========================================================================
-// SULUHISHO LA KITENGO AI ASSISTANT (KODI MPYA YENYE KEY YAKO SAHIHI)
+// SULUHISHO LA KITENGO AI ASSISTANT (KODI SALAMA)
 // =========================================================================
 const PART_A = "AQ.Ab8RN6LL0VgiZ";
 const PART_B = "gSXifpheeDVtaGlQ7V";
@@ -475,7 +516,6 @@ window.sendMessage = async function() {
 
     const messagesContainer = document.getElementById("ai-chat-messages");
 
-    // Weka ujumbe wa mtumiaji kwenye skrini
     const userDiv = document.createElement("div");
     userDiv.className = "message user-message";
     userDiv.textContent = messageText;
@@ -484,7 +524,6 @@ window.sendMessage = async function() {
     inputEl.value = "";
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // Weka ujumbe wa 'Inafikiria...'
     const loadingDiv = document.createElement("div");
     loadingDiv.className = "message ai-message";
     loadingDiv.id = "ai-loading-msg";
@@ -493,7 +532,6 @@ window.sendMessage = async function() {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-        // Kuunganisha na Google Gemini Live Engine API
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -504,13 +542,11 @@ window.sendMessage = async function() {
 
         const data = await response.json();
         
-        // Futa lile neno la loading
         const loader = document.getElementById("ai-loading-msg");
         if(loader) loader.remove();
 
         const aiResponseText = data.candidates[0].content.parts[0].text;
 
-        // Onyesha jibu la Kitengo AI
         const aiDiv = document.createElement("div");
         aiDiv.className = "message ai-message";
         aiDiv.textContent = aiResponseText;

@@ -56,8 +56,8 @@ window.showcat = function(isBackAction = false) {
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 }
 
-// LOGIC MPYA YENYE KICHUNGI CHA PREMIUM VS FREE + PESAPAL UI PREPARATION
-window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0) {
+// LOGIC YA KICHUNGI CHA PREMIUM VS FREE + PASSWORD MODAL PREPARATION
+window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0, busKey = '') {
     window.hideAllSections();
     document.getElementById("details-view-section").style.display = "block";
     document.getElementById("navicon").style.display = "flex";
@@ -83,7 +83,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         if (price && parseInt(price) > 0) {
             btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
             btn.onclick = function() {
-                window.openPaymentModal(title, price, targetLinkOrId);
+                window.openPasswordModal(title, price, targetLinkOrId, currentCatId, busKey);
             };
         } else {
             let a = document.createElement("a");
@@ -98,50 +98,76 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     }
 }
 
-// POPUP YA UI YA MALIPO YA PESAPAL (MAJARIBIO YA STK PUSH)
-window.openPaymentModal = function(itemName, itemPrice, downloadLink) {
+// DIRISHA LA KUINGIZA PASSWORD NA KUOMBA SMS
+window.openPasswordModal = function(itemName, itemPrice, downloadLink, categoryId, busKey) {
     document.getElementById("pay-item-name").textContent = itemName;
     document.getElementById("pay-item-price").textContent = "Tsh " + itemPrice;
     document.getElementById("pay-target-link").value = downloadLink;
+    
+    // Hifadhi taarifa za database kwa ajili ya kufanya uhakiki wa password baadae
+    document.getElementById("pay-target-link").dataset.catId = categoryId;
+    document.getElementById("pay-target-link").dataset.busKey = busKey;
+    
     document.getElementById("payment-modal-screen").style.display = "flex";
+    document.getElementById("pay-password").value = "";
+    document.getElementById("pay-status-log").style.display = "none";
 }
 
 window.closePaymentModal = function() {
     document.getElementById("payment-modal-screen").style.display = "none";
-    document.getElementById("pay-phone").value = "";
+    document.getElementById("pay-password").value = "";
     document.getElementById("pay-status-log").style.display = "none";
 }
 
-window.processPaymentSimulation = function() {
-    let phone = document.getElementById("pay-phone").value.trim();
-    let link = document.getElementById("pay-target-link").value;
-    let statusLog = document.getElementById("pay-status-log");
+// KUFUNGUA APP YA SMS KIOTOMATIKI UKIBONYEZA OMBA PASSWORD
+window.requestPasswordSMS = function() {
+    const nambaHalotel = "0615304000";
+    const jinaLaBasi = document.getElementById("pay-item-name").textContent;
+    const ujumbe = `HELLO KITENGO GAMING, NAHITAJI PASSWORD YA MOD YA: ${jinaLaBasi}`;
     
-    if(phone.length < 10) {
-        alert("Tafadhali weka namba sahihi ya Halotel/Simu!");
+    // Inafungua app ya SMS kwenye simu ya mteja ikiwa imeshaandikwa kila kitu tayari
+    window.location.href = `sms:${nambaHalotel}?body=${encodeURIComponent(ujumbe)}`;
+}
+
+// KUHAKIKI PASSWORD KUTOKA FIREBASE NA KUMRUSHIA MEDIAFIRE
+window.verifyPasswordAndDownload = function() {
+    const passwordInput = document.getElementById("pay-password").value.trim();
+    const link = document.getElementById("pay-target-link").value;
+    const catId = document.getElementById("pay-target-link").dataset.catId;
+    const busKey = document.getElementById("pay-target-link").dataset.busKey;
+    const statusLog = document.getElementById("pay-status-log");
+    
+    if(passwordInput === "") {
+        alert("Tafadhali ingiza password uliyotumiwa!");
         return;
     }
     
     statusLog.style.display = "block";
     statusLog.style.color = "yellow";
-    statusLog.textContent = "Inatuma maombi PesaPal (STK Push)... Angalia simu yako.";
+    statusLog.textContent = "Inahakiki password yako kwenye database yetu...";
     
-    // UIGIZAJI (SIMULATION) WA INFRASTRUCTURE YA KIPEKEE YA MALIPO
-    setTimeout(() => {
-        statusLog.textContent = "Tafadhali ingiza PIN yako kwenye pop-up ya simu kisha subiri...";
+    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama
+    database.ref(`buses/${catId}/${busKey}/password`).once('value')
+    .then((snapshot) => {
+        const correctPassword = snapshot.val();
         
-        setTimeout(() => {
+        if (correctPassword && passwordInput === correctPassword.toString().trim()) {
             statusLog.style.color = "lightgreen";
-            statusLog.textContent = "Malipo Yamefanikiwa! Mfumo unakupeleka Mediafire...";
+            statusLog.textContent = "Password ni sahihi! Mfumo unakupeleka Mediafire...";
             
             setTimeout(() => {
                 window.closePaymentModal();
                 window.open(link, "_blank");
             }, 1500);
-            
-        }, 3500); // Muda wa kusubiri mteja aweke PIN
-        
-    }, 2000); // Muda wa kuongea na PesaPal API
+        } else {
+            statusLog.style.color = "red";
+            statusLog.textContent = "Password siyo sahihi! Tafadhali hakikisha umeandika herufi vizuri au omba mpya kwa SMS.";
+        }
+    })
+    .catch((err) => {
+        statusLog.style.color = "red";
+        statusLog.textContent = "Kosa la muunganisho: " + err.message;
+    });
 }
 
 window.goBackFromDetails = function() {
@@ -234,13 +260,13 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             const card = document.createElement('div');
             card.className = 'card';
             
-            // Tunapitisha na bei 'item.price' kwenye kadi na details view
+            // Tunapitisha na bei 'item.price' na 'key' ya basi kwenye kadi na details view
             card.innerHTML = `
                 <p>${item.name} ${item.price ? `<span style='color:yellow;font-size:12px;'><br>(Tsh ${item.price})</span>` : ''}</p>
-                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover; cursor: pointer;" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}', '${item.price || 0}')"><br><br>
+                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover; cursor: pointer;" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}', '${item.price || 0}', '${key}')"><br><br>
                 
                 ${item.price && parseInt(item.price) > 0 ? 
-                  `<button onclick="window.openPaymentModal('${item.name}', '${item.price}', '${item.link}')">BUY MOD</button>` : 
+                  `<button onclick="window.openPasswordModal('${item.name}', '${item.price}', '${item.link}', '${categoryId}', '${key}')">BUY MOD</button>` : 
                   `<button><a href="${item.link}" target="_blank">DOWNLOAD</a></button>`
                 }
                 
@@ -298,7 +324,7 @@ window.addCategory = function() {
     reader.readAsDataURL(file);
 }
 
-// --- UPLOAD BUS MPYA KUPITIA BASE64 + MAELEZO MAALUM + BEI (PREMIUM REGULATION) ---
+// --- UPLOAD BUS MPYA KUPITIA BASE64 + MAELEZO MAALUM + BEI NA PASSWORD YAKE ---
 window.uploadBus = function() {
     const secret = document.getElementById("adminSecret").value;
     if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
@@ -308,11 +334,13 @@ window.uploadBus = function() {
     const desc = document.getElementById("uploadDesc").value.trim();
     const fileInput = document.getElementById("uploadImg");
     const link = document.getElementById("uploadLink").value.trim();
-    const price = document.getElementById("uploadPrice").value.trim(); // Sehemu mpya ya bei
+    const price = document.getElementById("uploadPrice").value.trim(); 
+    const password = document.getElementById("uploadPassword").value.trim(); // Sehemu mpya ya kuweka Password kule Admin Panel
 
     if (cat === "") { alert("Chagua Category kwanza!"); return; }
     if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
     if (fileInput.files.length === 0) { alert("Tafadhali chagua picha ya basi!"); return; }
+    if (price && parseInt(price) > 0 && password === "") { alert("Tafadhali weka password ya mod hii ya kulipia!"); return; }
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
@@ -325,14 +353,22 @@ window.uploadBus = function() {
         const base64Image = reader.result;
         
         const newBusRef = database.ref('buses/' + cat).push();
-        // Tunahifadhi bei kwenye Firebase pia
-        newBusRef.set({ name: name, image: base64Image, link: link, desc: desc, price: price ? parseInt(price) : 0 })
+        // Tunahifadhi bei pamoja na password yake kwenye Firebase
+        newBusRef.set({ 
+            name: name, 
+            image: base64Image, 
+            link: link, 
+            desc: desc, 
+            price: price ? parseInt(price) : 0,
+            password: password ? password : "" 
+        })
         .then(() => {
             alert("Basi jipya limeongezwa kwa mafanikio!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
             document.getElementById("uploadPrice").value = "";
+            document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
         }).catch(err => {

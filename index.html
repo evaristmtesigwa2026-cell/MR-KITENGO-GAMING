@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>KITENGO GAMING</title>
+    
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" href="yutong2.jpg">
     
     <style>
@@ -210,7 +212,7 @@
     <div class="hero-section" id="contact" style="margin-top: 50px;">
         <hr class="divider">
         <h2>CONTACT US</h2>
-        <p>Msaada au Malipo: <strong>0615304000</strong> PIA KWA MAHITAJI YA KUTENGENEZEWA WEBSITE ZA KIBIASHARA NA MAREKEBISHO YA MITANDAO YA KAMPUNI WASILIANA NA <a href="">@dotto samo_whatsapp.com</a></p>
+        <p>Msaada au Malipo: <strong>0615304000</strong> PIA KWA MAHITA YA KUTENGENEZEWA WEBSITE ZA KIBIASHARA NA MAREKEBISHO YA MITANDAO YA KAMPUNI WASILIANA NA <a href="">@dotto samo_whatsapp.com</a></p>
         <br><br>
     </div>
 </div>
@@ -330,5 +332,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <script src="game.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker imesajiliwa kikamilifu!', reg))
+        .catch(err => console.log('Kosa la kusajili Service Worker:', err));
+    });
+  }
+</script>
 </body>
 </html>

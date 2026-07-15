@@ -121,7 +121,7 @@
         }
 
         /* ========================================================================= */
-        /* MTINDO WA POPUP MENU YA MALIPO YA PESAPAL (HALOTEL INTEGRATION) */
+        /* MTINDO WA POPUP MENU YA MALIPO YA KIOTOMATIKI (SMS VERIFICATION INTERFACE) */
         /* ========================================================================= */
         .payment-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -133,7 +133,7 @@
             border: 2px solid #ff3d8d; padding: 30px; border-radius: 25px;
             width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .payment-card h3 { margin-top: 0; color: #00FF00; font-size: 20px; text-transform: uppercase; }
+        .payment-card h3 { margin-top: 0; color: #ff3d8d; font-size: 20px; text-transform: uppercase; }
         .payment-card input {
             width: 90%; padding: 12px; margin: 15px 0; border-radius: 10px;
             border: none; font-size: 16px; text-align: center; font-weight: bold;
@@ -276,8 +276,10 @@
     <div id="bus-upload-status" class="status-msg">Inapakia picha kwenye mtandao...</div>
     
     <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
-    <!-- INPUT MPYA YA KUWEKA BEI YA PREMIUM MOD -->
+    
+    <!-- INPUT MPYA ZA BEI NA PASSWORD YA PREMIUM MOD -->
     <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
+    <input type="text" id="uploadPassword" placeholder="Weka Password ya Premium Mod hapa">
     
     <button onclick="window.uploadBus()">UPLOAD ITEM</button>
     <hr>
@@ -288,22 +290,26 @@
 </div>
 
 <!-- ========================================================================= -->
-<!-- DIRISHA LA POPUP LA MALIPO YA KIOTOMATIKI (PESAPAL/HALOTEL INTERFACE) -->
+<!-- DIRISHA LA POPUP LA KUINGIZA PASSWORD NA KUOMBA SMS ZA KAWAIDA -->
 <!-- ========================================================================= -->
 <div id="payment-modal-screen" class="payment-modal">
     <div class="payment-card">
-        <h3>PesaPal Fast Pay</h3>
-        <p style="color: white !important; font-size: 14px; margin: 5px 0;">Unafanya malipo ya:</p>
+        <h3>Mod Imefungwa!</h3>
+        <p style="color: white !important; font-size: 14px; margin: 5px 0;">Inahitajika Password kupakua:</p>
         <div id="pay-item-name" style="font-weight: bold; color: yellow; font-size: 16px;"></div>
         <div id="pay-item-price" style="font-weight: bold; color: #ff3d8d; font-size: 22px; margin-top: 5px;"></div>
         
         <input type="hidden" id="pay-target-link">
-        <input type="text" id="pay-phone" placeholder="Namba ya Halotel (Mfano: 062XXXXXXX)">
+        <input type="text" id="pay-password" placeholder="Ingiza Password Hapa">
         
         <div id="pay-status-log" style="font-size: 12px; margin: 10px 0; display: none;"></div>
         
-        <button onclick="window.processPaymentSimulation()" style="width: 100%; background: #00FF00; color: black;">LIPIA SASA</button>
-        <button onclick="window.closePaymentModal()" style="width: 100%; background: #333; color: white; margin-top: 5px;">GHAIRI</button>
+        <button onclick="window.verifyPasswordAndDownload()" style="width: 100%; background: #00FF00; color: black; font-weight: bold; margin-top: 10px;">THIBITISHA PASSWORD</button>
+        
+        <p style="color: white !important; font-size: 12px; margin: 15px 0 5px 0;">Huna password bado? Bonyeza hapa chini:</p>
+        <button onclick="window.requestPasswordSMS()" style="width: 100%; background: #00ffff; color: black; font-weight: bold; margin-top: 2px;">OMBA PASSWORD KWA SMS</button>
+        
+        <button onclick="window.closePaymentModal()" style="width: 100%; background: #333; color: white; margin-top: 15px;">GHAIRI</button>
     </div>
 </div>
 

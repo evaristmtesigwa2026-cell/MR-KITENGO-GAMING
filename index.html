@@ -259,7 +259,7 @@
     
     <label class="file-label" for="newCatImg">📁 CHAGUA PICHA YA KUNDI</label>
     <input type="file" id="newCatImg" accept="image/*" style="display: none;">
-    <div id="cat-upload-status" class="status-msg">Inapakia picha kwenye mtandao...</div>
+    <div id="cat-upload-status" class="status-msg">Inashindilia picha...</div>
     
     <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
     <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
@@ -273,11 +273,10 @@
     
     <label class="file-label" for="uploadImg">📁 CHAGUA PICHA YA BASI</label>
     <input type="file" id="uploadImg" accept="image/*" style="display: none;">
-    <div id="bus-upload-status" class="status-msg">Inapakia picha kwenye mtandao...</div>
+    <div id="bus-upload-status" class="status-msg">Inashindilia picha...</div>
     
     <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
     
-    <!-- INPUT MPYA ZA BEI NA PASSWORD YA PREMIUM MOD -->
     <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
     <input type="text" id="uploadPassword" placeholder="Weka Password ya Premium Mod hapa">
     
@@ -289,9 +288,6 @@
     <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 90%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
 </div>
 
-<!-- ========================================================================= -->
-<!-- DIRISHA LA POPUP LA KUINGIZA PASSWORD NA KUOMBA SMS ZA KAWAIDA -->
-<!-- ========================================================================= -->
 <div id="payment-modal-screen" class="payment-modal">
     <div class="payment-card">
         <h3>Mod Imefungwa!</h3>
@@ -313,9 +309,6 @@
     </div>
 </div>
 
-<!-- ========================================================================= -->
-<!-- ELEMENT YA KITENGO AI ASSISTANT (INAYOELEA) -->
-<!-- ========================================================================= -->
 <div id="ai-chat-icon" onclick="window.toggleChat()">
     <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/brightness_spark/default/24px.svg" alt="AI Icon">
 </div>

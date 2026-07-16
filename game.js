@@ -220,7 +220,7 @@ window.loadCategories = function() {
     const container = document.getElementById("categories-container");
     const selectDropdown = document.getElementById("uploadCategory");
     
-    if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Inapakia makundi kwa kasi ya mwanga...</p>";
+    if (container) container.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif; letter-spacing:1px;'>Inapakia makundi kwa kasi ya mwanga...</p>";
 
     database.ref('categories').once('value').then((snapshot) => {
         if (container) container.innerHTML = "";
@@ -252,7 +252,7 @@ window.loadCategories = function() {
                 card.className = 'card';
                 card.innerHTML = `
                     <p>${cat.name}</p> 
-                    <img src="${cat.image}" style="width: 180px; height: 110px; border-radius: 10px; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${cat.name}', '${cat.image}', \`${cat.desc || ''}\`, 'category', '${id}')"> <br>
+                    <img src="${cat.image}" style="width: 100%; height: 115px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);" onclick="window.showDetails('${cat.name}', '${cat.image}', \`${cat.desc || ''}\`, 'category', '${id}')"> <br>
                     <button onclick="window.showBusCategory('${id}', '${cat.name}')">CHAGUA HAPA</button>
                     <button class="btn-delete" style="display:none; background-color:red;" id="del-cat-${id}" onclick="window.deleteCategory('${id}')">FUTA GROUP</button>
                 `;
@@ -288,7 +288,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, `#${categoryId}`);
     
     const busContainer = document.getElementById("dynamic-bus-list");
-    busContainer.innerHTML = "<p style='color:white; text-align:center;'>Inatengeneza muonekano...</p>";
+    busContainer.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif;'>Inatengeneza muonekano...</p>";
 
     database.ref('buses/' + categoryId).once('value').then((snapshot) => {
         busContainer.innerHTML = "";
@@ -303,11 +303,15 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             const card = document.createElement('div');
             card.className = 'card';
             
+            // Tambua kama ni Premium (ina bei na ipo juu ya 0)
+            const isPremium = item.price && parseInt(item.price) > 0;
+            
             card.innerHTML = `
-                <p>${item.name} ${item.price ? `<span style='color:yellow;font-size:12px;'><br>(Tsh ${item.price})</span>` : ''}</p>
-                <img src="${item.image}" style="width: 180px; height:110px; border-radius:10px; object-fit:cover; cursor: pointer;" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}', '${item.price || 0}', '${key}')"><br><br>
+                ${isPremium ? `<div class="premium-badge">👑 PREMIUM</div>` : ''}
+                <p>${item.name} ${isPremium ? `<span style='color:#ff007f;font-size:14px;display:block;margin-top:5px;font-family:"Orbitron", sans-serif;text-shadow: 0 0 5px rgba(255,0,127,0.3);'>(Tsh ${item.price})</span>` : ''}</p>
+                <img src="${item.image}" style="width: 100%; height:115px; border-radius:12px; object-fit:cover; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);" onclick="window.showDetails('${item.name}', '${item.image}', \`${item.desc || ''}\`, 'bus', '${item.link}', '${categoryId}', '${categoryName}', '${item.price || 0}', '${key}')"><br><br>
                 
-                ${item.price && parseInt(item.price) > 0 ? 
+                ${isPremium ? 
                   `<button onclick="window.openPasswordModal('${item.name}', '${item.price}', '${item.link}', '${categoryId}', '${key}')">BUY MOD</button>` : 
                   `<button><a href="${item.link}" target="_blank">DOWNLOAD</a></button>`
                 }

@@ -8,207 +8,656 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="yutong2.jpg">
     
+    <!-- Google Fonts kwa ajili ya Muonekano wa Kisasa -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* ==========================================
+           1. USANIFU WA MSINGI (BASE DESIGN)
+        ========================================== */
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            color: white;
-            background: linear-gradient(-45deg, #ff0000, #FF7F00, #00FF00, #9400D3);
-            background-size: 400% 400%;
-            animation: rainbowMotion 10s ease infinite;
+            font-family: 'Rajdhani', sans-serif;
+            color: #c5c6c7;
+            background-color: #0b0c10;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(31, 40, 51, 0.3) 0, transparent 50%),
+                radial-gradient(at 50% 0%, rgba(113, 57, 232, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(69, 243, 255, 0.1) 0, transparent 50%);
+            background-attachment: fixed;
             position: relative;
             overflow-x: hidden;
             min-height: 100vh;
         }
-        @keyframes rainbowMotion {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        body::before, body::after {
+
+        /* Ambient Glowing Background Effect */
+        body::before {
             content: "";
             position: fixed;
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            filter: blur(80px);
-            z-index: -1; 
-            animation: floatingOrbs 20s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(69, 243, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -10%;
+            left: -10%;
+            z-index: -1;
+            animation: floatingGlow 15s ease-in-out infinite alternate;
         }
-        body::after { background: rgba(47, 107, 255, 0.3); width: 400px; height: 400px; animation-delay: -10s; }
-        @keyframes floatingOrbs {
-            0%, 100% { top: -10%; left: 10%; }
-            33% { top: 60%; left: 80%; }
-            66% { top: 80%; left: -10%; }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.1) 0%, rgba(0,0,0,0) 70%);
+            bottom: -10%;
+            right: -10%;
+            z-index: -1;
+            animation: floatingGlow 20s ease-in-out infinite alternate-reverse;
         }
+
+        @keyframes floatingGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.2); }
+        }
+
+        /* ==========================================
+           2. NAVIGATION BAR
+        ========================================== */
         .navbar {
-            background-color: #111;
+            background-color: rgba(11, 12, 16, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(69, 243, 255, 0.2);
             display: flex;
             justify-content: center;
             padding: 15px 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .navbar a {
-            color: white;
-            text-align: center;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-        .navbar a:hover { background: linear-gradient(135deg, #2f6bff, #7139e8); border-radius: 20px; }
-        h1 { text-align: center; background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); margin: 0; padding: 20px; }
-        h2 { text-align: center; color: #333; padding: 10px; }
-        p { color: BLACK; text-align: center; line-height: 1.6; padding: 0 20px; }    
-        .hero-section { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        /* MPANGILIO MKUU WA GRIDI NA KADI */
-        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-        .card {
-            margin: 0 auto; padding: 20px; border-radius: 35px; 
-            background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
-            color: white; text-align: center; width: 250px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
         }
 
-        /* MBALIMBALI KULINGANA NA UKUBWA WA SKRINI (MEDIA QUERIES) */
+        .navbar a {
+            color: #ffffff;
+            text-align: center;
+            padding: 10px 22px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: #45f3ff;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar a:hover {
+            color: #45f3ff;
+            text-shadow: 0 0 10px rgba(69, 243, 255, 0.8);
+        }
+
+        .navbar a:hover::after {
+            width: 80%;
+        }
+
+        /* ==========================================
+           3. HEADINGS AND TEXTS
+        ========================================== */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: 3px;
+            font-size: 2.5rem;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(69, 243, 255, 0.6);
+            background: linear-gradient(135deg, #45f3ff, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            padding: 25px 20px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: #45f3ff;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(69, 243, 255, 0.3);
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        p {
+            color: #a4a6b0;
+            text-align: center;
+            font-size: 17px;
+            line-height: 1.7;
+            padding: 0 20px;
+        }    
+        
+        a {
+            color: #45f3ff;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: #ff007f;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+
+        .hero-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #about {
+            background: rgba(31, 40, 51, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            margin-top: 15px;
+        }
+        
+        /* ==========================================
+           4. GRID SYSTEM & LUXURY CARDS (METAMETA EFFECT)
+        ========================================== */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            position: relative;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(31, 40, 51, 0.65);
+            border: 1px solid rgba(69, 243, 255, 0.15);
+            color: #ffffff;
+            text-align: center;
+            width: 260px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        /* Elegant Neon Borders on Hover */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #45f3ff;
+            box-shadow: 0 15px 35px rgba(69, 243, 255, 0.3);
+            background: rgba(31, 40, 51, 0.85);
+        }
+
+        .card p {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card img {
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* 👑 BADGE YA PREMIUM INAYOMELEMETA */
+        .premium-badge {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #000000;
+            font-weight: 900;
+            font-size: 11px;
+            padding: 5px 35px;
+            transform: rotate(45deg);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 2px rgba(255,255,255,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 10;
+        }
+
+        /* ==========================================
+           5. RESPONSIVENESS (MOBILE DEVICES)
+        ========================================== */
         @media (max-width: 900px) { 
             .cat-grid { grid-template-columns: repeat(2, 1fr); } 
         }
         @media (max-width: 600px) { 
             .cat-grid { 
-                grid-template-columns: repeat(2, 1fr) !important; /* Inalazimisha gridi ya mbili mbili kwenye simu */
-                gap: 12px; 
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px; 
                 padding: 10px; 
             } 
             .card {
-                width: auto !important; /* Inafanya kadi iweze kunyooka na kupungua ili zitoshe mbili */
+                width: auto !important;
                 max-width: 100%;
-                padding: 15px 8px;
-                border-radius: 20px;
+                padding: 15px 10px;
+                border-radius: 15px;
+            }
+            .card p {
+                font-size: 14px;
+                margin-bottom: 8px;
             }
             .card img {
                 width: 100% !important;
                 height: auto !important;
-                max-height: 120px !important; /* Inazuia picha zisiwe ndefu mno zikaharibu muonekano */
+                max-height: 110px !important;
                 object-fit: cover !important;
-                border-radius: 12px !important;
+                border-radius: 10px !important;
+            }
+            h1 {
+                font-size: 1.8rem;
+                padding: 15px 10px;
             }
         }
         
-        /* FOMU ZA LOGIN NA REGISTER */
+        /* ==========================================
+           6. AUTH & ADMIN PANELS
+        ========================================== */
         .reg, .log, .admin-panel {
-            margin: 50px auto; padding: 20px; border-radius: 35px; 
-            background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
-            color: white; text-align: center; width: 280px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin: 50px auto; 
+            padding: 30px 20px; 
+            border-radius: 20px; 
+            background: rgba(31, 40, 51, 0.8);
+            border: 1px solid rgba(69, 243, 255, 0.2);
+            color: #ffffff; 
+            text-align: center; 
+            width: 300px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .reg h1, .log h1, .admin-panel h1 {
+            font-size: 1.8rem;
+            padding: 10px 0;
+            margin-bottom: 20px;
         }
         
-        /* Mtindo wa Input zote za Mfumo ili zionekane vizuri */
+        /* Modern Glassmorphic Inputs */
         .log input, .reg input, .admin-panel input, .admin-panel select { 
-            padding: 12px; 
+            padding: 12px 15px; 
             border-radius: 10px; 
-            width: 90%; 
+            width: 95%; 
             margin-bottom: 15px; 
-            border: none; 
-            font-size: 16px;
-            color: black;
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(11, 12, 16, 0.7);
+            font-size: 15px;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
             box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .log input:focus, .reg input:focus, .admin-panel input:focus, .admin-panel select:focus {
+            outline: none;
+            border-color: #45f3ff;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.5);
+            background: rgba(11, 12, 16, 0.9);
         }
         
-        /* Kurekebisha maandishi ya maelezo ndani ya Login/Register yasiwe Meusi */
         .log p, .reg p {
-            color: white !important;
+            color: #a4a6b0 !important;
         }
         .log a, .reg a {
-            color: yellow;
+            color: #ff007f;
             font-weight: bold;
         }
 
-        .file-label { display: block; background: #333; padding: 10px; border-radius: 10px; margin-bottom: 10px; width: 90%; margin-left: auto; margin-right: auto; cursor: pointer; font-size: 14px; font-weight: bold; box-sizing: border-box; }
-        button {
-            border-radius: 40px; background: rgba(80, 40, 170, 0.7); color: white; cursor: pointer; 
-            border: none; padding: 10px 35px; margin-top: 20px; font-weight: bold; transition: 0.3s;
+        .file-label { 
+            display: block; 
+            background: rgba(69, 243, 255, 0.1); 
+            border: 1px dashed #45f3ff;
+            padding: 12px; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            width: 95%; 
+            margin-left: auto; 
+            margin-right: auto; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: bold; 
+            box-sizing: border-box; 
+            transition: 0.3s;
         }
-        button:hover { background: rgba(255, 61, 141, 0.9); }
-        button a { color: white; text-decoration: none; display: inline-block; width: 100%; height: 100%; }
-        .divider { border: 0; height: 2px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0)); margin: 20px 0; }
-        .btn-delete { background-color: #ff0000 !important; margin-top: 5px; padding: 5px 15px; font-size: 12px; }
-        .status-msg { font-size: 13px; color: lightgreen; font-weight: bold; display: none; margin-bottom: 10px; }
-        
-        /* MTINDO WA SEHEMU YA MAELEZO YA NDANI YA PICHA */
-        .details-box p {
+
+        .file-label:hover {
+            background: rgba(69, 243, 255, 0.2);
+            box-shadow: 0 0 8px rgba(69, 243, 255, 0.3);
+        }
+
+        /* ==========================================
+           7. BUTTONS (CYBER STYLE)
+        ========================================== */
+        button {
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 30px; 
+            background: linear-gradient(135deg, #7139e8, #ff007f); 
+            color: #ffffff; 
+            cursor: pointer; 
+            border: none; 
+            padding: 12px 35px; 
+            margin-top: 15px; 
+            font-weight: 900; 
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+        }
+
+        button:hover { 
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+            background: linear-gradient(135deg, #ff007f, #45f3ff);
+            color: #000000;
+        }
+
+        button a { 
+            color: #ffffff; 
+            text-decoration: none; 
+            display: inline-block; 
+            width: 100%; 
+            height: 100%; 
+        }
+
+        button:hover a {
+            color: #000000;
+        }
+
+        .divider { 
+            border: 0; 
+            height: 1px; 
+            background-image: linear-gradient(to right, rgba(69, 243, 255, 0), rgba(69, 243, 255, 0.75), rgba(69, 243, 255, 0)); 
+            margin: 30px 0; 
+        }
+
+        .btn-delete { 
+            background: #ff3333 !important; 
+            margin-top: 8px; 
+            padding: 6px 15px; 
+            font-size: 11px; 
+            box-shadow: 0 4px 10px rgba(255, 51, 51, 0.4);
+        }
+        .btn-delete:hover {
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.8) !important;
             color: white !important;
         }
 
-        /* ========================================================================= */
-        /* MTINDO WA POPUP MENU YA MALIPO YA KIOTOMATIKI (SMS VERIFICATION INTERFACE) */
-        /* ========================================================================= */
-        .payment-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); display: none; justify-content: center;
-            align-items: center; z-index: 1000000;
+        .status-msg { 
+            font-size: 13px; 
+            color: #00ffcc; 
+            font-weight: bold; 
+            display: none; 
+            margin-bottom: 10px; 
         }
-        .payment-card {
-            background: linear-gradient(135deg, #111111, #222222);
-            border: 2px solid #ff3d8d; padding: 30px; border-radius: 25px;
-            width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .payment-card h3 { margin-top: 0; color: #ff3d8d; font-size: 20px; text-transform: uppercase; }
-        .payment-card input {
-            width: 90%; padding: 12px; margin: 15px 0; border-radius: 10px;
-            border: none; font-size: 16px; text-align: center; font-weight: bold;
+        
+        /* ==========================================
+           8. DETAILS VIEW BOX
+        ========================================== */
+        .details-box {
+            background: rgba(31, 40, 51, 0.85) !important;
+            border: 2px solid #45f3ff !important;
+            box-shadow: 0 10px 40px rgba(69, 243, 255, 0.25) !important;
         }
 
-        /* ========================================================================= */
-        /* MTINDO MAALUM WA KITENGO AI (HAUINGILIANI NA VITU VYAKO VYENGINE) */
-        /* ========================================================================= */
+        .details-box p {
+            color: #c5c6c7 !important;
+        }
+
+        /* ==========================================
+           9. PAYMENT MODAL SCREEN
+        ========================================== */
+        .payment-modal {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(11, 12, 16, 0.92); 
+            backdrop-filter: blur(8px);
+            display: none; 
+            justify-content: center;
+            align-items: center; 
+            z-index: 1000000;
+        }
+
+        .payment-card {
+            background: #111111;
+            border: 2px solid #45f3ff; 
+            padding: 30px; 
+            border-radius: 20px;
+            width: 90%; 
+            max-width: 350px; 
+            text-align: center; 
+            box-shadow: 0 10px 40px rgba(69, 243, 255, 0.3);
+        }
+
+        .payment-card h3 { 
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 0; 
+            color: #45f3ff; 
+            font-size: 22px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+
+        .payment-card input {
+            width: 90%; 
+            padding: 12px; 
+            margin: 15px 0; 
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(0,0,0,0.5);
+            font-size: 18px; 
+            text-align: center; 
+            font-weight: bold;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .payment-card input:focus {
+            outline: none;
+            border-color: #ff007f;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+        }
+
+        /* ==========================================
+           10. KITENGO AI CHATBOX SPECIAL DESIGN
+        ========================================== */
         #ai-chat-icon {
             position: fixed !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            background: linear-gradient(135deg, #7139e8, #ff3d8d) !important;
-            width: 60px !important;
-            height: 60px !important;
+            bottom: 25px !important;
+            right: 25px !important;
+            background: linear-gradient(135deg, #7139e8, #ff007f) !important;
+            width: 65px !important;
+            height: 65px !important;
             border-radius: 50% !important;
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5) !important;
+            box-shadow: 0px 5px 20px rgba(255, 0, 127, 0.5) !important;
             cursor: pointer !important;
             z-index: 999999 !important;
+            transition: all 0.3s;
         }
-        #ai-chat-icon img { width: 30px; height: 30px; filter: invert(1); }
+
+        #ai-chat-icon:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0px 8px 25px rgba(69, 243, 255, 0.6) !important;
+            background: linear-gradient(135deg, #45f3ff, #7139e8) !important;
+        }
+
+        #ai-chat-icon img { 
+            width: 32px; 
+            height: 32px; 
+            filter: invert(1); 
+        }
+
         #ai-chat-box {
             position: fixed !important;
-            bottom: 90px !important;
-            right: 20px !important;
-            width: 310px;
-            height: 390px;
-            background-color: #111111 !important;
-            border: 2px solid #333;
-            border-radius: 15px;
-            box-shadow: 0px 5px 25px rgba(0,0,0,0.7);
+            bottom: 100px !important;
+            right: 25px !important;
+            width: 320px;
+            height: 420px;
+            background-color: #11141a !important;
+            border: 2px solid rgba(69, 243, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0px 10px 35px rgba(0,0,0,0.8);
             display: none;
             flex-direction: column;
             overflow: hidden;
             z-index: 999999 !important;
-            font-family: Arial, sans-serif;
+            font-family: 'Rajdhani', sans-serif;
         }
-        #ai-chat-header { background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); color: white; padding: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-        #ai-chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; color: #fff; background-color: #1a1a1a; }
-        .message { padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 13px; line-height: 1.4; box-sizing: border-box; word-wrap: break-word; }
-        .ai-message { background-color: #2b2b2b; align-self: flex-start; border-bottom-left-radius: 2px; color: #fff !important; }
-        .user-message { background: linear-gradient(135deg, #7139e8, #ff3d8d); color: white !important; align-self: flex-end; border-bottom-right-radius: 2px; }
-        #ai-chat-input-container { display: flex; padding: 8px; background-color: #111; border-top: 1px solid #222; }
-        #ai-user-input { flex: 1; padding: 8px; background-color: #252525; border: none; border-radius: 8px; color: white !important; outline: none; font-size: 13px; }
-        #ai-send-btn { background: linear-gradient(135deg, #7139e8, #ff3d8d); border: none; color: white; padding: 8px 14px; margin-left: 5px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+        #ai-chat-header { 
+            background: linear-gradient(135deg, #1f2833, #0b0c10); 
+            border-bottom: 1px solid rgba(69, 243, 255, 0.3);
+            color: #45f3ff; 
+            padding: 15px; 
+            font-weight: bold; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 15px; 
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        #ai-chat-messages { 
+            flex: 1; 
+            padding: 15px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            color: #fff; 
+            background-color: #0b0c10; 
+        }
+
+        .message { 
+            padding: 10px 14px; 
+            border-radius: 15px; 
+            max-width: 85%; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            box-sizing: border-box; 
+            word-wrap: break-word; 
+        }
+
+        .ai-message { 
+            background-color: #1f2833; 
+            border: 1px solid rgba(255,255,255,0.05);
+            align-self: flex-start; 
+            border-bottom-left-radius: 2px; 
+            color: #c5c6c7 !important; 
+        }
+
+        .user-message { 
+            background: linear-gradient(135deg, #7139e8, #ff007f); 
+            color: white !important; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 2px; 
+            box-shadow: 0 3px 10px rgba(255, 0, 127, 0.2);
+        }
+
+        #ai-chat-input-container { 
+            display: flex; 
+            padding: 10px; 
+            background-color: #11141a; 
+            border-top: 1px solid rgba(69, 243, 255, 0.1); 
+        }
+
+        #ai-user-input { 
+            flex: 1; 
+            padding: 10px 12px; 
+            background-color: #1f2833; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 10px; 
+            color: white !important; 
+            outline: none; 
+            font-size: 14px; 
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+        }
+
+        #ai-user-input:focus {
+            border-color: #45f3ff;
+        }
+
+        #ai-send-btn { 
+            background: linear-gradient(135deg, #7139e8, #ff007f); 
+            border: none; 
+            color: white; 
+            padding: 10px 16px; 
+            margin-left: 8px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: bold; 
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 0 !important;
+            box-shadow: none;
+        }
+        
+        #ai-send-btn:hover {
+            color: white;
+            background: linear-gradient(135deg, #ff007f, #7139e8);
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -224,7 +673,7 @@
     <div class="hero-section">
         <h1>KITENGO GAMING</h1>
         <br>
-        <img src="logo.jpg" alt="image" style="display: block; margin:0 auto; width: 100%; max-width: 800px; border-radius: 15px;">
+        <img src="logo.jpg" alt="image" style="display: block; margin:0 auto; width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.6);">
         <br>
         <p id="about">......welcome kitengo gaming for highly realistic gaming experience & ENJOY, our updates are coming after two days, DOWNLOAD APP YETU KWA UPDATE ZAID <a href="https://www.mediafire.com/file/ffjym4gtkxm6dww/app-apk-609a525dd2d244fbad514ca71031f099-1783768439.apk/file">KITENGO GAMING APP</a>, <a href="">FACEBOOK</a>, <a href="">INSTAGRAM</a>, <a href="">TIKTOK</a>, <a href="">WHATSAPP</a>, <a href="">YOUTUBE</a> as our main launching platforms. dont forget to subscribe our <a href="">YOUTUBE CHANNEL</a>, so as to be the first one to get our updates daily.....</p>
         <hr class="divider">
@@ -243,13 +692,13 @@
 </div>
 
 <div id="bus-view-section" style="display:none;">
-    <h2 id="dynamic-bus-title" style="background-color: ghostwhite; text-transform: uppercase; padding: 10px; color: black; text-align: center;">MABASI</h2>
+    <h2 id="dynamic-bus-title" style="background-color: rgba(255,255,255,0.05); text-transform: uppercase; padding: 15px; color: #45f3ff; text-align: center; border-radius: 10px; max-width: 600px; margin: 20px auto; border: 1px solid rgba(69, 243, 255, 0.2);">MABASI</h2>
     <div class="cat-grid" id="dynamic-bus-list"></div>
 </div>
 
 <div id="details-view-section" style="display:none; padding: 20px;">
     <button onclick="window.goBackFromDetails()" style="margin: 10px auto 25px auto; display: block;">⬅ Rudi Nyuma</button>
-    <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; background: linear-gradient(135deg, #1f2d5a, #4e2272);">
+    <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
         <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
         <img id="details-img" src="" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
         <p id="details-desc" style="margin-top: 20px; font-size: 16px; line-height: 1.5; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></p>
@@ -320,7 +769,7 @@
         <h3>Mod Imefungwa!</h3>
         <p style="color: white !important; font-size: 14px; margin: 5px 0;">Inahitajika Password kupakua:</p>
         <div id="pay-item-name" style="font-weight: bold; color: yellow; font-size: 16px;"></div>
-        <div id="pay-item-price" style="font-weight: bold; color: #ff3d8d; font-size: 22px; margin-top: 5px;"></div>
+        <div id="pay-item-price" style="font-weight: bold; color: #ff007f; font-size: 22px; margin-top: 5px; font-family: 'Orbitron', sans-serif;"></div>
         
         <input type="hidden" id="pay-target-link">
         <input type="text" id="pay-password" placeholder="Ingiza Password Hapa">

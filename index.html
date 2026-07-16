@@ -68,13 +68,38 @@
         h2 { text-align: center; color: #333; padding: 10px; }
         p { color: BLACK; text-align: center; line-height: 1.6; padding: 0 20px; }    
         .hero-section { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* MPANGILIO MKUU WA GRIDI NA KADI */
         .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-        @media (max-width: 900px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .cat-grid { grid-template-columns: 1fr; } }
         .card {
             margin: 0 auto; padding: 20px; border-radius: 35px; 
             background: linear-gradient(135deg, #2f6bff, #7139e8, #ff3d8d); 
             color: white; text-align: center; width: 250px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* MBALIMBALI KULINGANA NA UKUBWA WA SKRINI (MEDIA QUERIES) */
+        @media (max-width: 900px) { 
+            .cat-grid { grid-template-columns: repeat(2, 1fr); } 
+        }
+        @media (max-width: 600px) { 
+            .cat-grid { 
+                grid-template-columns: repeat(2, 1fr) !important; /* Inalazimisha gridi ya mbili mbili kwenye simu */
+                gap: 12px; 
+                padding: 10px; 
+            } 
+            .card {
+                width: auto !important; /* Inafanya kadi iweze kunyooka na kupungua ili zitoshe mbili */
+                max-width: 100%;
+                padding: 15px 8px;
+                border-radius: 20px;
+            }
+            .card img {
+                width: 100% !important;
+                height: auto !important;
+                max-height: 120px !important; /* Inazuia picha zisiwe ndefu mno zikaharibu muonekano */
+                object-fit: cover !important;
+                border-radius: 12px !important;
+            }
         }
         
         /* FOMU ZA LOGIN NA REGISTER */

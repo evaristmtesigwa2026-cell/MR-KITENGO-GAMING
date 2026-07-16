@@ -8,7 +8,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="yutong2.jpg">
     
-    <!-- Google Fonts kwa ajili ya Muonekano wa Kisasa -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -176,7 +175,7 @@
         }
         
         /* ==========================================
-           4. GRID SYSTEM & LUXURY CARDS (METAMETA EFFECT)
+           4. GRID SYSTEM & LUXURY CARDS (WITH MOTION BORDER EFFECT)
         ========================================== */
         .cat-grid {
             display: grid;
@@ -192,8 +191,6 @@
             margin: 0 auto;
             padding: 20px;
             border-radius: 20px;
-            background: rgba(31, 40, 51, 0.65);
-            border: 1px solid rgba(69, 243, 255, 0.15);
             color: #ffffff;
             text-align: center;
             width: 260px;
@@ -201,6 +198,26 @@
             backdrop-filter: blur(8px);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
+
+            /* MFUMO WA MPAMO WA RANGI INAYOTEMBEA (MOTION GRADIENT BORDER) */
+            border: 2px solid transparent;
+            background-image: 
+                linear-gradient(rgba(31, 40, 51, 0.85), rgba(31, 40, 51, 0.85)), 
+                linear-gradient(90deg, #45f3ff, #ff007f, #7139e8, #45f3ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 200% 100%;
+            animation: borderMotion 4s linear infinite;
+        }
+
+        /* Uhuishaji wa Rangi kwenye Mpaka wa Kadi */
+        @keyframes borderMotion {
+            0% {
+                background-position: 0% 0%, 0% 0%;
+            }
+            100% {
+                background-position: 0% 0%, 200% 0%;
+            }
         }
 
         /* Elegant Neon Borders on Hover */
@@ -226,9 +243,12 @@
 
         .card:hover {
             transform: translateY(-10px);
-            border-color: #45f3ff;
-            box-shadow: 0 15px 35px rgba(69, 243, 255, 0.3);
-            background: rgba(31, 40, 51, 0.85);
+            box-shadow: 0 15px 35px rgba(69, 243, 255, 0.4);
+            background-image: 
+                linear-gradient(rgba(31, 40, 51, 0.95), rgba(31, 40, 51, 0.95)), 
+                linear-gradient(90deg, #45f3ff, #ff007f, #7139e8, #45f3ff);
+            /* Inaharakisha mzunguko wa rangi kidogo mtumiaji anapoweka kishale */
+            animation: borderMotion 2s linear infinite;
         }
 
         .card p {
@@ -250,7 +270,7 @@
             transform: scale(1.05);
         }
 
-        /* 👑 BADGE YA PREMIUM INAYOMELEMETA */
+        /* PREMIUM BADGE */
         .premium-badge {
             position: absolute;
             top: 15px;
@@ -697,7 +717,7 @@
 </div>
 
 <div id="details-view-section" style="display:none; padding: 20px;">
-    <button onclick="window.goBackFromDetails()" style="margin: 10px auto 25px auto; display: block;">⬅ Rudi Nyuma</button>
+    <button onclick="window.goBackFromDetails()" style="margin: 10px auto 25px auto; display: block;">тмЕ Rudi Nyuma</button>
     <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
         <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
         <img id="details-img" src="" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
@@ -733,7 +753,7 @@
     <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
     <input type="text" id="newCatDesc" placeholder="Maelezo mafupi ya kundi hili (Optional)">
     
-    <label class="file-label" for="newCatImg">📁 CHAGUA PICHA YA KUNDI</label>
+    <label class="file-label" for="newCatImg">ЁЯУБ CHAGUA PICHA YA KUNDI</label>
     <input type="file" id="newCatImg" accept="image/*" style="display: none;">
     <div id="cat-upload-status" class="status-msg">Inashindilia picha...</div>
     
@@ -747,7 +767,7 @@
     <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
     <input type="text" id="uploadDesc" placeholder="Maelezo mafupi ya basi hili (Optional)">
     
-    <label class="file-label" for="uploadImg">📁 CHAGUA PICHA YA BASI</label>
+    <label class="file-label" for="uploadImg">ЁЯУБ CHAGUA PICHA YA BASI</label>
     <input type="file" id="uploadImg" accept="image/*" style="display: none;">
     <div id="bus-upload-status" class="status-msg">Inashindilia picha...</div>
     

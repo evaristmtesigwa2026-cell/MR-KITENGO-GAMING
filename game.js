@@ -32,7 +32,7 @@ window.register = function() {
     if (name == "" || email == "" || password == "") { alert("Jaza nafasi zote!"); } 
     else { 
         localStorage.setItem("name", name); localStorage.setItem("email", email); localStorage.setItem("password", password);
-        alert("Sajili imekamilika!"); window.showlogin();
+        alert("hongera mkuu registration yako imekamilika!"); window.showlogin();
     }
 }
 
@@ -43,8 +43,8 @@ window.login = function() {
     let dbpassword = localStorage.getItem("password");
     if (name == "" || password == "") { alert("Jaza nafasi zote!"); } 
     else if (name == dbname && password == dbpassword) {
-        alert("Umeingia kikamilifu!"); history.replaceState({ page: "home" }, "Home", "#home"); window.showcat(true); 
-    } else { alert("Taarifa si sahihi!"); }
+        alert("HONGERA SANA KARIBU KITENGO GAMING !"); history.replaceState({ page: "home" }, "Home", "#home"); window.showcat(true); 
+    } else { alert("Taarifa ulizoweka sio sahihi!"); }
 }
 
 window.showcat = function(isBackAction = false) {
@@ -64,7 +64,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     
     document.getElementById("details-title").textContent = title;
     document.getElementById("details-img").src = image;
-    document.getElementById("details-desc").textContent = desc ? desc : "Hakuna maelezo ya ziada yaliyowekwa kwenye item hii.";
+    document.getElementById("details-desc").textContent = desc ? desc : "samahani mkuu Hakuna maelezo ya ziada yaliyowekwa kwenye item hii.";
     
     let btnContainer = document.getElementById("details-action-btn");
     btnContainer.innerHTML = "";
@@ -144,7 +144,7 @@ window.verifyPasswordAndDownload = function() {
     
     statusLog.style.display = "block";
     statusLog.style.color = "yellow";
-    statusLog.textContent = "Inahakiki password yako kwenye database yetu...";
+    statusLog.textContent = "SUBIRI KWANZA MAANA PASSWORD YAKO INAHAKIKIWA  ...";
     
     // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama (Kasi ya juu kwa once)
     database.ref(`buses/${catId}/${busKey}/password`).once('value')
@@ -153,7 +153,7 @@ window.verifyPasswordAndDownload = function() {
         
         if (correctPassword && passwordInput === correctPassword.toString().trim()) {
             statusLog.style.color = "lightgreen";
-            statusLog.textContent = "Password ni sahihi! Mfumo unakupeleka Mediafire...";
+            statusLog.textContent = "hongera Password ni sahihi! Mfumo unakupeleka download page ...";
             
             setTimeout(() => {
                 window.closePaymentModal();
@@ -161,12 +161,12 @@ window.verifyPasswordAndDownload = function() {
             }, 1500);
         } else {
             statusLog.style.color = "red";
-            statusLog.textContent = "Password siyo sahihi! Tafadhali hakikisha umeandika herufi vizuri au omba mpya kwa SMS.";
+            statusLog.textContent = "oyaaaa Password siyo sahihi mkuuu! Tafadhali hakikisha umeandika herufi vizuri au omba mpya kwa SMS.";
         }
     })
     .catch((err) => {
         statusLog.style.color = "red";
-        statusLog.textContent = "Kosa la muunganisho: " + err.message;
+        statusLog.textContent = "CONNECTION ERROR: " + err.message;
     });
 }
 
@@ -220,7 +220,7 @@ window.loadCategories = function() {
     const container = document.getElementById("categories-container");
     const selectDropdown = document.getElementById("uploadCategory");
     
-    if (container) container.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif; letter-spacing:1px;'>Inapakia makundi kwa kasi ya mwanga...</p>";
+    if (container) container.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif; letter-spacing:1px;'>LOADING......</p>";
 
     database.ref('categories').once('value').then((snapshot) => {
         if (container) container.innerHTML = "";
@@ -288,13 +288,13 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, `#${categoryId}`);
     
     const busContainer = document.getElementById("dynamic-bus-list");
-    busContainer.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif;'>Inatengeneza muonekano...</p>";
+    busContainer.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif;'>LOADING.....</p>";
 
     database.ref('buses/' + categoryId).once('value').then((snapshot) => {
         busContainer.innerHTML = "";
         const busesData = snapshot.val();
         if (!busesData) {
-            busContainer.innerHTML = "<p style='color:white; text-align:center;'>Hakuna basi kundi hili bado.</p>";
+            busContainer.innerHTML = "<p style='color:white; text-align:center;'>EMPTY CATEGORY .</p>";
             return;
         }
 
@@ -328,14 +328,14 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
             }
         });
     }).catch(err => {
-        busContainer.innerHTML = "<p style='color:red;'>Tatizo la mtandao: " + err.message + "</p>";
+        busContainer.innerHTML = "<p style='color:red;'>NETWORK ERROR: " + err.message + "</p>";
     });
 }
 
 // --- ONGEZA CATEGORY KUPITIA BASE64 ILIYOSHINDILIWA ---
 window.addCategory = function() {
     const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
+    if (secret !== "1234") { alert("WE ADMIN PASSWORD YAKO SIO SAHIHI!"); return; }
 
     const id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     const name = document.getElementById("newCatName").value.trim();
@@ -563,7 +563,7 @@ window.sendMessage = async function() {
         
         const aiDiv = document.createElement("div");
         aiDiv.className = "message ai-message";
-        aiDiv.textContent = "Samahani mkuu, kuna tatizo la mtandao. Jaribu tena!";
+        aiDiv.textContent = "Samahani mkuu,KITENGO AI NIPO KWENYE MABORESHO KWA SASA.!";
         messagesContainer.appendChild(aiDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }

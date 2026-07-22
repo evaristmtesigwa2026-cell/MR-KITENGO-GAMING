@@ -283,7 +283,7 @@ window.showBusCategory = function(categoryId, categoryName, isBackAction = false
     window.hideAllSections();
     document.getElementById("bus-view-section").style.display = "block";
     document.getElementById("navicon").style.display = "flex";
-    document.getElementById("dynamic-bus-title").textContent = categoryName + " BUSES";
+    document.getElementById("dynamic-bus-title").textContent = categoryName + " ";
 
     if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, `#${categoryId}`);
     

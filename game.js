@@ -13,9 +13,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-window.isAdminMode = function() {
-    return window.location.hash === "#admin";
-};
+// VARIABLE YA KUTHIBITISHA HAKI ZA ADMIN TAYARI
+window.isAdminAuthenticated = false;
 
 window.hideAllSections = function() {
     const sections = ["cat", "bus-view-section", "details-view-section", "log", "reg", "adminSection"];
@@ -24,10 +23,10 @@ window.hideAllSections = function() {
         if (el) el.style.display = "none";
     });
     document.getElementById("navicon").style.display = "none";
-};
+}
 
-window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; };
-window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; };
+window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; }
+window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; }
 
 window.register = function() {
     let name = document.getElementById("regname").value;
@@ -38,7 +37,7 @@ window.register = function() {
         localStorage.setItem("name", name); localStorage.setItem("email", email); localStorage.setItem("password", password);
         alert("hongera mkuu registration yako imekamilika!"); window.showlogin();
     }
-};
+}
 
 window.login = function() {
     let name = document.getElementById("logname").value;
@@ -49,131 +48,18 @@ window.login = function() {
     else if (name == dbname && password == dbpassword) {
         alert("HONGERA SANA KARIBU KITENGO GAMING !"); history.replaceState({ page: "home" }, "Home", "#home"); window.showcat(true); 
     } else { alert("Taarifa ulizoweka sio sahihi!"); }
-};
+}
 
 window.showcat = function(isBackAction = false) {
     let dbname = localStorage.getItem("name");
-    if(!dbname && !window.isAdminMode()) { window.showregister(); return; }
-    
+    if(!dbname) { window.showregister(); return; }
     window.hideAllSections();
     document.getElementById("cat").style.display = "block";
     document.getElementById("navicon").style.display = "flex"; 
-    
-    const banner = document.getElementById("admin-mode-banner");
-    if (banner) {
-        banner.style.display = window.isAdminMode() ? "block" : "none";
-    }
+    if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
+}
 
-    if (!isBackAction) history.pushState({ page: "home" }, "Home", window.isAdminMode() ? "#admin" : "#home");
-    window.loadCategories();
-};
-
-// HELPER FOR LONG PRESS (5 SECONDS / 5000MS)
-window.setupLongPress = function(element, callback) {
-    let timer = null;
-    let isLongPress = false;
-
-    const start = (e) => {
-        if (!window.isAdminMode()) return;
-        isLongPress = false;
-        timer = setTimeout(() => {
-            isLongPress = true;
-            if (navigator.vibrate) navigator.vibrate(100);
-            callback(e);
-        }, 5000); // 5 Seconds exact
-    };
-
-    const cancel = () => {
-        if (timer) clearTimeout(timer);
-    };
-
-    element.addEventListener('touchstart', start, { passive: true });
-    element.addEventListener('touchend', cancel);
-    element.addEventListener('touchmove', cancel);
-
-    element.addEventListener('mousedown', start);
-    element.addEventListener('mouseup', cancel);
-    element.addEventListener('mouseleave', cancel);
-};
-
-// EDIT FUNCTIONS FOR ADMIN VIA LONG PRESS
-window.adminEditImage = function(dbPath, currentCatId, isBus = false) {
-    if (!window.isAdminMode()) return;
-    const pass = prompt("WE ADMIN: Ingiza Kodi ya Siri Kuedit Picha Hii:");
-    if (pass !== "1234") { alert("Kodi ya siri sio sahihi!"); return; }
-
-    const hiddenInput = document.getElementById("adminHiddenImageInput");
-    hiddenInput.onchange = function(e) {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            window.compressImage(file, 600, 600, 0.7, function(compressedBase64) {
-                database.ref(dbPath).update({ image: compressedBase64 })
-                .then(() => {
-                    alert("Picha imebadilishwa kikamilifu!");
-                    if (isBus) window.showBusCategory(currentCatId, "MABASI", true);
-                    else window.loadCategories();
-                })
-                .catch(err => alert("Kosa la update: " + err.message));
-            });
-        }
-    };
-    hiddenInput.click();
-};
-
-window.adminEditLink = function(dbPath, currentCatId) {
-    if (!window.isAdminMode()) return;
-    const pass = prompt("WE ADMIN: Ingiza Kodi ya Siri Kuedit Link Hii:");
-    if (pass !== "1234") { alert("Kodi ya siri sio sahihi!"); return; }
-
-    database.ref(dbPath).once('value').then(snapshot => {
-        const item = snapshot.val();
-        const oldLink = item ? item.link : '';
-        const newLink = prompt("Ingiza Link Mpya ya Download (Mediafire):", oldLink);
-        if (newLink !== null && newLink.trim() !== "") {
-            database.ref(dbPath).update({ link: newLink.trim() })
-            .then(() => {
-                alert("Link imebadilishwa kikamilifu!");
-                window.showBusCategory(currentCatId, "MABASI", true);
-            })
-            .catch(err => alert("Kosa la update: " + err.message));
-        }
-    });
-};
-
-window.adminEditDetails = function(dbPath, currentCatId, isBus = false) {
-    if (!window.isAdminMode()) return;
-    const pass = prompt("WE ADMIN: Ingiza Kodi ya Siri Kuedit Maelezo:");
-    if (pass !== "1234") { alert("Kodi ya siri sio sahihi!"); return; }
-
-    database.ref(dbPath).once('value').then(snapshot => {
-        const item = snapshot.val();
-        if (!item) return;
-
-        const newName = prompt("Badili Jina:", item.name || "");
-        if (newName === null) return;
-
-        const newDesc = prompt("Badili Maelezo Mafupi (Desc):", item.desc || "");
-
-        let updates = { name: newName.trim(), desc: newDesc !== null ? newDesc.trim() : "" };
-
-        if (isBus) {
-            const newPrice = prompt("Badili Bei (Weka 0 kama ni ya bure):", item.price || 0);
-            const newPass = prompt("Badili Password ya Mod:", item.password || "");
-            if (newPrice !== null) updates.price = parseInt(newPrice) || 0;
-            if (newPass !== null) updates.password = newPass.trim();
-        }
-
-        database.ref(dbPath).update(updates)
-        .then(() => {
-            alert("Taarifa zimebadilishwa kikamilifu!");
-            if (isBus) window.showBusCategory(currentCatId, "MABASI", true);
-            else window.loadCategories();
-        })
-        .catch(err => alert("Kosa: " + err.message));
-    });
-};
-
-// LOGIC YA DETAILS VIEW
+// LOGIC YA KICHUNGI CHA PREMIUM VS FREE + PASSWORD MODAL PREPARATION
 window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0, busKey = '') {
     window.hideAllSections();
     document.getElementById("details-view-section").style.display = "block";
@@ -195,6 +81,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         window.currentDetailsBack = function() { window.showcat(); };
     } else {
         let btn = document.createElement("button");
+        
         if (price && parseInt(price) > 0) {
             btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
             btn.onclick = function() {
@@ -211,7 +98,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         btnContainer.appendChild(btn);
         window.currentDetailsBack = function() { window.showBusCategory(currentCatId, currentCatName); };
     }
-};
+}
 
 window.openPasswordModal = function(itemName, itemPrice, downloadLink, categoryId, busKey) {
     document.getElementById("pay-item-name").textContent = itemName;
@@ -224,20 +111,21 @@ window.openPasswordModal = function(itemName, itemPrice, downloadLink, categoryI
     document.getElementById("payment-modal-screen").style.display = "flex";
     document.getElementById("pay-password").value = "";
     document.getElementById("pay-status-log").style.display = "none";
-};
+}
 
 window.closePaymentModal = function() {
     document.getElementById("payment-modal-screen").style.display = "none";
     document.getElementById("pay-password").value = "";
     document.getElementById("pay-status-log").style.display = "none";
-};
+}
 
 window.requestPasswordSMS = function() {
     const nambaHalotel = "0615304000";
     const jinaLaBasi = document.getElementById("pay-item-name").textContent;
     const ujumbe = `HELLO KITENGO GAMING, NAHITAJI PASSWORD YA MOD YA: ${jinaLaBasi}`;
+    
     window.location.href = `sms:${nambaHalotel}?body=${encodeURIComponent(ujumbe)}`;
-};
+}
 
 window.verifyPasswordAndDownload = function() {
     const passwordInput = document.getElementById("pay-password").value.trim();
@@ -276,7 +164,7 @@ window.verifyPasswordAndDownload = function() {
         statusLog.style.color = "red";
         statusLog.textContent = "CONNECTION ERROR: " + err.message;
     });
-};
+}
 
 window.goBackFromDetails = function() {
     if (typeof window.currentDetailsBack === "function") {
@@ -284,260 +172,66 @@ window.goBackFromDetails = function() {
     } else {
         window.showcat();
     }
-};
+}
 
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     const reader = new FileReader();
     reader.onload = function(event) {
         const img = new Image();
         img.onload = function() {
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             let width = img.width;
             let height = img.height;
-
+            
             if (width > height) {
                 if (width > maxWidth) {
-                    height *= maxWidth / width;
+                    height = Math.round(height * maxWidth / width);
                     width = maxWidth;
                 }
             } else {
                 if (height > maxHeight) {
-                    width *= maxHeight / height;
+                    width = Math.round(width * maxHeight / height);
                     height = maxHeight;
                 }
             }
-
+            
             canvas.width = width;
             canvas.height = height;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
-
-            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            
+            const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
             callback(compressedBase64);
         };
         img.src = event.target.result;
     };
     reader.readAsDataURL(file);
-};
-
-// LOAD CATEGORIES (WITH INLINE DESCRIPTION + LONG PRESS EDITS)
-window.loadCategories = function() {
-    const container = document.getElementById("categories-container");
-    const selectDropdown = document.getElementById("uploadCategory");
-    
-    if (container) container.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif; letter-spacing:1px;'>LOADING......</p>";
-
-    database.ref('categories').once('value').then((snapshot) => {
-        if (container) container.innerHTML = "";
-        if (selectDropdown) selectDropdown.innerHTML = "";
-        
-        const data = snapshot.val();
-        if (!data) {
-            if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Hakuna kundi lililowekwa bado.</p>";
-            if (selectDropdown) {
-                let opt = document.createElement('option');
-                opt.value = "";
-                opt.textContent = "-- Hakuna Kundi --";
-                selectDropdown.appendChild(opt);
-            }
-            return;
-        }
-
-        if (selectDropdown) {
-            let defaultOpt = document.createElement('option');
-            defaultOpt.value = "";
-            defaultOpt.textContent = "-- Chagua Category --";
-            selectDropdown.appendChild(defaultOpt);
-        }
-
-        Object.keys(data).forEach((id) => {
-            const cat = data[id];
-            if (container) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                const titleP = document.createElement('p');
-                titleP.className = 'card-title';
-                titleP.textContent = cat.name;
-
-                const imgEl = document.createElement('img');
-                imgEl.src = cat.image;
-                imgEl.style.cssText = "width: 100%; height: 115px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);";
-                imgEl.onclick = function() {
-                    window.showDetails(cat.name, cat.image, cat.desc || '', 'category', id);
-                };
-
-                const descDiv = document.createElement('div');
-                descDiv.className = 'card-description-inline';
-                descDiv.textContent = cat.desc ? cat.desc : "Hakuna maelezo ya ziada.";
-
-                const actionBtn = document.createElement('button');
-                actionBtn.textContent = "CHAGUA HAPA";
-                actionBtn.onclick = function() {
-                    window.showBusCategory(id, cat.name);
-                };
-
-                const delBtn = document.createElement('button');
-                delBtn.className = "btn-delete";
-                delBtn.style.cssText = "display:none; background-color:red;";
-                delBtn.id = `del-cat-${id}`;
-                delBtn.textContent = "FUTA GROUP";
-                delBtn.onclick = function() { window.deleteCategory(id); };
-
-                card.appendChild(titleP);
-                card.appendChild(imgEl);
-                card.appendChild(descDiv);
-                card.appendChild(actionBtn);
-                card.appendChild(delBtn);
-
-                // Setup Long-press event handlers for Admin Mode
-                window.setupLongPress(imgEl, () => window.adminEditImage(`categories/${id}`, id, false));
-                window.setupLongPress(titleP, () => window.adminEditDetails(`categories/${id}`, id, false));
-                window.setupLongPress(descDiv, () => window.adminEditDetails(`categories/${id}`, id, false));
-
-                container.appendChild(card);
-            }
-
-            if (selectDropdown) {
-                const option = document.createElement('option');
-                option.value = id;
-                option.textContent = cat.name;
-                selectDropdown.appendChild(option);
-            }
-
-            if(window.isAdminMode()) {
-                setTimeout(() => {
-                    let btn = document.getElementById(`del-cat-${id}`);
-                    if(btn) btn.style.display = "inline-block";
-                }, 100);
-            }
-        });
-    }).catch(err => {
-        if (container) container.innerHTML = "<p style='color:red;'>Tatizo la mtandao: " + err.message + "</p>";
-    });
-};
-
-// LOAD BUSES (WITH INLINE DESCRIPTION + LONG PRESS EDITS)
-window.showBusCategory = function(categoryId, categoryName, isBackAction = false) {
-    window.hideAllSections();
-    document.getElementById("bus-view-section").style.display = "block";
-    document.getElementById("navicon").style.display = "flex";
-    document.getElementById("dynamic-bus-title").textContent = categoryName + " ";
-
-    if (!isBackAction) history.pushState({ page: categoryId, catName: categoryName }, categoryId, window.isAdminMode() ? "#admin" : `#${categoryId}`);
-    
-    const busContainer = document.getElementById("dynamic-bus-list");
-    busContainer.innerHTML = "<p style='color:white; text-align:center; font-family:\"Orbitron\", sans-serif;'>LOADING.....</p>";
-
-    database.ref('buses/' + categoryId).once('value').then((snapshot) => {
-        busContainer.innerHTML = "";
-        const busesData = snapshot.val();
-        if (!busesData) {
-            busContainer.innerHTML = "<p style='color:white; text-align:center;'>EMPTY CATEGORY .</p>";
-            return;
-        }
-
-        Object.keys(busesData).forEach((key) => {
-            const item = busesData[key];
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            const isPremium = item.price && parseInt(item.price) > 0;
-            
-            if (isPremium) {
-                const badge = document.createElement('div');
-                badge.className = 'premium-badge';
-                badge.textContent = '👑 PREMIUM';
-                card.appendChild(badge);
-            }
-
-            const titleP = document.createElement('p');
-            titleP.className = 'card-title';
-            titleP.innerHTML = `${item.name} ${isPremium ? `<span style='color:#ff007f;font-size:14px;display:block;margin-top:5px;font-family:"Orbitron", sans-serif;text-shadow: 0 0 5px rgba(255,0,127,0.3);'>(Tsh ${item.price})</span>` : ''}`;
-
-            const imgEl = document.createElement('img');
-            imgEl.src = item.image;
-            imgEl.style.cssText = "width: 100%; height:115px; border-radius:12px; object-fit:cover; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);";
-            imgEl.onclick = function() {
-                window.showDetails(item.name, item.image, item.desc || '', 'bus', item.link, categoryId, categoryName, item.price || 0, key);
-            };
-
-            const descDiv = document.createElement('div');
-            descDiv.className = 'card-description-inline';
-            descDiv.textContent = item.desc ? item.desc : "Hakuna maelezo ya ziada.";
-
-            let actionBtn;
-            if (isPremium) {
-                actionBtn = document.createElement('button');
-                actionBtn.textContent = "BUY MOD";
-                actionBtn.onclick = function() {
-                    window.openPasswordModal(item.name, item.price, item.link, categoryId, key);
-                };
-            } else {
-                actionBtn = document.createElement('button');
-                let a = document.createElement('a');
-                a.href = item.link;
-                a.target = "_blank";
-                a.textContent = "DOWNLOAD";
-                actionBtn.appendChild(a);
-            }
-
-            const delBtn = document.createElement('button');
-            delBtn.className = "btn-delete";
-            delBtn.id = `del-bus-${key}`;
-            delBtn.style.display = "none";
-            delBtn.textContent = "FUTA";
-            delBtn.onclick = function() { window.deleteBus(categoryId, key); };
-
-            card.appendChild(titleP);
-            card.appendChild(imgEl);
-            card.appendChild(descDiv);
-            card.appendChild(actionBtn);
-            card.appendChild(delBtn);
-
-            // Setup Long-press event handlers for Admin Mode
-            const itemPath = `buses/${categoryId}/${key}`;
-            window.setupLongPress(imgEl, () => window.adminEditImage(itemPath, categoryId, true));
-            window.setupLongPress(actionBtn, () => window.adminEditLink(itemPath, categoryId));
-            window.setupLongPress(titleP, () => window.adminEditDetails(itemPath, categoryId, true));
-            window.setupLongPress(descDiv, () => window.adminEditDetails(itemPath, categoryId, true));
-
-            busContainer.appendChild(card);
-
-            if(window.isAdminMode()) {
-                setTimeout(() => {
-                    let btn = document.getElementById(`del-bus-${key}`);
-                    if(btn) btn.style.display = "inline-block";
-                }, 100);
-            }
-        });
-    }).catch(err => {
-        busContainer.innerHTML = "<p style='color:red;'>NETWORK ERROR: " + err.message + "</p>";
-    });
-};
+}
 
 window.addCategory = function() {
-    const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("WE ADMIN PASSWORD YAKO SIO SAHIHI!"); return; }
-
-    const id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    const name = document.getElementById("newCatName").value.trim();
-    const desc = document.getElementById("newCatDesc").value.trim();
-    const fileInput = document.getElementById("newCatImg");
-
-    if (id === "" || name === "") { alert("Tafadhali jaza ID na Jina la Category!"); return; }
-    if (fileInput.files.length === 0) { alert("Tafadhali chagua picha kutoka kwenye simu!"); return; }
-
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya admin!"); return; }
+    let id = document.getElementById("newCatId").value.trim();
+    let name = document.getElementById("newCatName").value.trim();
+    let desc = document.getElementById("newCatDesc").value.trim();
+    let fileInput = document.getElementById("newCatImg");
+    
+    if (id === "" || name === "") { alert("Jaza ID na Jina!"); return; }
+    if (fileInput.files.length === 0) { alert("Chagua picha ya kundi!"); return; }
+    
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inashindilia picha kuwa nyepesi na kuhifadhi kwenye Firebase...";
-
+    statusDiv.textContent = "Inashindilia picha ya kundi kuwa nyepesi...";
+    
     const file = fileInput.files[0];
-
-    window.compressImage(file, 500, 500, 0.7, function(compressedBase64) {
-        database.ref('categories/' + id).set({ name: name, image: compressedBase64, desc: desc })
+    
+    window.compressImage(file, 400, 400, 0.7, function(compressedBase64) {
+        database.ref('categories/' + id).set({ 
+            name: name, 
+            image: compressedBase64, 
+            desc: desc
+        })
         .then(() => {
-            alert("Category mpya imeongezwa kikamilifu!");
+            alert("Kundi jipya limeongezwa!");
             document.getElementById("newCatId").value = "";
             document.getElementById("newCatName").value = "";
             document.getElementById("newCatDesc").value = "";
@@ -545,25 +239,267 @@ window.addCategory = function() {
             statusDiv.style.display = "none";
             window.loadCategories();
         }).catch(err => {
-            alert("Kosa la Firebase: " + err.message);
+            alert("Kosa: " + err.message);
             statusDiv.style.display = "none";
         });
     });
-};
+}
+
+window.loadCategories = function() {
+    database.ref('categories').once('value', (snapshot) => {
+        const categories = snapshot.val() || {};
+        let categorySelect = document.getElementById("uploadCategory");
+        let adminCategorySelect = document.getElementById("adminCategorySelect");
+
+        if (categorySelect) categorySelect.innerHTML = '<option value="">-- Chagua Category --</option>';
+        if (adminCategorySelect) adminCategorySelect.innerHTML = '<option value="">-- Chagua Category --</option>';
+        
+        let catContainer = document.getElementById("categories-container");
+        if (catContainer) catContainer.innerHTML = "";
+        
+        for (const [key, cat] of Object.entries(categories)) {
+            if (categorySelect) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = cat.name;
+                categorySelect.appendChild(opt);
+            }
+
+            if (adminCategorySelect) {
+                const optAdmin = document.createElement("option");
+                optAdmin.value = key;
+                optAdmin.textContent = cat.name;
+                adminCategorySelect.appendChild(optAdmin);
+            }
+            
+            if (catContainer) {
+                const card = document.createElement("div");
+                card.className = "card category-card";
+                card.style.position = "relative";
+                
+                card.innerHTML = `
+                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
+                        <img src="${cat.image}" alt="${cat.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${cat.name}</h3>
+                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">${cat.desc || 'Kundi la mods'}</p>
+                    <button onclick="window.showBusCategory('${key}', '${cat.name}', false, false)" style="width: 100%; margin-top: 15px;">CHAGUA HAPA</button>
+                `;
+                
+                catContainer.appendChild(card);
+            }
+        }
+    });
+}
+
+window.showBusCategory = function(catId, catName, isAdminMode = false, forceAdminView = false) {
+    database.ref('buses/' + catId).once('value', (snapshot) => {
+        const buses = snapshot.val() || {};
+        
+        // KUCHUNGUZA KAMA ADMIN AMEINGIA PASSIWORD SAHIHI
+        let isAdmin = window.isAdminAuthenticated && (isAdminMode || forceAdminView);
+        
+        window.hideAllSections();
+        document.getElementById("bus-view-section").style.display = "block";
+        document.getElementById("navicon").style.display = "flex";
+        
+        if (!isAdmin) {
+            history.pushState({ page: catId, catName: catName }, catName, "#" + catId);
+        }
+        
+        document.getElementById("dynamic-bus-title").textContent = catName;
+        
+        let busList = document.getElementById("dynamic-bus-list");
+        busList.innerHTML = "";
+        
+        for (const [key, bus] of Object.entries(buses)) {
+            const card = document.createElement("div");
+            card.className = "card bus-card";
+            
+            if (isAdmin) {
+                // Admin mode card (Itaonyeshwa kwa Admin aliyehifadhiwa tu)
+                card.innerHTML = `
+                    <div class="admin-card-wrapper" data-cat="${catId}" data-key="${key}">
+                        <div style="position: relative;">
+                            <img src="${bus.image}" alt="${bus.name}" class="editable-image" style="width: 100%; height: 200px; object-fit: cover; border-radius: 15px; cursor: pointer;">
+                            <div class="long-press-hint" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #45f3ff; padding: 3px 8px; border-radius: 5px; font-size: 11px; display: none;">5s = Edit</div>
+                        </div>
+                        <h3 class="editable-title" style="margin: 15px 0 5px 0; cursor: pointer; color: #45f3ff;">${bus.name}</h3>
+                        <p class="editable-category" style="margin: 0; font-size: 12px; color: #7139e8; cursor: pointer;">${catName}</p>
+                        <p class="editable-desc" style="margin: 10px 0; font-size: 14px; line-height: 1.4; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; cursor: pointer;">
+                            ${bus.desc || 'Hakuna maelezo'}
+                        </p>
+                        <div style="display: flex; gap: 8px; margin: 10px 0;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 11px; color: #a4a6b0;">Bei (Tsh):</label>
+                                <p class="editable-price" style="margin: 0; color: #ff007f; font-weight: bold; cursor: pointer; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;">${bus.price || 0}</p>
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 11px; color: #a4a6b0;">Link:</label>
+                                <p class="editable-link" style="margin: 0; color: #45f3ff; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;" title="${bus.link}">${(bus.link || '').substring(0, 20)}...</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; margin: 0;">FUTA</button>
+                            <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; margin: 0;">REFRESH</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Normal User card (Watumiaji wa kawaida HAWAWEZI ku-edit)
+                card.innerHTML = `
+                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
+                        <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')">
+                    </div>
+                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${bus.name}</h3>
+                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0; line-height: 1.4;">
+                        ${bus.desc || 'Hakuna maelezo'}
+                    </p>
+                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin: 12px 0;">
+                        ${bus.price && parseInt(bus.price) > 0 ? 
+                            `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
+                            `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
+                    </div>
+                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')" style="width: 100%;">TAZAMA & DOWNLOAD</button>
+                `;
+            }
+            
+            busList.appendChild(card);
+            
+            if (isAdmin) {
+                window.setupAdminCardListeners(card, catId, key, bus);
+            }
+        }
+        
+        let backBtn = document.createElement("button");
+        backBtn.textContent = "Rudi Nyuma";
+        backBtn.style.cssText = "display: block; margin: 20px auto; padding: 12px 30px; width: auto;";
+        backBtn.onclick = function() {
+            if (isAdmin) {
+                window.showAdminPanel();
+            } else {
+                window.showcat();
+            }
+        };
+        busList.parentElement.insertBefore(backBtn, busList.nextSibling);
+    });
+}
+
+window.reloadCategoryView = function(catId, catName) {
+    window.showBusCategory(catId, catName, true, true);
+}
+
+window.setupAdminCardListeners = function(card, catId, key, bus) {
+    if (!window.isAdminAuthenticated) return;
+
+    const titleEl = card.querySelector('.editable-title');
+    const priceEl = card.querySelector('.editable-price');
+    const linkEl = card.querySelector('.editable-link');
+    const descEl = card.querySelector('.editable-desc');
+    const imageEl = card.querySelector('.editable-image');
+    const hintEl = card.querySelector('.long-press-hint');
+    
+    let pressTimer;
+    
+    if (imageEl) {
+        imageEl.addEventListener('mousedown', () => {
+            if(hintEl) hintEl.style.display = 'block';
+            pressTimer = setTimeout(() => {
+                window.editBusImage(catId, key, bus);
+            }, 3000);
+        });
+        imageEl.addEventListener('mouseup', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
+        imageEl.addEventListener('mouseleave', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
+        
+        imageEl.addEventListener('touchstart', () => {
+            if(hintEl) hintEl.style.display = 'block';
+            pressTimer = setTimeout(() => {
+                window.editBusImage(catId, key, bus);
+            }, 3000);
+        });
+        imageEl.addEventListener('touchend', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
+    }
+    
+    if (titleEl) {
+        titleEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'), 3000); });
+        titleEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
+        titleEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+        titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'), 3000); });
+        titleEl.addEventListener('touchend', () => clearTimeout(pressTimer));
+    }
+    
+    if (priceEl) {
+        priceEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'), 3000); });
+        priceEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
+        priceEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+        priceEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'), 3000); });
+        priceEl.addEventListener('touchend', () => clearTimeout(pressTimer));
+    }
+    
+    if (linkEl) {
+        linkEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'link', bus.link, 'Link ya Download'), 3000); });
+        linkEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
+        linkEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+        linkEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'link', bus.link, 'Link ya Download'), 3000); });
+        linkEl.addEventListener('touchend', () => clearTimeout(pressTimer));
+    }
+    
+    if (descEl) {
+        descEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo'), 3000); });
+        descEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
+        descEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+        descEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo'), 3000); });
+        descEl.addEventListener('touchend', () => clearTimeout(pressTimer));
+    }
+}
+
+window.editBusField = function(catId, key, field, currentValue, label) {
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya Admin!"); return; }
+    const newValue = prompt(`Badilisha ${label}:\n\n(Sasa: ${currentValue})`, currentValue);
+    if (newValue !== null && newValue !== currentValue) {
+        database.ref(`buses/${catId}/${key}/${field}`).set(newValue)
+            .then(() => {
+                alert('Imebadilishwa kwa ufanisi!');
+                window.reloadCategoryView(catId, '');
+            })
+            .catch(err => alert('Kosa: ' + err.message));
+    }
+}
+
+window.editBusImage = function(catId, key, bus) {
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya Admin!"); return; }
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    
+    fileInput.onchange = function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            window.compressImage(file, 600, 600, 0.7, function(compressedBase64) {
+                database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
+                    .then(() => {
+                        alert('Picha imebadilishwa kwa ufanisi!');
+                        window.reloadCategoryView(catId, '');
+                    })
+                    .catch(err => alert('Kosa: ' + err.message));
+            });
+        }
+    };
+    
+    fileInput.click();
+}
 
 window.uploadBus = function() {
-    const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri siyo sahihi!"); return; }
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya Admin!"); return; }
+    let cat = document.getElementById("uploadCategory").value;
+    let name = document.getElementById("uploadName").value;
+    let link = document.getElementById("uploadLink").value;
+    let desc = document.getElementById("uploadDesc").value;
+    let price = document.getElementById("uploadPrice").value;
+    let password = document.getElementById("uploadPassword").value;
+    let fileInput = document.getElementById("uploadImg");
 
-    const cat = document.getElementById("uploadCategory").value;
-    const name = document.getElementById("uploadName").value.trim();
-    const desc = document.getElementById("uploadDesc").value.trim();
-    const fileInput = document.getElementById("uploadImg");
-    const link = document.getElementById("uploadLink").value.trim();
-    const price = document.getElementById("uploadPrice").value.trim(); 
-    const password = document.getElementById("uploadPassword").value.trim();
-
-    if (cat === "") { alert("Chagua Category kwanza!"); return; }
+    if (cat === "") { alert("Tafadhali chagua Category kwanza!"); return; }
     if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
     if (fileInput.files.length === 0) { alert("Tafadhali chagua picha ya basi!"); return; }
     if (price && parseInt(price) > 0 && password === "") { alert("Tafadhali weka password ya mod hii ya kulipia!"); return; }
@@ -593,15 +529,16 @@ window.uploadBus = function() {
             document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
-            window.showBusCategory(cat, "MABASI", true);
+            window.showBusCategory(cat, "MABASI", true, true);
         }).catch(err => {
             alert("Kosa la Firebase: " + err.message);
             statusDiv.style.display = "none";
         });
     });
-};
+}
 
 window.deleteCategory = function(categoryId) {
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya Admin!"); return; }
     if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
     if(confirm("Je, una uhakika unataka kufuta GROUP la '" + categoryId + "' na kila kitu chake?")) {
         database.ref('categories/' + categoryId).remove()
@@ -611,75 +548,92 @@ window.deleteCategory = function(categoryId) {
             window.loadCategories();
         }).catch(err => alert("Kosa: " + err.message));
     }
-};
+}
 
 window.clearEntireDatabase = function() {
-    const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
-
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya Admin!"); return; }
     let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
     if (confirmationText === "FUTA") {
         database.ref().remove()
         .then(() => { alert("Database yote imesafishwa!"); window.loadCategories(); })
         .catch(err => alert("Kosa: " + err.message));
     } else { alert("Zoezi limesitishwa."); }
-};
+}
 
 window.deleteBus = function(category, key) {
+    if (!window.isAdminAuthenticated) { alert("Huna ruhusa ya Admin!"); return; }
     if(confirm("Unataka kufuta basi hili?")) {
         database.ref('buses/' + category + '/' + key).remove()
         .then(() => {
             alert("Basi limefutwa!");
-            window.showBusCategory(category, "MABASI", true);
+            window.showBusCategory(category, "MABASI", true, true);
         })
         .catch(err => alert("Kosa: " + err.message));
     }
-};
+}
+
+// UHAKIKI WA SECRET KEY YA ADMIN
+window.loginAdmin = function() {
+    const secret = document.getElementById("adminSecret").value.trim();
+    if (secret === "1234") {
+        window.isAdminAuthenticated = true;
+        document.getElementById("adminControls").style.display = "block";
+        alert("Hongera! Umeingia kama Admin.");
+        window.loadCategories();
+    } else {
+        alert("Kodi ya siri siyo sahihi!");
+    }
+}
+
+window.showAdminPanel = function() {
+    window.hideAllSections();
+    document.getElementById("adminSection").style.display = "block";
+    if (window.isAdminAuthenticated) {
+        document.getElementById("adminControls").style.display = "block";
+        window.loadCategories();
+    } else {
+        document.getElementById("adminControls").style.display = "none";
+    }
+}
 
 window.checkCurrentLocation = function() {
     let hash = window.location.hash;
     let dbname = localStorage.getItem("name");
     
     if (hash === "#admin") { 
-        window.showcat(true);
+        window.showAdminPanel();
         return; 
     }
-    if (!dbname) { 
-        window.hideAllSections(); 
-        if (hash === "#login") window.showlogin(); 
-        else window.showregister(); 
-    } else { 
-        window.showcat(true); 
-    }
-};
+    if (!dbname) { window.hideAllSections(); if (hash === "#login") window.showlogin(); else window.showregister(); } 
+    else { window.showcat(true); }
+}
 
 window.addEventListener("popstate", function(event) {
     let hash = window.location.hash;
-    if (hash === "#admin") { 
-        window.showcat(true);
-        return; 
-    }
+    if (hash === "#admin") { window.showAdminPanel(); return; }
     let dbname = localStorage.getItem("name");
     if (!dbname) { window.showregister(); return; }
     
     if (event.state && event.state.page) {
         let page = event.state.page;
         if (page === "home") window.showcat(true);
-        else window.showBusCategory(page, event.state.catName || page, true);
+        else window.showBusCategory(page, event.state.catName || page, false, false);
     } else { window.checkCurrentLocation(); }
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+    window.loadCategories();
     window.checkCurrentLocation();
 });
 
 // =========================================================================
-// KITENGO AI ASSISTANT (WORKING GEMINI INTEGRATION)
+// KITENGO AI ASSISTANT LOGIC
 // =========================================================================
-const PART_A = "AIzaSyDA0ty5dOoBiPJx5fRdFI_";
-const PART_B = "hvddJyUbb6B4";
+const PART_A = "AQ.Ab8RN6LL0VgiZ";
+const PART_B = "gSXifpheeDVtaGlQ7V";
+const PART_C = "n4-8t42QCcrK885ck8w";
 
-const GEMINI_API_KEY = PART_A + PART_B;
+const GEMINI_API_KEY = PART_A + PART_B + PART_C;
 
 window.toggleChat = function() {
     const chatBox = document.getElementById("ai-chat-box");
@@ -689,13 +643,13 @@ window.toggleChat = function() {
     } else {
         chatBox.style.display = "none";
     }
-};
+}
 
 window.checkEnter = function(event) {
     if (event.key === "Enter") {
         window.sendMessage();
     }
-};
+}
 
 window.sendMessage = async function() {
     const inputEl = document.getElementById("ai-user-input");
@@ -719,35 +673,30 @@ window.sendMessage = async function() {
     messagesContainer.appendChild(loadingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    const systemInstruction = "Wewe ni Kitengo AI Assistant, msaidizi rasmi wa tovuti ya Kitengo Gaming. Unatakiwa kujibu maswali ya wachezaji kuhusu mods za ETS2, Bussid (Maleo), na downloads kwa lugha ya Kiswahili fasaha, rafiki, na kwa kifupi sana.";
-
     try {
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const systemPrompt = "Wewe ni Kitengo AI Assistant - msaidizi wa kucheza mahitaji ya watumiaji wa Kitengo Gaming. Jibu kwa Kiswahili kimafupi na kwa maelezo mazuri. Usitumie markdown. Jibu ni karibu 2-3 sentensi tu.";
+        const userPrompt = messageText + " (" + systemPrompt + ")";
+        
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                contents: [
-                    {
-                        role: "user",
-                        parts: [{ text: `${systemInstruction}\n\nSwali la Mteja: ${messageText}` }]
-                    }
-                ]
+                contents: [{ 
+                    parts: [{ 
+                        text: userPrompt
+                    }] 
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 150
+                }
             })
         });
 
         if (!response.ok) {
-            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            role: "user",
-                            parts: [{ text: `${systemInstruction}\n\nSwali la Mteja: ${messageText}` }]
-                        }
-                    ]
-                })
-            });
+            throw new Error(`API Error: ${response.status}`);
         }
 
         const data = await response.json();
@@ -755,25 +704,27 @@ window.sendMessage = async function() {
         const loader = document.getElementById("ai-loading-msg");
         if(loader) loader.remove();
 
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
             const aiResponseText = data.candidates[0].content.parts[0].text;
+
             const aiDiv = document.createElement("div");
             aiDiv.className = "message ai-message";
             aiDiv.textContent = aiResponseText;
             messagesContainer.appendChild(aiDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         } else {
-            throw new Error("Jibu halikupatikana");
+            throw new Error("Invalid response format");
         }
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     } catch (error) {
+        console.error("AI Error:", error);
         const loader = document.getElementById("ai-loading-msg");
         if(loader) loader.remove();
         
         const aiDiv = document.createElement("div");
         aiDiv.className = "message ai-message";
-        aiDiv.textContent = "Mambo mkuu! Kwa sasa mtandao wa AI unapitia marekebisho kidogo. Unaweza kuwasiliana nasi kwa SMS 0615304000 kwa msaada wa haraka!";
+        aiDiv.textContent = "Samahani mkuu, KITENGO AI NIPO KWENYE MABORESHO KWA SASA. Jaribu tena baadae! Kosa: " + error.message;
         messagesContainer.appendChild(aiDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-};
+}

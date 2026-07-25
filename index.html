@@ -27,11 +27,8 @@
             position: relative;
             overflow-x: hidden;
             min-height: 100vh;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
-        /* Ambient Glowing Background Effect */
         body::before {
             content: "";
             position: fixed;
@@ -177,7 +174,7 @@
         }
         
         /* ==========================================
-           4. GRID SYSTEM & LUXURY CARDS
+           4. GRID SYSTEM & CARDS
         ========================================== */
         .cat-grid {
             display: grid;
@@ -188,467 +185,409 @@
             margin: 0 auto;
         }
 
-        .card {
-            position: relative;
-            margin: 0 auto;
-            padding: 20px;
-            border-radius: 20px;
-            color: #ffffff;
-            text-align: center;
-            width: 260px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-
-            border: 2px solid transparent;
-            background-image: 
-                linear-gradient(rgba(31, 40, 51, 0.85), rgba(31, 40, 51, 0.85)), 
-                linear-gradient(90deg, #45f3ff, #ff007f, #7139e8, #45f3ff);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            background-size: 200% 100%;
-            animation: borderMotion 4s linear infinite;
+        @media (max-width: 1024px) {
+            .cat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        @keyframes borderMotion {
-            0% { background-position: 0% 0%, 0% 0%; }
-            100% { background-position: 0% 0%, 200% 0%; }
+        @media (max-width: 600px) {
+            .cat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.5), rgba(113, 57, 232, 0.1));
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
         }
 
         .card::before {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
-            transition: 0.5s;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(69, 243, 255, 0.1), rgba(255, 0, 127, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 1;
         }
-
-        .card:hover::before { left: 100%; }
 
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(69, 243, 255, 0.4);
-            background-image: 
-                linear-gradient(rgba(31, 40, 51, 0.95), rgba(31, 40, 51, 0.95)), 
-                linear-gradient(90deg, #45f3ff, #ff007f, #7139e8, #45f3ff);
-            animation: borderMotion 2s linear infinite;
+            border-color: rgba(69, 243, 255, 0.4);
+            box-shadow: 0 15px 50px rgba(69, 243, 255, 0.2);
+            transform: translateY(-5px);
         }
 
-        .card p.card-title {
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card button {
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            margin: 15px;
+            width: calc(100% - 30px);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
             font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-top: 0;
-            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(113, 57, 232, 0.3);
         }
 
-        .card-description-inline {
-            font-size: 13px;
-            color: #a4a6b0;
-            text-align: center;
-            line-height: 1.4;
-            margin: 10px 0;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            word-wrap: break-word;
-        }
-
-        .card img {
-            transition: transform 0.5s ease;
-        }
-
-        .card:hover img {
+        .card button:hover {
+            background: linear-gradient(135deg, #45f3ff, #7139e8);
             transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(69, 243, 255, 0.4);
         }
 
-        .premium-badge {
-            position: absolute;
-            top: 15px;
-            right: -30px;
-            background: linear-gradient(135deg, #ffd700, #ffa500);
-            color: #000000;
-            font-weight: 900;
-            font-size: 11px;
-            padding: 5px 35px;
-            transform: rotate(45deg);
-            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
-            letter-spacing: 1px;
+        .details-box {
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.6), rgba(113, 57, 232, 0.15)) !important;
+            border: 2px solid rgba(69, 243, 255, 0.3) !important;
+        }
+
+        .divider {
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #45f3ff, transparent);
+            border: none;
+            margin: 30px auto;
+        }
+
+        /* ==========================================
+           5. LOGIN & REGISTER FORMS
+        ========================================== */
+        .log, .reg {
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 40px;
+            background: rgba(31, 40, 51, 0.6);
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .log input, .reg input, #adminSecret {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        .log input:focus, .reg input:focus, #adminSecret:focus {
+            outline: none;
+            border-color: #45f3ff;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.3);
+        }
+
+        .log button, .reg button {
+            background: linear-gradient(135deg, #7139e8, #ff007f);
+            border: none;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
             font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 2px rgba(255,255,255,0.6);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 10;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .log button:hover, .reg button:hover {
+            background: linear-gradient(135deg, #ff007f, #7139e8);
+            transform: scale(1.02);
         }
 
         /* ==========================================
-           5. RESPONSIVENESS
+           6. ADMIN PANEL STYLES
         ========================================== */
-        @media (max-width: 900px) { 
-            .cat-grid { grid-template-columns: repeat(2, 1fr); } 
-        }
-        @media (max-width: 600px) { 
-            .cat-grid { 
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 15px; 
-                padding: 10px; 
-            } 
-            .card {
-                width: auto !important;
-                max-width: 100%;
-                padding: 15px 10px;
-                border-radius: 15px;
-            }
-            .card p.card-title {
-                font-size: 14px;
-                margin-bottom: 8px;
-            }
-            .card img {
-                width: 100% !important;
-                height: auto !important;
-                max-height: 110px !important;
-                object-fit: cover !important;
-                border-radius: 10px !important;
-            }
-            h1 {
-                font-size: 1.8rem;
-                padding: 15px 10px;
-            }
-        }
-        
-        /* ==========================================
-           6. AUTH & ADMIN PANELS
-        ========================================== */
-        .reg, .log, .admin-panel {
-            margin: 50px auto; 
-            padding: 30px 20px; 
-            border-radius: 20px; 
-            background: rgba(31, 40, 51, 0.8);
-            border: 1px solid rgba(69, 243, 255, 0.2);
-            color: #ffffff; 
-            text-align: center; 
-            width: 300px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        .admin-panel {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(31, 40, 51, 0.4);
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            border-radius: 20px;
             backdrop-filter: blur(10px);
         }
 
-        .reg h1, .log h1, .admin-panel h1 {
-            font-size: 1.8rem;
-            padding: 10px 0;
-            margin-bottom: 20px;
+        .admin-panel h3 {
+            color: #45f3ff;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .log input, .reg input, .admin-panel input, .admin-panel select { 
-            padding: 12px 15px; 
-            border-radius: 10px; 
-            width: 95%; 
-            margin-bottom: 15px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(11, 12, 16, 0.7);
-            font-size: 15px;
+
+        .admin-panel input, .admin-panel select {
+            display: block;
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             color: #ffffff;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
+            border-radius: 10px;
             box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .admin-panel input:focus, .admin-panel select:focus {
+            outline: none;
+            border-color: #45f3ff;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.3);
+        }
+
+        .admin-panel button {
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
             transition: all 0.3s;
         }
 
-        .log input:focus, .reg input:focus, .admin-panel input:focus, .admin-panel select:focus {
-            outline: none;
-            border-color: #45f3ff;
-            box-shadow: 0 0 10px rgba(69, 243, 255, 0.5);
-            background: rgba(11, 12, 16, 0.9);
+        .admin-panel button:hover {
+            background: linear-gradient(135deg, #45f3ff, #7139e8);
+            transform: scale(1.02);
         }
-        
-        .log p, .reg p { color: #a4a6b0 !important; }
-        .log a, .reg a { color: #ff007f; font-weight: bold; }
 
-        .file-label { 
-            display: block; 
-            background: rgba(69, 243, 255, 0.1); 
-            border: 1px dashed #45f3ff;
-            padding: 12px; 
-            border-radius: 10px; 
-            margin-bottom: 15px; 
-            width: 95%; 
-            margin-left: auto; 
-            margin-right: auto; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: bold; 
-            box-sizing: border-box; 
-            transition: 0.3s;
+        .file-label {
+            display: block;
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            color: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .file-label:hover {
-            background: rgba(69, 243, 255, 0.2);
-            box-shadow: 0 0 8px rgba(69, 243, 255, 0.3);
+            opacity: 0.9;
+        }
+
+        .status-msg {
+            background: rgba(0, 0, 0, 0.3);
+            color: #45f3ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            border: 1px solid rgba(69, 243, 255, 0.2);
         }
 
         /* ==========================================
-           7. BUTTONS
-        ========================================== */
-        button {
-            font-family: 'Orbitron', sans-serif;
-            border-radius: 30px; 
-            background: linear-gradient(135deg, #7139e8, #ff007f); 
-            color: #ffffff; 
-            cursor: pointer; 
-            border: none; 
-            padding: 12px 35px; 
-            margin-top: 15px; 
-            font-weight: 900; 
-            font-size: 13px;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
-        }
-
-        button:hover { 
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
-            background: linear-gradient(135deg, #ff007f, #45f3ff);
-            color: #000000;
-        }
-
-        button a { 
-            color: #ffffff; 
-            text-decoration: none; 
-            display: inline-block; 
-            width: 100%; 
-            height: 100%; 
-        }
-
-        button:hover a { color: #000000; }
-
-        .divider { 
-            border: 0; 
-            height: 1px; 
-            background-image: linear-gradient(to right, rgba(69, 243, 255, 0), rgba(69, 243, 255, 0.75), rgba(69, 243, 255, 0)); 
-            margin: 30px 0; 
-        }
-
-        .btn-delete { 
-            background: #ff3333 !important; 
-            margin-top: 8px; 
-            padding: 6px 15px; 
-            font-size: 11px; 
-            box-shadow: 0 4px 10px rgba(255, 51, 51, 0.4);
-        }
-        .btn-delete:hover {
-            box-shadow: 0 0 15px rgba(255, 51, 51, 0.8) !important;
-            color: white !important;
-        }
-
-        .status-msg { 
-            font-size: 13px; 
-            color: #00ffcc; 
-            font-weight: bold; 
-            display: none; 
-            margin-bottom: 10px; 
-        }
-        
-        /* ==========================================
-           8. DETAILS VIEW BOX
-        ========================================== */
-        .details-box {
-            background: rgba(31, 40, 51, 0.85) !important;
-            border: 2px solid #45f3ff !important;
-            box-shadow: 0 10px 40px rgba(69, 243, 255, 0.25) !important;
-        }
-
-        .details-box p { color: #c5c6c7 !important; }
-
-        /* ==========================================
-           9. PAYMENT MODAL SCREEN
+           7. PAYMENT MODAL
         ========================================== */
         .payment-modal {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
             height: 100%;
-            background: rgba(11, 12, 16, 0.92); 
-            backdrop-filter: blur(8px);
-            display: none; 
+            background-color: rgba(0, 0, 0, 0.8);
             justify-content: center;
-            align-items: center; 
-            z-index: 1000000;
+            align-items: center;
         }
 
         .payment-card {
-            background: #111111;
-            border: 2px solid #45f3ff; 
-            padding: 30px; 
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.9), rgba(113, 57, 232, 0.2));
+            border: 2px solid rgba(69, 243, 255, 0.4);
             border-radius: 20px;
-            width: 90%; 
-            max-width: 350px; 
-            text-align: center; 
-            box-shadow: 0 10px 40px rgba(69, 243, 255, 0.3);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
         }
 
-        .payment-card h3 { 
-            font-family: 'Orbitron', sans-serif;
-            margin-top: 0; 
-            color: #45f3ff; 
-            font-size: 22px; 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
+        .payment-card h3 {
+            color: #45f3ff;
+            text-align: center;
+            text-transform: uppercase;
+            margin-top: 0;
         }
 
         .payment-card input {
-            width: 90%; 
-            padding: 12px; 
-            margin: 15px 0; 
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(0,0,0,0.5);
-            font-size: 18px; 
-            text-align: center; 
-            font-weight: bold;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             color: #ffffff;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
+            border-radius: 10px;
+            box-sizing: border-box;
         }
 
         .payment-card input:focus {
             outline: none;
-            border-color: #ff007f;
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+            border-color: #45f3ff;
+        }
+
+        .payment-card button {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
         }
 
         /* ==========================================
-           10. KITENGO AI CHATBOX SPECIAL DESIGN
+           8. AI CHAT BOX
         ========================================== */
         #ai-chat-icon {
-            position: fixed !important;
-            bottom: 25px !important;
-            right: 25px !important;
-            background: linear-gradient(135deg, #7139e8, #ff007f) !important;
-            width: 65px !important;
-            height: 65px !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            box-shadow: 0px 5px 20px rgba(255, 0, 127, 0.5) !important;
-            cursor: pointer !important;
-            z-index: 999999 !important;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(113, 57, 232, 0.4);
             transition: all 0.3s;
+            z-index: 500;
         }
 
         #ai-chat-icon:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0px 8px 25px rgba(69, 243, 255, 0.6) !important;
-            background: linear-gradient(135deg, #45f3ff, #7139e8) !important;
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(69, 243, 255, 0.6);
         }
 
-        #ai-chat-icon img { 
-            width: 32px; 
-            height: 32px; 
-            filter: invert(1); 
+        #ai-chat-icon img {
+            width: 30px;
+            height: 30px;
         }
 
         #ai-chat-box {
-            position: fixed !important;
-            bottom: 100px !important;
-            right: 25px !important;
-            width: 320px;
-            height: 420px;
-            background-color: #11141a !important;
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.95), rgba(113, 57, 232, 0.15));
             border: 2px solid rgba(69, 243, 255, 0.3);
-            border-radius: 20px;
-            box-shadow: 0px 10px 35px rgba(0,0,0,0.8);
+            border-radius: 15px;
             display: none;
             flex-direction: column;
-            overflow: hidden;
-            z-index: 999999 !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 501;
+        }
+
+        #ai-chat-header {
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            color: white;
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+        }
+
+        #ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            color: white;
+            align-self: flex-end;
+            border-radius: 10px 0px 10px 10px;
+        }
+
+        .ai-message {
+            background: rgba(0, 0, 0, 0.3);
+            color: #a4a6b0;
+            align-self: flex-start;
+            border-radius: 0px 10px 10px 10px;
+            border-left: 3px solid #45f3ff;
+        }
+
+        #ai-chat-input-container {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid rgba(69, 243, 255, 0.2);
+        }
+
+        #ai-user-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border-radius: 10px;
             font-family: 'Rajdhani', sans-serif;
         }
 
-        #ai-chat-header { 
-            background: linear-gradient(135deg, #1f2833, #0b0c10); 
-            border-bottom: 1px solid rgba(69, 243, 255, 0.3);
-            color: #45f3ff; 
-            padding: 15px; 
-            font-weight: bold; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-size: 15px; 
-            font-family: 'Orbitron', sans-serif;
+        #ai-user-input:focus {
+            border-color: #45f3ff;
         }
-
-        #ai-chat-messages { 
-            flex: 1; 
-            padding: 15px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            color: #fff; 
-            background-color: #0b0c10; 
-        }
-
-        .message { 
-            padding: 10px 14px; 
-            border-radius: 15px; 
-            max-width: 85%; 
-            font-size: 14px; 
-            line-height: 1.5; 
-            box-sizing: border-box; 
-            word-wrap: break-word; 
-        }
-
-        .ai-message { 
-            background-color: #1f2833; 
-            border: 1px solid rgba(255,255,255,0.05);
-            align-self: flex-start; 
-            border-bottom-left-radius: 2px; 
-            color: #c5c6c7 !important; 
-        }
-
-        .user-message { 
-            background: linear-gradient(135deg, #7139e8, #ff007f); 
-            color: white !important; 
-            align-self: flex-end; 
-            border-bottom-right-radius: 2px; 
-            box-shadow: 0 3px 10px rgba(255, 0, 127, 0.2);
-        }
-
-        #ai-chat-input-container { 
-            display: flex; 
-            padding: 10px; 
-            background-color: #11141a; 
-            border-top: 1px solid rgba(69, 243, 255, 0.1); 
-        }
-
-        #ai-user-input { 
-            flex: 1; 
-            padding: 10px 12px; 
-            background-color: #1f2833; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 10px; 
-            color: white !important; 
-            outline: none; 
-            font-size: 14px; 
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-        }
-
-        #ai-user-input:focus { border-color: #45f3ff; }
 
         #ai-send-btn { 
             background: linear-gradient(135deg, #7139e8, #ff007f); 
@@ -671,24 +610,16 @@
             transform: none;
         }
 
-        .admin-banner-hint {
-            background: rgba(255, 0, 127, 0.2);
-            border: 1px solid #ff007f;
-            color: #ff007f;
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            font-family: 'Orbitron', sans-serif;
-            border-radius: 10px;
-            margin: 10px auto;
-            max-width: 800px;
-            font-size: 13px;
+        /* ==========================================
+           9. ADMIN CARD STYLES
+        ========================================== */
+        .admin-card-wrapper {
+            padding: 15px;
+            position: relative;
         }
     </style>
 </head>
 <body>
-
-<input type="file" id="adminHiddenImageInput" accept="image/*" style="display: none;">
 
 <div class="navbar" id="navicon" style="display:none;">
     <a href="javascript:void(0);" onclick="window.showcat()">Home</a>
@@ -700,9 +631,6 @@
 <div id="cat" style="display:none;">
     <div class="hero-section">
         <h1>KITENGO GAMING</h1>
-        <div id="admin-mode-banner" class="admin-banner-hint" style="display:none;">
-            👑 ONA NA KUTRIM MODS (ADMIN MODE ACTIVE) - BONYEZA ITEM KWA SEKUNDE 5 KU-EDIT!
-        </div>
         <br>
         <img src="logo.jpg" alt="image" style="display: block; margin:0 auto; width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.6);">
         <br>
@@ -728,7 +656,7 @@
 </div>
 
 <div id="details-view-section" style="display:none; padding: 20px;">
-    <button onclick="window.goBackFromDetails()" style="margin: 10px auto 25px auto; display: block;">⬅ Rudi Nyuma</button>
+    <button onclick="window.goBackFromDetails()" style="margin: 10px auto 25px auto; display: block;">Rudi Nyuma</button>
     <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
         <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
         <img id="details-img" src="" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
@@ -756,43 +684,52 @@
 
 <div id="adminSection" class="admin-panel" style="display:none;">
     <h1>ADMIN PANEL</h1>
-    <input type="password" id="adminSecret" placeholder="Kodi ya Siri ">
-    <hr>
+    <p style="color: #45f3ff;">Ingiza Kodi ya Siri ili kupata uwezo wa ku-edit:</p>
+    <input type="password" id="adminSecret" placeholder="Kodi ya Siri">
+    <button onclick="window.loginAdmin()">INGIA ADMIN</button>
     
-    <h3>1. USIMAMIZI WA CATEGORIES</h3>
-    <input type="text" id="newCatId" placeholder="ID ya Category (Mfano: yutong)">
-    <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
-    <input type="text" id="newCatDesc" placeholder="Maelezo mafupi ya kundi hili (Optional)">
-    
-    <label class="file-label" for="newCatImg">📁 CHAGUA PICHA YA KUNDI</label>
-    <input type="file" id="newCatImg" accept="image/*" style="display: none;">
-    <div id="cat-upload-status" class="status-msg">Inashindilia picha...</div>
-    
-    <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
-    <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
-    <hr>
+    <div id="adminControls" style="display: none; margin-top: 20px;">
+        <hr>
+        <h3>1. USIMAMIZI WA CATEGORIES</h3>
+        <input type="text" id="newCatId" placeholder="ID ya Category (Mfano: yutong)">
+        <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
+        <input type="text" id="newCatDesc" placeholder="Maelezo mafupi ya kundi hili (Optional)">
+        
+        <label class="file-label" for="newCatImg">CHAGUA PICHA YA KUNDI</label>
+        <input type="file" id="newCatImg" accept="image/*" style="display: none;">
+        <div id="cat-upload-status" class="status-msg">Inashindilia picha...</div>
+        
+        <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
+        <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
+        <hr>
 
-    <h3>2. UPLOAD BUS MPYA</h3>
-    <label>Chagua Category:</label>
-    <select id="uploadCategory"></select>
-    <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
-    <input type="text" id="uploadDesc" placeholder="Maelezo mafupi ya basi hili (Optional)">
-    
-    <label class="file-label" for="uploadImg">📁 CHAGUA PICHA YA BASI</label>
-    <input type="file" id="uploadImg" accept="image/*" style="display: none;">
-    <div id="bus-upload-status" class="status-msg">Inashindilia picha...</div>
-    
-    <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
-    
-    <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
-    <input type="text" id="uploadPassword" placeholder="Weka Password ya Premium Mod hapa">
-    
-    <button onclick="window.uploadBus()">UPLOAD ITEM</button>
-    <hr>
+        <h3>2. UPLOAD BUS MPYA</h3>
+        <label>Chagua Category:</label>
+        <select id="uploadCategory"></select>
+        <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
+        <input type="text" id="uploadDesc" placeholder="Maelezo mafupi ya basi hili (Optional)">
+        
+        <label class="file-label" for="uploadImg">CHAGUA PICHA YA BASI</label>
+        <input type="file" id="uploadImg" accept="image/*" style="display: none;">
+        <div id="bus-upload-status" class="status-msg">Inashindilia picha...</div>
+        
+        <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
+        
+        <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
+        <input type="text" id="uploadPassword" placeholder="Weka Password ya Premium Mod hapa">
+        
+        <button onclick="window.uploadBus()">UPLOAD ITEM</button>
+        <hr>
 
-    <h3>3. RESET SYSTEM</h3>
-    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta kila kitu kwenye database!</p>
-    <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 90%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
+        <h3>3. MABASI YA KUHARIRI (Long-Press kwa sekunde 3)</h3>
+        <p style="color: #45f3ff; font-size: 13px;">Chagua category ili kuona na kuhariri mabasi:</p>
+        <select id="adminCategorySelect" onchange="if(this.value) window.showBusCategory(this.value, this.value, true, true)"></select>
+        <hr>
+
+        <h3>4. RESET SYSTEM</h3>
+        <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta kila kitu kwenye database!</p>
+        <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 100%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
+    </div>
 </div>
 
 <div id="payment-modal-screen" class="payment-modal">

@@ -10,7 +10,9 @@ const firebaseConfig = {
 };
 
 // Kuanzisha Firebase
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const database = firebase.database();
 
 window.hideAllSections = function() {
@@ -90,6 +92,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
             a.href = targetLinkOrId;
             a.target = "_blank";
             a.textContent = "DOWNLOAD NOW";
+            a.style.color = "#ffffff";
             btn.appendChild(a);
         }
         
@@ -146,7 +149,7 @@ window.verifyPasswordAndDownload = function() {
     statusLog.style.color = "yellow";
     statusLog.textContent = "SUBIRI KWANZA MAANA PASSWORD YAKO INAHAKIKIWA  ...";
     
-    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama (Kasi ya juu kwa once)
+    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama
     database.ref(`buses/${catId}/${busKey}/password`).once('value')
     .then((snapshot) => {
         const correctPassword = snapshot.val();
@@ -178,8 +181,9 @@ window.goBackFromDetails = function() {
     }
 }
 
-// CHOMBO CHA USHINDILIAJI PICHA KIOTOMATIKI (KUZUIA MB KUBWA)
+// CHOMBO CHA USHINDILIAJI PICHA KIOTOMATIKI (OPTIMIZED FOR MAXIMUM SPEED)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = function(event) {
         const img = new Image();
@@ -190,12 +194,12 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
             
             if (width > height) {
                 if (width > maxWidth) {
-                    height = Math.round(height * maxWidth / width);
+                    height = Math.round((height * maxWidth) / width);
                     width = maxWidth;
                 }
             } else {
                 if (height > maxHeight) {
-                    width = Math.round(width * maxHeight / height);
+                    width = Math.round((width * maxHeight) / height);
                     height = maxHeight;
                 }
             }
@@ -205,15 +209,19 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+            // Webp or standard JPEG with low quality for fast load
+            const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.5);
             callback(compressedBase64);
+        };
+        img.onerror = function() {
+            alert("Hitilafu kwenye picha! Jaribu picha nyingine.");
         };
         img.src = event.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-// PAKIA PICHA YA CATEGORY + KUICHEZA ANIMATION
+// PAKIA PICHA YA CATEGORY
 window.addCategory = function() {
     let id = document.getElementById("newCatId").value.trim();
     let name = document.getElementById("newCatName").value.trim();
@@ -229,7 +237,7 @@ window.addCategory = function() {
     
     const file = fileInput.files[0];
     
-    window.compressImage(file, 400, 400, 0.7, function(compressedBase64) {
+    window.compressImage(file, 400, 400, 0.5, function(compressedBase64) {
         database.ref('categories/' + id).set({ 
             name: name, 
             image: compressedBase64, 
@@ -254,31 +262,35 @@ window.loadCategories = function() {
     database.ref('categories').once('value', (snapshot) => {
         const categories = snapshot.val() || {};
         let categorySelect = document.getElementById("uploadCategory");
-        categorySelect.innerHTML = '<option value="">-- Chagua Category --</option>';
+        if(categorySelect) categorySelect.innerHTML = '<option value="">-- Chagua Category --</option>';
         
         let catContainer = document.getElementById("categories-container");
-        catContainer.innerHTML = "";
+        if(catContainer) catContainer.innerHTML = "";
         
         for (const [key, cat] of Object.entries(categories)) {
-            const opt = document.createElement("option");
-            opt.value = key;
-            opt.textContent = cat.name;
-            categorySelect.appendChild(opt);
+            if(categorySelect) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = cat.name;
+                categorySelect.appendChild(opt);
+            }
             
-            const card = document.createElement("div");
-            card.className = "card category-card";
-            card.style.position = "relative";
-            
-            card.innerHTML = `
-                <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
-                    <img src="${cat.image}" alt="${cat.name}" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <h3 style="margin: 15px 0 5px 0; text-align: center;">${cat.name}</h3>
-                <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">${cat.desc || 'Kundi la mods'}</p>
-                <button onclick="window.showBusCategory('${key}', '${cat.name}', false)" style="width: 100%; margin-top: 15px;">CHAGUA HAPA</button>
-            `;
-            
-            catContainer.appendChild(card);
+            if(catContainer) {
+                const card = document.createElement("div");
+                card.className = "card category-card";
+                card.style.position = "relative";
+                
+                card.innerHTML = `
+                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
+                        <img src="${cat.image}" alt="${cat.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${cat.name}</h3>
+                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">${cat.desc || 'Kundi la mods'}</p>
+                    <button onclick="window.showBusCategory('${key}', '${cat.name}', false)" style="width: calc(100% - 30px); margin: 15px;">CHAGUA HAPA</button>
+                `;
+                
+                catContainer.appendChild(card);
+            }
         }
         
         // Populate admin category select dropdown
@@ -299,17 +311,13 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
     database.ref('buses/' + catId).once('value', (snapshot) => {
         const buses = snapshot.val() || {};
         
-        // Check if user is admin ONLY by checking hash - HAKUNA COMPROMISE!
         let isAdmin = window.location.hash === "#admin";
         
-        if (isAdmin) {
-            window.hideAllSections();
-            document.getElementById("bus-view-section").style.display = "block";
-            document.getElementById("navicon").style.display = "flex";
-        } else {
-            window.hideAllSections();
-            document.getElementById("bus-view-section").style.display = "block";
-            document.getElementById("navicon").style.display = "flex";
+        window.hideAllSections();
+        document.getElementById("bus-view-section").style.display = "block";
+        document.getElementById("navicon").style.display = "flex";
+        
+        if (!isAdmin) {
             history.pushState({ page: catId, catName: catName }, catName, "#" + catId);
         }
         
@@ -323,7 +331,7 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
             card.className = "card bus-card";
             
             if (isAdmin) {
-                // Admin mode card with edit features
+                // Admin mode card
                 card.innerHTML = `
                     <div class="admin-card-wrapper" data-cat="${catId}" data-key="${key}">
                         <div style="position: relative;">
@@ -342,7 +350,7 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                             </div>
                             <div style="flex: 1;">
                                 <label style="font-size: 11px; color: #a4a6b0;">Link:</label>
-                                <p class="editable-link" style="margin: 0; color: #45f3ff; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;" title="${bus.link}">${bus.link.substring(0, 20)}...</p>
+                                <p class="editable-link" style="margin: 0; color: #45f3ff; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;" title="${bus.link}">${bus.link ? bus.link.substring(0, 20) : ''}...</p>
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px;">
@@ -366,19 +374,17 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                             `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
                             `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
                     </div>
-                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')" style="width: 100%;">TAZAMA & DOWNLOAD</button>
+                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')" style="width: calc(100% - 30px); margin: 15px;">TAZAMA & DOWNLOAD</button>
                 `;
             }
             
             busList.appendChild(card);
             
-            // Add long-press listeners for admin mode
             if (isAdmin) {
                 window.setupAdminCardListeners(card, catId, key, bus);
             }
         }
         
-        // Add back button
         let backBtn = document.createElement("button");
         backBtn.textContent = "Rudi Nyuma";
         backBtn.style.cssText = "display: block; margin: 20px auto; padding: 12px 30px; width: auto;";
@@ -407,105 +413,54 @@ window.setupAdminCardListeners = function(card, catId, key, bus) {
     
     let pressTimer;
     
-    // Image long-press
     if (imageEl) {
         imageEl.addEventListener('mousedown', () => {
-            hintEl.style.display = 'block';
-            pressTimer = setTimeout(() => {
-                window.editBusImage(catId, key, bus);
-            }, 5000);
+            if(hintEl) hintEl.style.display = 'block';
+            pressTimer = setTimeout(() => { window.editBusImage(catId, key, bus); }, 5000);
         });
-        imageEl.addEventListener('mouseup', () => {
-            clearTimeout(pressTimer);
-            hintEl.style.display = 'none';
-        });
-        imageEl.addEventListener('mouseleave', () => {
-            clearTimeout(pressTimer);
-            hintEl.style.display = 'none';
-        });
+        imageEl.addEventListener('mouseup', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
+        imageEl.addEventListener('mouseleave', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
         
-        // Touch support
         imageEl.addEventListener('touchstart', () => {
-            hintEl.style.display = 'block';
-            pressTimer = setTimeout(() => {
-                window.editBusImage(catId, key, bus);
-            }, 5000);
+            if(hintEl) hintEl.style.display = 'block';
+            pressTimer = setTimeout(() => { window.editBusImage(catId, key, bus); }, 5000);
         });
-        imageEl.addEventListener('touchend', () => {
-            clearTimeout(pressTimer);
-            hintEl.style.display = 'none';
-        });
+        imageEl.addEventListener('touchend', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
     }
     
-    // Title long-press
     if (titleEl) {
-        titleEl.addEventListener('mousedown', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod');
-            }, 5000);
-        });
+        titleEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'); }, 5000); });
         titleEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
         titleEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
         
-        titleEl.addEventListener('touchstart', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod');
-            }, 5000);
-        });
+        titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'); }, 5000); });
         titleEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
     
-    // Price long-press
     if (priceEl) {
-        priceEl.addEventListener('mousedown', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod');
-            }, 5000);
-        });
+        priceEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 5000); });
         priceEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
         priceEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
         
-        priceEl.addEventListener('touchstart', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod');
-            }, 5000);
-        });
+        priceEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 5000); });
         priceEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
     
-    // Link long-press
     if (linkEl) {
-        linkEl.addEventListener('mousedown', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'link', bus.link, 'Link ya Download');
-            }, 5000);
-        });
+        linkEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'link', bus.link, 'Link ya Download'); }, 5000); });
         linkEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
         linkEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
         
-        linkEl.addEventListener('touchstart', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'link', bus.link, 'Link ya Download');
-            }, 5000);
-        });
+        linkEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'link', bus.link, 'Link ya Download'); }, 5000); });
         linkEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
     
-    // Description long-press
     if (descEl) {
-        descEl.addEventListener('mousedown', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo');
-            }, 5000);
-        });
+        descEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo'); }, 5000); });
         descEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
         descEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
         
-        descEl.addEventListener('touchstart', () => {
-            pressTimer = setTimeout(() => {
-                window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo');
-            }, 5000);
-        });
+        descEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo'); }, 5000); });
         descEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
 }
@@ -530,7 +485,7 @@ window.editBusImage = function(catId, key, bus) {
     fileInput.onchange = function() {
         if (this.files.length > 0) {
             const file = this.files[0];
-            window.compressImage(file, 600, 600, 0.7, function(compressedBase64) {
+            window.compressImage(file, 500, 500, 0.5, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
                         alert('Picha imebadilishwa kwa ufanisi!');
@@ -544,27 +499,29 @@ window.editBusImage = function(catId, key, bus) {
     fileInput.click();
 }
 
+// OPTIMIZED FAST UPLOAD BUS FUNCTION
 window.uploadBus = function() {
     let cat = document.getElementById("uploadCategory").value;
-    let name = document.getElementById("uploadName").value;
-    let link = document.getElementById("uploadLink").value;
-    let desc = document.getElementById("uploadDesc").value;
+    let name = document.getElementById("uploadName").value.trim();
+    let link = document.getElementById("uploadLink").value.trim();
+    let desc = document.getElementById("uploadDesc").value.trim();
     let price = document.getElementById("uploadPrice").value;
-    let password = document.getElementById("uploadPassword").value;
+    let password = document.getElementById("uploadPassword").value.trim();
     let fileInput = document.getElementById("uploadImg");
 
+    if (cat === "") { alert("Chagua Category kwanza!"); return; }
     if (name === "" || link === "") { alert("Jaza jina na link!"); return; }
     if (fileInput.files.length === 0) { alert("Tafadhali chagua picha ya basi!"); return; }
     if (price && parseInt(price) > 0 && password === "") { alert("Tafadhali weka password ya mod hii ya kulipia!"); return; }
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inashindilia picha ya basi kuwa nyepesi na kupakia Firebase...";
+    statusDiv.textContent = "Inashindilia picha kwa kasi kubwa na kupakia Firebase...";
 
     const file = fileInput.files[0];
 
-    // Kupunguza picha ya basi hadi pixel 600 max width na ubora wa 0.7
-    window.compressImage(file, 600, 600, 0.7, function(compressedBase64) {
+    // Speed-optimized compression (500px width max & 0.5 JPEG quality)
+    window.compressImage(file, 500, 500, 0.5, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
             name: name, 
@@ -583,7 +540,7 @@ window.uploadBus = function() {
             document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
-            window.showBusCategory(cat, "MABASI", true); // Reload category hiyo husika kwa kasi
+            window.showBusCategory(cat, "MABASI", true);
         }).catch(err => {
             alert("Kosa la Firebase: " + err.message);
             statusDiv.style.display = "none";
@@ -644,6 +601,57 @@ window.checkCurrentLocation = function() {
     else { window.showcat(true); }
 }
 
+// LOGIC YA TAFUTA (SEARCH BAR)
+window.handleSearchInput = function(query) {
+    const searchTerm = query.toLowerCase().trim();
+    if(searchTerm === "") return;
+    
+    database.ref('buses').once('value', (snapshot) => {
+        const allCategories = snapshot.val() || {};
+        let matchingBuses = [];
+        
+        for (const [catId, buses] of Object.entries(allCategories)) {
+            for (const [busKey, bus] of Object.entries(buses)) {
+                if (bus.name && bus.name.toLowerCase().includes(searchTerm)) {
+                    matchingBuses.push({ bus, catId, busKey });
+                }
+            }
+        }
+        
+        if (matchingBuses.length > 0) {
+            window.hideAllSections();
+            document.getElementById("bus-view-section").style.display = "block";
+            document.getElementById("navicon").style.display = "flex";
+            document.getElementById("dynamic-bus-title").textContent = `MATOKEO YA: "${query.toUpperCase()}"`;
+            
+            let busList = document.getElementById("dynamic-bus-list");
+            busList.innerHTML = "";
+            
+            matchingBuses.forEach(item => {
+                const bus = item.bus;
+                const card = document.createElement("div");
+                card.className = "card bus-card";
+                card.innerHTML = `
+                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
+                        <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${item.catId}', 'SEARCH', ${bus.price || 0}, '${item.busKey}')">
+                    </div>
+                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${bus.name}</h3>
+                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">
+                        ${bus.desc || 'Hakuna maelezo'}
+                    </p>
+                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin: 12px 0;">
+                        ${bus.price && parseInt(bus.price) > 0 ? 
+                            `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
+                            `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
+                    </div>
+                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${item.catId}', 'SEARCH', ${bus.price || 0}, '${item.busKey}')" style="width: calc(100% - 30px); margin: 15px;">TAZAMA & DOWNLOAD</button>
+                `;
+                busList.appendChild(card);
+            });
+        }
+    });
+}
+
 window.addEventListener("popstate", function(event) {
     let hash = window.location.hash;
     if (hash === "#admin") { window.showAdminPanel(); return; }
@@ -663,7 +671,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // =========================================================================
-// SULUHISHO LA KITENGO AI ASSISTANT (FIXED NA KAZI VIZURI)
+// KITENGO AI ASSISTANT (OPTIMIZED)
 // =========================================================================
 const PART_A = "AQ.Ab8RN6LL0VgiZ";
 const PART_B = "gSXifpheeDVtaGlQ7V";
@@ -733,12 +741,9 @@ window.sendMessage = async function() {
             });
         };
 
-        // "gemini-1.5-flash" imezimwa kabisa na Google (Julai 2026), ndio maana AI ilikuwa haijibu.
-        // Tunatumia model mpya inayofanya kazi sasa, na kama Google wakiibadilisha tena baadaye,
-        // mfumo unajaribu model mbadala kiotomatiki badala ya kukwama kimya kimya.
-        let response = await askGemini("gemini-3.6-flash");
+        let response = await askGemini("gemini-2.5-flash");
         if (!response.ok) {
-            response = await askGemini("gemini-2.5-flash");
+            response = await askGemini("gemini-1.5-flash");
         }
 
         if (!response.ok) {

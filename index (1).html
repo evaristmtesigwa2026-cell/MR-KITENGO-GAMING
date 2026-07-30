@@ -69,53 +69,194 @@
         }
 
         /* ==========================================
-           2. NAVIGATION BAR
+           2. MODERN NAVBAR & HEADER DESIGN
         ========================================== */
         .navbar {
             background-color: rgba(11, 12, 16, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid rgba(69, 243, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(69, 243, 255, 0.3);
             display: flex;
-            justify-content: center;
-            padding: 15px 0;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+            gap: 12px;
         }
 
-        .navbar a {
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .navbar a.nav-item {
             color: #ffffff;
             text-align: center;
-            padding: 10px 22px;
+            padding: 8px 14px;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
             position: relative;
+            border-radius: 6px;
         }
 
-        .navbar a::after {
+        .navbar a.nav-item::after {
             content: '';
             position: absolute;
             width: 0;
             height: 2px;
-            bottom: 0;
+            bottom: 2px;
             left: 50%;
             background-color: #45f3ff;
             transition: all 0.3s ease;
             transform: translateX(-50%);
         }
 
-        .navbar a:hover {
+        .navbar a.nav-item:hover {
             color: #45f3ff;
+            background: rgba(69, 243, 255, 0.1);
             text-shadow: 0 0 10px rgba(69, 243, 255, 0.8);
         }
 
-        .navbar a:hover::after {
+        .navbar a.nav-item:hover::after {
             width: 80%;
+        }
+
+        /* Search Bar Wrapper */
+        .nav-search-container {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(69, 243, 255, 0.4);
+            border-radius: 20px;
+            padding: 4px 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 280px;
+            min-width: 160px;
+        }
+
+        .nav-search-container:focus-within {
+            border-color: #ff007f;
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.4);
+        }
+
+        .nav-search-container input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            width: 100%;
+            padding: 4px 6px;
+        }
+
+        .nav-search-container input::placeholder {
+            color: #8a8d9b;
+        }
+
+        .search-icon-btn {
+            background: none;
+            border: none;
+            color: #45f3ff;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Contact Phone Icon Dropdown */
+        .phone-action-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .phone-btn {
+            background: linear-gradient(135deg, #00aa00, #45f3ff);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .phone-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .phone-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: rgba(11, 12, 16, 0.98);
+            border: 1px solid rgba(69, 243, 255, 0.4);
+            border-radius: 12px;
+            min-width: 170px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 1001;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .phone-dropdown a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .phone-dropdown a:hover {
+            background: rgba(69, 243, 255, 0.15);
+            color: #45f3ff;
+        }
+
+        .phone-action-container:hover .phone-dropdown {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                justify-content: space-between;
+                padding: 10px 12px;
+            }
+            .nav-links {
+                order: 1;
+                width: 100%;
+                justify-content: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                padding-top: 6px;
+                margin-top: 4px;
+            }
+            .nav-search-container {
+                order: 2;
+                max-width: 70%;
+            }
+            .phone-action-container {
+                order: 3;
+            }
         }
 
         /* ==========================================
@@ -182,7 +323,7 @@
         }
         
         /* ==========================================
-           4. GRID SYSTEM & LUXURY CARDS (WITH MOTION BORDER EFFECT)
+           4. GRID SYSTEM & LUXURY CARDS
         ========================================== */
         .cat-grid {
             display: grid;
@@ -626,14 +767,35 @@
             position: relative;
         }
     </style>
+
+    <!-- Firebase App Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="game.js" defer></script>
 </head>
 <body>
 
 <div class="navbar" id="navicon" style="display:none;">
-    <a href="javascript:void(0);" onclick="window.showcat()">Home</a>
-    <a href="javascript:void(0);" onclick="alert('Karibu Kitengo Gaming!')">About Us</a>
-    <a href="javascript:void(0);" onclick="alert('Tunatoa ETS2 Mods kali!')">Our Services</a>
-    <a href="javascript:void(0);" onclick="alert('Wasiliana nasi: 0615304000')">Contact Us</a>
+    <div class="nav-links">
+        <a href="javascript:void(0);" class="nav-item" onclick="window.showcat()">Home</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Karibu Kitengo Gaming!')">About Us</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 Mods kali!')">Our Services</a>
+    </div>
+
+    <!-- Search Bar in Header -->
+    <div class="nav-search-container">
+        <input type="text" id="global-search-input" placeholder="Tafuta Mod..." oninput="window.handleSearchInput(this.value)">
+        <button class="search-icon-btn" aria-label="Tafuta Mod">&#128099;</button>
+    </div>
+
+    <!-- Phone/Contact Icon Dropdown -->
+    <div class="phone-action-container">
+        <button class="phone-btn" title="Wasiliana Nasi" aria-label="Wasiliana Nasi">&#128222;</button>
+        <div class="phone-dropdown">
+            <a href="tel:0615304000">&#128222; Piga Simu</a>
+            <a href="sms:0615304000?body=HABARI%20KITENGO%20GAMING">&#128172; Tuma SMS</a>
+        </div>
+    </div>
 </div>
 
 <div id="cat" style="display:none;">
@@ -732,61 +894,49 @@
     <hr>
 
     <h3>4. RESET SYSTEM</h3>
-    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta kila kitu kwenye database!</p>
-    <button onclick="window.clearEntireDatabase()" style="background-color: #7a0000; width: 100%; border: 2px solid white;">FUTA DATABASE NZIMA</button>
+    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta vitu vyote</p>
+    <button onclick="window.clearEntireDatabase()" style="background-color: #ff0000;">SAFISHA DATABASE YOTE</button>
 </div>
 
+<!-- Modal ya Payment na SMS Password -->
 <div id="payment-modal-screen" class="payment-modal">
     <div class="payment-card">
-        <h3>MOD HII NI YA KULIPIA!</h3>
-        <p style="color: white !important; font-size: 14px; margin: 5px 0;">INAHITAJIKA PASSWORD KUPATA MOD HII:</p>
-        <div id="pay-item-name" style="font-weight: bold; color: yellow; font-size: 16px;"></div>
-        <div id="pay-item-price" style="font-weight: bold; color: #ff007f; font-size: 22px; margin-top: 5px; font-family: 'Orbitron', sans-serif;"></div>
-        
+        <h3>DOWNLOAD PREMIUM MOD</h3>
+        <p style="text-align: center; color: #45f3ff; font-weight: bold;" id="pay-item-name"></p>
+        <p style="text-align: center; color: #ff007f; font-size: 20px; font-weight: bold;" id="pay-item-price"></p>
         <input type="hidden" id="pay-target-link">
+        
+        <p style="font-size: 13px; text-align: center;">Kama hujaweka malipo, bonyeza button chini kutuma SMS upewe password:</p>
+        <button onclick="window.requestPasswordSMS()" style="background: linear-gradient(135deg, #00aa00, #45f3ff); color: white;">1. OMBA PASSWORD (SMS)</button>
+        
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+        
         <input type="text" id="pay-password" placeholder="Ingiza Password Hapa">
+        <div id="pay-status-log" style="display:none; font-size: 12px; text-align: center; margin: 5px 0;"></div>
         
-        <div id="pay-status-log" style="font-size: 12px; margin: 10px 0; display: none;"></div>
-        
-        <button onclick="window.verifyPasswordAndDownload()" style="width: 100%; background: #00FF00; color: black; font-weight: bold; margin-top: 10px;">THIBITISHA PASSWORD</button>
-        
-        <p style="color: white !important; font-size: 12px; margin: 15px 0 5px 0;">Huna password bado? Bonyeza hapa chini:</p>
-        <button onclick="window.requestPasswordSMS()" style="width: 100%; background: #00ffff; color: black; font-weight: bold; margin-top: 2px;">OMBA PASSWORD KWA SMS</button>
-        
-        <button onclick="window.closePaymentModal()" style="width: 100%; background: #333; color: white; margin-top: 15px;">GHAIRI</button>
+        <button onclick="window.verifyPasswordAndDownload()" style="background: linear-gradient(135deg, #7139e8, #ff007f); color: white;">2. THIBITISHA & DOWNLOAD</button>
+        <button onclick="window.closePaymentModal()" style="background: transparent; color: #a4a6b0; border: 1px solid #a4a6b0; margin-top: 10px;">FUNGA</button>
     </div>
 </div>
 
-<div id="ai-chat-icon" onclick="window.toggleChat()">
-    <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/brightness_spark/default/24px.svg" alt="AI Icon">
+<!-- AI Chat Assistant Float -->
+<div id="ai-chat-icon" onclick="window.toggleChat()" title="Ongea na Kitengo AI">
+    <span style="font-size: 24px;">&#129302;</span>
 </div>
 
 <div id="ai-chat-box">
     <div id="ai-chat-header">
-        <span>Kitengo AI Assistant</span>
-        <button onclick="window.toggleChat()" style="background:none; border:none; color:white; font-size:18px; cursor:pointer;">&times;</button>
+        <span>KITENGO AI ASSISTANT</span>
+        <span onclick="window.toggleChat()" style="cursor: pointer; font-size: 18px;">&times;</span>
     </div>
     <div id="ai-chat-messages">
-        <div class="message ai-message">Mambo mkuu! Karibu Kitengo Gaming. Mimi ni Kitengo AI Assistant, nikusaidie nini kuhusu ETS2 Mods leo?</div>
+        <div class="message ai-message">Habari! Mimi ni Kitengo AI Assistant. Ninaweza kukusaidia vipi leo kuhusu mods zetu au utatuzi wa changamoto?</div>
     </div>
     <div id="ai-chat-input-container">
-        <input type="text" id="ai-user-input" placeholder="Andika ujumbe wako hapa..." onkeypress="window.checkEnter(event)">
-        <button id="ai-send-btn" onclick="window.sendMessage()">Tuma</button>
+        <input type="text" id="ai-user-input" placeholder="Andika ujumbe wako..." onkeypress="window.checkEnter(event)">
+        <button id="ai-send-btn" onclick="window.sendMessage()">TUMA</button>
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-<script src="game.js"></script>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker imesajiliwa kikamilifu!', reg))
-        .catch(err => console.log('Kosa la kusajili Service Worker:', err));
-    });
-  }
-</script>
 </body>
 </html>

@@ -55,6 +55,7 @@ window.showcat = function(isBackAction = false) {
     window.hideAllSections();
     document.getElementById("cat").style.display = "block";
     document.getElementById("navicon").style.display = "flex"; 
+    window.loadCategories();
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 }
 
@@ -107,7 +108,6 @@ window.openPasswordModal = function(itemName, itemPrice, downloadLink, categoryI
     document.getElementById("pay-item-price").textContent = "Tsh " + itemPrice;
     document.getElementById("pay-target-link").value = downloadLink;
     
-    // Hifadhi taarifa za database kwa ajili ya kufanya uhakiki wa password baadae
     document.getElementById("pay-target-link").dataset.catId = categoryId;
     document.getElementById("pay-target-link").dataset.busKey = busKey;
     
@@ -128,7 +128,6 @@ window.requestPasswordSMS = function() {
     const jinaLaBasi = document.getElementById("pay-item-name").textContent;
     const ujumbe = `HELLO KITENGO GAMING, NAHITAJI PASSWORD YA MOD YA: ${jinaLaBasi}`;
     
-    // Inafungua app ya SMS kwenye simu ya mteja ikiwa imeshaandikwa kila kitu tayari
     window.location.href = `sms:${nambaHalotel}?body=${encodeURIComponent(ujumbe)}`;
 }
 
@@ -149,7 +148,6 @@ window.verifyPasswordAndDownload = function() {
     statusLog.style.color = "yellow";
     statusLog.textContent = "SUBIRI KWANZA MAANA PASSWORD YAKO INAHAKIKIWA  ...";
     
-    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama
     database.ref(`buses/${catId}/${busKey}/password`).once('value')
     .then((snapshot) => {
         const correctPassword = snapshot.val();
@@ -209,7 +207,6 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Webp or standard JPEG with low quality for fast load
             const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.5);
             callback(compressedBase64);
         };
@@ -258,6 +255,18 @@ window.addCategory = function() {
     });
 }
 
+window.deleteCategory = function(catId) {
+    if (!catId) { alert("Weka ID ya category ya kufuta!"); return; }
+    if (confirm(`Je, una uhakika unataka kufuta category ${catId}?`)) {
+        database.ref('categories/' + catId).remove();
+        database.ref('buses/' + catId).remove()
+        .then(() => {
+            alert("Category imefutwa!");
+            window.loadCategories();
+        });
+    }
+}
+
 window.loadCategories = function() {
     database.ref('categories').once('value', (snapshot) => {
         const categories = snapshot.val() || {};
@@ -293,7 +302,6 @@ window.loadCategories = function() {
             }
         }
         
-        // Populate admin category select dropdown
         let adminCatSelect = document.getElementById("adminCategorySelect");
         if (adminCatSelect) {
             adminCatSelect.innerHTML = '<option value="">-- Chagua Category ya Kuhariri --</option>';
@@ -310,7 +318,6 @@ window.loadCategories = function() {
 window.showBusCategory = function(catId, catName, isAdminMode = false) {
     database.ref('buses/' + catId).once('value', (snapshot) => {
         const buses = snapshot.val() || {};
-        
         let isAdmin = window.location.hash === "#admin";
         
         window.hideAllSections();
@@ -322,7 +329,6 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
         }
         
         document.getElementById("dynamic-bus-title").textContent = catName;
-        
         let busList = document.getElementById("dynamic-bus-list");
         busList.innerHTML = "";
         
@@ -331,7 +337,6 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
             card.className = "card bus-card";
             
             if (isAdmin) {
-                // Admin mode card
                 card.innerHTML = `
                     <div class="admin-card-wrapper" data-cat="${catId}" data-key="${key}">
                         <div style="position: relative;">
@@ -360,7 +365,6 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                     </div>
                 `;
             } else {
-                // User mode card
                 card.innerHTML = `
                     <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
                         <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')">
@@ -397,6 +401,16 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
         };
         busList.parentElement.insertBefore(backBtn, busList.nextSibling);
     });
+}
+
+window.deleteBus = function(catId, busKey) {
+    if (confirm("Je, una uhakika unataka kufuta Mod hii?")) {
+        database.ref(`buses/${catId}/${busKey}`).remove()
+        .then(() => {
+            alert("Mod imefutwa kikamilifu!");
+            window.showBusCategory(catId, '', true);
+        });
+    }
 }
 
 window.reloadCategoryView = function(catId, catName) {
@@ -520,262 +534,156 @@ window.uploadBus = function() {
 
     const file = fileInput.files[0];
 
-    // Speed-optimized compression (500px width max & 0.5 JPEG quality)
     window.compressImage(file, 500, 500, 0.5, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
-        newBusRef.set({ 
-            name: name, 
-            image: compressedBase64, 
-            link: link, 
-            desc: desc, 
-            price: price ? parseInt(price) : 0,
-            password: password ? password : "" 
+        newBusRef.set({
+            name: name,
+            link: link,
+            desc: desc,
+            price: price || 0,
+            password: password || "",
+            image: compressedBase64
         })
         .then(() => {
-            alert("Basi jipya limeongezwa kwa ufanisi mkubwa!");
+            alert("Mod imepakiwa kwa ufanisi!");
             document.getElementById("uploadName").value = "";
-            document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
+            document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadPrice").value = "";
             document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
-            window.showBusCategory(cat, "MABASI", true);
-        }).catch(err => {
-            alert("Kosa la Firebase: " + err.message);
+        })
+        .catch(err => {
+            alert("Kosa: " + err.message);
             statusDiv.style.display = "none";
         });
     });
 }
 
-window.deleteCategory = function(categoryId) {
-    if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
-    if(confirm("Je, una uhakika unataka kufuta GROUP la '" + categoryId + "' na kila kitu chake?")) {
-        database.ref('categories/' + categoryId).remove()
-        .then(() => { 
-            database.ref('buses/' + categoryId).remove(); 
-            alert("Vimefutwa!"); 
-            window.loadCategories();
-        }).catch(err => alert("Kosa: " + err.message));
+// SEARCH BAR LOGIC
+window.handleSearchInput = function(searchTerm) {
+    let term = searchTerm.toLowerCase().trim();
+    if (term === "") {
+        window.showcat();
+        return;
     }
-}
 
-window.clearEntireDatabase = function() {
-    const secret = document.getElementById("adminSecret").value;
-    if (secret !== "1234") { alert("Kodi ya siri ya admin siyo sahihi!"); return; }
-
-    let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
-    if (confirmationText === "FUTA") {
-        database.ref().remove()
-        .then(() => { alert("Database yote imesafishwa!"); window.loadCategories(); })
-        .catch(err => alert("Kosa: " + err.message));
-    } else { alert("Zoezi limesitishwa."); }
-}
-
-window.deleteBus = function(category, key) {
-    if(confirm("Unataka kufuta basi hili?")) {
-        database.ref('buses/' + category + '/' + key).remove()
-        .then(() => {
-            alert("Basi limefutwa!");
-            window.showBusCategory(category, "MABASI", true);
-        })
-        .catch(err => alert("Kosa: " + err.message));
-    }
-}
-
-window.showAdminPanel = function() {
-    window.hideAllSections();
-    document.getElementById("adminSection").style.display = "block";
-    window.loadCategories();
-}
-
-window.checkCurrentLocation = function() {
-    let hash = window.location.hash;
-    let dbname = localStorage.getItem("name");
-    
-    if (hash === "#admin") { 
-        window.showAdminPanel();
-        return; 
-    }
-    if (!dbname) { window.hideAllSections(); if (hash === "#login") window.showlogin(); else window.showregister(); } 
-    else { window.showcat(true); }
-}
-
-// LOGIC YA TAFUTA (SEARCH BAR)
-window.handleSearchInput = function(query) {
-    const searchTerm = query.toLowerCase().trim();
-    if(searchTerm === "") return;
-    
     database.ref('buses').once('value', (snapshot) => {
-        const allCategories = snapshot.val() || {};
-        let matchingBuses = [];
+        const allBusesData = snapshot.val() || {};
+        window.hideAllSections();
+        document.getElementById("bus-view-section").style.display = "block";
+        document.getElementById("navicon").style.display = "flex";
         
-        for (const [catId, buses] of Object.entries(allCategories)) {
-            for (const [busKey, bus] of Object.entries(buses)) {
-                if (bus.name && bus.name.toLowerCase().includes(searchTerm)) {
-                    matchingBuses.push({ bus, catId, busKey });
+        document.getElementById("dynamic-bus-title").textContent = `MATOKEO YA: "${searchTerm}"`;
+        let busList = document.getElementById("dynamic-bus-list");
+        busList.innerHTML = "";
+
+        let count = 0;
+        for (const [catId, categoryBuses] of Object.entries(allBusesData)) {
+            for (const [busKey, bus] of Object.entries(categoryBuses)) {
+                if (bus.name && bus.name.toLowerCase().includes(term)) {
+                    count++;
+                    const card = document.createElement("div");
+                    card.className = "card bus-card";
+                    card.innerHTML = `
+                        <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
+                            <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', 'SEARCH', ${bus.price || 0}, '${busKey}')">
+                        </div>
+                        <h3 style="margin: 15px 0 5px 0; text-align: center;">${bus.name}</h3>
+                        <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0; line-height: 1.4;">
+                            ${bus.desc || 'Hakuna maelezo'}
+                        </p>
+                        <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin: 12px 0;">
+                            ${bus.price && parseInt(bus.price) > 0 ? 
+                                `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
+                                `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
+                        </div>
+                        <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', 'SEARCH', ${bus.price || 0}, '${busKey}')" style="width: calc(100% - 30px); margin: 15px;">TAZAMA & DOWNLOAD</button>
+                    `;
+                    busList.appendChild(card);
                 }
             }
         }
-        
-        if (matchingBuses.length > 0) {
-            window.hideAllSections();
-            document.getElementById("bus-view-section").style.display = "block";
-            document.getElementById("navicon").style.display = "flex";
-            document.getElementById("dynamic-bus-title").textContent = `MATOKEO YA: "${query.toUpperCase()}"`;
-            
-            let busList = document.getElementById("dynamic-bus-list");
-            busList.innerHTML = "";
-            
-            matchingBuses.forEach(item => {
-                const bus = item.bus;
-                const card = document.createElement("div");
-                card.className = "card bus-card";
-                card.innerHTML = `
-                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
-                        <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${item.catId}', 'SEARCH', ${bus.price || 0}, '${item.busKey}')">
-                    </div>
-                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${bus.name}</h3>
-                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">
-                        ${bus.desc || 'Hakuna maelezo'}
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin: 12px 0;">
-                        ${bus.price && parseInt(bus.price) > 0 ? 
-                            `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
-                            `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
-                    </div>
-                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${item.catId}', 'SEARCH', ${bus.price || 0}, '${item.busKey}')" style="width: calc(100% - 30px); margin: 15px;">TAZAMA & DOWNLOAD</button>
-                `;
-                busList.appendChild(card);
-            });
+
+        if (count === 0) {
+            busList.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ff007f;">Hakuna mod iliyopatikana yenye jina hilo.</p>`;
         }
     });
 }
 
-window.addEventListener("popstate", function(event) {
-    let hash = window.location.hash;
-    if (hash === "#admin") { window.showAdminPanel(); return; }
-    let dbname = localStorage.getItem("name");
-    if (!dbname) { window.showregister(); return; }
-    
-    if (event.state && event.state.page) {
-        let page = event.state.page;
-        if (page === "home") window.showcat(true);
-        else window.showBusCategory(page, event.state.catName || page, true);
-    } else { window.checkCurrentLocation(); }
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-    window.loadCategories();
-    window.checkCurrentLocation();
-});
-
-// =========================================================================
-// KITENGO AI ASSISTANT (OPTIMIZED)
-// =========================================================================
-const PART_A = "AQ.Ab8RN6LL0VgiZ";
-const PART_B = "gSXifpheeDVtaGlQ7V";
-const PART_C = "n4-8t42QCcrK885ck8w";
-
-const GEMINI_API_KEY = PART_A + PART_B + PART_C;
-
+// AI CHAT BOT HELPER
 window.toggleChat = function() {
-    const chatBox = document.getElementById("ai-chat-box");
-    if (!chatBox) return;
-    if (chatBox.style.display === "none" || chatBox.style.display === "") {
-        chatBox.style.display = "flex";
-    } else {
-        chatBox.style.display = "none";
-    }
+    let box = document.getElementById("ai-chat-box");
+    box.style.display = (box.style.display === "flex") ? "none" : "flex";
 }
 
-window.checkEnter = function(event) {
-    if (event.key === "Enter") {
-        window.sendMessage();
-    }
+window.checkEnter = function(e) {
+    if (e.key === "Enter") { window.sendMessage(); }
 }
 
-window.sendMessage = async function() {
-    const inputEl = document.getElementById("ai-user-input");
-    const messageText = inputEl.value.trim();
-    if (messageText === "") return;
+window.sendMessage = function() {
+    let input = document.getElementById("ai-user-input");
+    let msg = input.value.trim();
+    if (msg === "") return;
 
-    const messagesContainer = document.getElementById("ai-chat-messages");
-
-    const userDiv = document.createElement("div");
+    let msgBox = document.getElementById("ai-chat-messages");
+    
+    let userDiv = document.createElement("div");
     userDiv.className = "message user-message";
-    userDiv.textContent = messageText;
-    messagesContainer.appendChild(userDiv);
+    userDiv.textContent = msg;
+    msgBox.appendChild(userDiv);
+    
+    input.value = "";
+    msgBox.scrollTop = msgBox.scrollHeight;
 
-    inputEl.value = "";
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-    const loadingDiv = document.createElement("div");
-    loadingDiv.className = "message ai-message";
-    loadingDiv.id = "ai-loading-msg";
-    loadingDiv.textContent = "Kitengo AI inafikiria...";
-    messagesContainer.appendChild(loadingDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-    try {
-        const systemPrompt = "Wewe ni Kitengo AI Assistant - msaidizi wa kucheza mahitaji ya watumiaji wa Kitengo Gaming. Jibu kwa Kiswahili kimafupi na kwa maelezo mazuri. Usitumie markdown. Jibu ni karibu 2-3 sentensi tu.";
-        const userPrompt = messageText + " (" + systemPrompt + ")";
-        
-        const askGemini = async (model) => {
-            return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    contents: [{ 
-                        parts: [{ 
-                            text: userPrompt
-                        }] 
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 150
-                    }
-                })
-            });
-        };
-
-        let response = await askGemini("gemini-2.5-flash");
-        if (!response.ok) {
-            response = await askGemini("gemini-1.5-flash");
-        }
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        const loader = document.getElementById("ai-loading-msg");
-        if(loader) loader.remove();
-
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-            const aiResponseText = data.candidates[0].content.parts[0].text;
-
-            const aiDiv = document.createElement("div");
-            aiDiv.className = "message ai-message";
-            aiDiv.textContent = aiResponseText;
-            messagesContainer.appendChild(aiDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        } else {
-            throw new Error("Invalid response format");
-        }
-
-    } catch (error) {
-        console.error("AI Error:", error);
-        const loader = document.getElementById("ai-loading-msg");
-        if(loader) loader.remove();
-        
-        const aiDiv = document.createElement("div");
+    setTimeout(() => {
+        let aiDiv = document.createElement("div");
         aiDiv.className = "message ai-message";
-        aiDiv.textContent = "Samahani mkuu, KITENGO AI NIPO KWENYE MABORESHO KWA SASA. Jaribu tena baadae! Kosa: " + error.message;
-        messagesContainer.appendChild(aiDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        let lower = msg.toLowerCase();
+        if (lower.includes("hello") || lower.includes("mambo") || lower.includes("habari")) {
+            aiDiv.textContent = "Poa sana! Karibu Kitengo Gaming. Unahitaji msaada gani wa mods leo?";
+        } else if (lower.includes("bus") || lower.includes("mod") || lower.includes("ets2")) {
+            aiDiv.textContent = "Tunazo mods kibao za Maleo na ETS2! Unaweza kutumia search bar ya juu kutafuta mod unayotaka au kuangalia kwenye Categories.";
+        } else if (lower.includes("password") || lower.includes("malipo") || lower.includes("lipa")) {
+            aiDiv.textContent = "Kwa mod za kulipia (Premium), ukibonyeza Download zitakuomba uagize Password kwa SMS au kupiga simu 0615304000.";
+        } else {
+            aiDiv.textContent = "Asante kwa ujumbe wako. Kwa msaada wa haraka zaidi, unaweza pia kutupigia simu au kututumia SMS kupitia 0615304000.";
+        }
+        
+        msgBox.appendChild(aiDiv);
+        msgBox.scrollTop = msgBox.scrollHeight;
+    }, 600);
+}
+
+// ADMIN PANEL DISPLAY CONTROL VIA SECRET KEY
+window.showAdminPanel = function() {
+    window.hideAllSections();
+    document.getElementById("adminSection").style.display = "block";
+}
+
+window.clearEntireDatabase = function() {
+    let secret = document.getElementById("adminSecret").value;
+    if (secret === "1234") { // Weka password yako hapa
+        if (confirm("Upo tayari kufuta database yote?")) {
+            database.ref().remove().then(() => alert("Database imesafishwa!"));
+        }
+    } else {
+        alert("Siri sio sahihi!");
     }
 }
+
+// INITIAL STARTUP LOGIC
+window.addEventListener("DOMContentLoaded", () => {
+    if (window.location.hash === "#admin") {
+        window.showAdminPanel();
+    } else {
+        let dbname = localStorage.getItem("name");
+        if (dbname) {
+            window.showcat(true);
+        } else {
+            window.showregister();
+        }
+    }
+});

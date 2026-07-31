@@ -130,7 +130,6 @@
             width: 80%;
         }
 
-        /* Search Bar Wrapper */
         .nav-search-container {
             display: flex;
             align-items: center;
@@ -176,7 +175,6 @@
             justify-content: center;
         }
 
-        /* Contact Phone Icon Dropdown */
         .phone-action-container {
             position: relative;
             display: inline-block;
@@ -267,14 +265,14 @@
             text-align: center;
             font-weight: 900;
             letter-spacing: 3px;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: #ffffff;
             text-shadow: 0 0 15px rgba(69, 243, 255, 0.6);
             background: linear-gradient(135deg, #45f3ff, #ff007f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0;
-            padding: 25px 20px;
+            padding: 20px 10px;
         }
 
         h2 {
@@ -290,9 +288,9 @@
         p {
             color: #a4a6b0;
             text-align: center;
-            font-size: 17px;
-            line-height: 1.7;
-            padding: 0 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            padding: 0 15px;
         }    
         
         a {
@@ -310,111 +308,121 @@
         .hero-section {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
         #about {
             background: rgba(31, 40, 51, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
             backdrop-filter: blur(5px);
             margin-top: 15px;
         }
         
         /* ==========================================
-           4. GRID SYSTEM & LUXURY CARDS
+           4. CATEGORY & ITEM GRID SYSTEM (KAMA PICHA)
         ========================================== */
         .cat-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            padding: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 12px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        @media (max-width: 1024px) {
+        @media (min-width: 768px) {
             .cat-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
             }
         }
 
-        @media (max-width: 600px) {
+        @media (min-width: 1024px) {
             .cat-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(4, 1fr);
             }
-        }
-
-        /* Category boxes: fixed 315x235 size (categories only, does not affect bus lists) */
-        #categories-container.cat-grid {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 315px));
-            justify-content: center;
         }
 
         .card {
-            background: linear-gradient(135deg, rgba(31, 40, 51, 0.5), rgba(113, 57, 232, 0.1));
-            border: 2px solid transparent;
+            background: #14161d;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
-            padding: 0;
+            padding: 12px;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            position: relative;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(69, 243, 255, 0.1), rgba(255, 0, 127, 0.05));
-            opacity: 0;
-            transition: opacity 0.4s;
-            border-radius: 20px;
-            pointer-events: none;
-            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
         }
 
         .card:hover {
+            transform: translateY(-4px);
             border-color: rgba(69, 243, 255, 0.4);
-            box-shadow: 0 15px 50px rgba(69, 243, 255, 0.2);
-            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(69, 243, 255, 0.15);
         }
 
-        .card:hover::before {
-            opacity: 1;
-        }
-
-        .card * {
+        .card-img-wrapper {
             position: relative;
-            z-index: 2;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
         }
 
-        .card button {
-            background: linear-gradient(135deg, #7139e8, #45f3ff);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            margin: 15px;
-            width: calc(100% - 30px);
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(113, 57, 232, 0.3);
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
         }
 
-        .card button:hover {
-            background: linear-gradient(135deg, #45f3ff, #7139e8);
+        .card:hover .card-img-wrapper img {
             transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(69, 243, 255, 0.4);
+        }
+
+        .card-content {
+            padding: 12px 4px 4px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-tag {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffaa00;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 2px 0;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+            color: #8a8d9b;
+            font-size: 13px;
+        }
+
+        .card-action-icon {
+            color: #a4a6b0;
+            font-size: 14px;
         }
 
         .details-box {
@@ -436,7 +444,7 @@
         .log, .reg {
             max-width: 400px;
             margin: 60px auto;
-            padding: 40px;
+            padding: 30px;
             background: rgba(31, 40, 51, 0.6);
             border: 2px solid rgba(69, 243, 255, 0.2);
             border-radius: 20px;
@@ -658,11 +666,6 @@
             box-shadow: 0 8px 30px rgba(69, 243, 255, 0.6);
         }
 
-        #ai-chat-icon img {
-            width: 30px;
-            height: 30px;
-        }
-
         #ai-chat-box {
             position: fixed;
             bottom: 100px;
@@ -749,25 +752,13 @@
             border: none; 
             color: white; 
             padding: 10px 16px; 
-            margin-left: 8px; 
             border-radius: 10px; 
             cursor: pointer; 
             font-size: 13px; 
             font-weight: bold; 
             font-family: 'Orbitron', sans-serif;
-            margin-top: 0 !important;
-            box-shadow: none;
-        }
-        
-        #ai-send-btn:hover {
-            color: white;
-            background: linear-gradient(135deg, #ff007f, #7139e8);
-            transform: none;
         }
 
-        /* ==========================================
-           9. ADMIN CARD STYLES
-        ========================================== */
         .admin-card-wrapper {
             padding: 15px;
             position: relative;
@@ -785,7 +776,7 @@
     <div class="nav-links">
         <a href="javascript:void(0);" class="nav-item" onclick="window.showcat()">Home</a>
         <a href="javascript:void(0);" class="nav-item" onclick="alert('Karibu Kitengo Gaming!')">About Us</a>
-        <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 Mods kali!')">Our Services</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 & Maleo Mods kali!')">Our Services</a>
     </div>
 
     <!-- Search Bar in Header -->
@@ -816,7 +807,7 @@
         <p id="about">......welcome kitengo gaming for highly realistic gaming experience & ENJOY, our updates are coming after two days, DOWNLOAD APP YETU KWA UPDATE ZAID <a href="https://www.mediafire.com/file/ffjym4gtkxm6dww/app-apk-609a525dd2d244fbad514ca71031f099-1783768439.apk/file">KITENGO GAMING APP</a>, <a href="">FACEBOOK</a>, <a href="">INSTAGRAM</a>, <a href="">TIKTOK</a>, <a href="">WHATSAPP</a>, <a href="">YOUTUBE</a> as our main launching platforms. dont forget to subscribe our <a href="">YOUTUBE CHANNEL</a>, so as to be the first one to get our updates daily..... PIA KWA MSAADA ZAIDI WA NAMNA YA KU IMPORT MODS ZA MALEO WASILIANA NASI KWA SIMU NAMBA 0615304000 </p>
         <hr class="divider">
         <h2>OUR SERVICES</h2>
-        <p style="margin-bottom: 30px;">Tunatoa mod kali za INDONESIA BUS SIMULATOR (MALEO),EURO TRUCK SIMULATOR 2 NA NYINGINE NYINGI. Chagua CATEGORY uipendayo hapa chini:</p>
+        <p style="margin-bottom: 20px;">Tunatoa mod kali za INDONESIA BUS SIMULATOR (MALEO), EURO TRUCK SIMULATOR 2 NA NYINGINE NYINGI. Chagua CATEGORY uipendayo hapa chini:</p>
     </div>
     
     <div class="cat-grid" id="categories-container"></div>
@@ -835,12 +826,12 @@
 </div>
 
 <div id="details-view-section" style="display:none; padding: 20px;">
-    <button onclick="window.goBackFromDetails()" aria-label="Rudi Nyuma" style="margin: 10px auto 25px auto; display: block;">&larr; Rudi Nyuma</button>
+    <button onclick="window.goBackFromDetails()" aria-label="Rudi Nyuma" style="margin: 10px auto 25px auto; display: block; background: #7139e8; color: white; border: none; padding: 10px 20px; border-radius: 10px;">&larr; Rudi Nyuma</button>
     <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
         <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
         <img id="details-img" src="" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
         <p id="details-desc" style="margin-top: 20px; font-size: 16px; line-height: 1.5; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></p>
-        <div id="details-action-btn"></div>
+        <div id="details-action-btn" style="margin-top: 15px;"></div>
     </div>
 </div>
 

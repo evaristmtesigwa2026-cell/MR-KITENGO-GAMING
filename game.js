@@ -74,14 +74,15 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     if (type === 'category') {
         let btn = document.createElement("button");
         btn.textContent = "CHAGUA HAPA (FUNGUA MODS)";
+        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;";
         btn.onclick = function() { window.showBusCategory(targetLinkOrId, title); };
         btnContainer.appendChild(btn);
         
         window.currentDetailsBack = function() { window.showcat(); };
     } else {
         let btn = document.createElement("button");
+        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;";
         
-        // Angalia kama basi lina bei (Premium) au ni la Bure (Free)
         if (price && parseInt(price) > 0) {
             btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
             btn.onclick = function() {
@@ -101,13 +102,11 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     }
 }
 
-// DIRISHA LA KUINGIZA PASSWORD NA KUOMBA SMS
 window.openPasswordModal = function(itemName, itemPrice, downloadLink, categoryId, busKey) {
     document.getElementById("pay-item-name").textContent = itemName;
     document.getElementById("pay-item-price").textContent = "Tsh " + itemPrice;
     document.getElementById("pay-target-link").value = downloadLink;
     
-    // Hifadhi taarifa za database kwa ajili ya kufanya uhakiki wa password baadae
     document.getElementById("pay-target-link").dataset.catId = categoryId;
     document.getElementById("pay-target-link").dataset.busKey = busKey;
     
@@ -122,17 +121,13 @@ window.closePaymentModal = function() {
     document.getElementById("pay-status-log").style.display = "none";
 }
 
-// KUFUNGUA APP YA SMS KIOTOMATIKI UKIBONYEZA OMBA PASSWORD
 window.requestPasswordSMS = function() {
     const nambaHalotel = "0615304000";
     const jinaLaBasi = document.getElementById("pay-item-name").textContent;
     const ujumbe = `HELLO KITENGO GAMING, NAHITAJI PASSWORD YA MOD YA: ${jinaLaBasi}`;
-    
-    // Inafungua app ya SMS kwenye simu ya mteja ikiwa imeshaandikwa kila kitu tayari
     window.location.href = `sms:${nambaHalotel}?body=${encodeURIComponent(ujumbe)}`;
 }
 
-// KUHAKIKI PASSWORD KUTOKA FIREBASE NA KUMRUSHIA MEDIAFIRE
 window.verifyPasswordAndDownload = function() {
     const passwordInput = document.getElementById("pay-password").value.trim();
     const link = document.getElementById("pay-target-link").value;
@@ -149,7 +144,6 @@ window.verifyPasswordAndDownload = function() {
     statusLog.style.color = "yellow";
     statusLog.textContent = "SUBIRI KWANZA MAANA PASSWORD YAKO INAHAKIKIWA  ...";
     
-    // Tunavuta password sahihi ya basi hili kutoka Firebase kiusalama
     database.ref(`buses/${catId}/${busKey}/password`).once('value')
     .then((snapshot) => {
         const correctPassword = snapshot.val();
@@ -181,7 +175,7 @@ window.goBackFromDetails = function() {
     }
 }
 
-// CHOMBO CHA USHINDILIAJI PICHA KIOTOMATIKI (OPTIMIZED FOR MAXIMUM SPEED)
+// ULTRA-FAST COMPRESSION UTILITY (Kutatua tatizo la upload kuwa nzito)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     if (!file) return;
     const reader = new FileReader();
@@ -209,8 +203,8 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Webp or standard JPEG with low quality for fast load
-            const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.5);
+            // Inafinywa sana picha baseline (0.4/0.5 quality) ili data za Firebase ziwe ndogo sana
+            const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.4);
             callback(compressedBase64);
         };
         img.onerror = function() {
@@ -233,11 +227,11 @@ window.addCategory = function() {
     
     const statusDiv = document.getElementById("cat-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inashindilia picha ya kundi kuwa nyepesi...";
+    statusDiv.textContent = "Inashindilia picha ya kundi kwa kasi kubwa...";
     
     const file = fileInput.files[0];
     
-    window.compressImage(file, 400, 400, 0.5, function(compressedBase64) {
+    window.compressImage(file, 400, 400, 0.4, function(compressedBase64) {
         database.ref('categories/' + id).set({ 
             name: name, 
             image: compressedBase64, 
@@ -258,6 +252,7 @@ window.addCategory = function() {
     });
 }
 
+// RENDER CATEGORIES KAMA PICHA ULIYOTUMA (CARD STYLE & 2-COLUMN ARRANGEMENT)
 window.loadCategories = function() {
     database.ref('categories').once('value', (snapshot) => {
         const categories = snapshot.val() || {};
@@ -278,22 +273,28 @@ window.loadCategories = function() {
             if(catContainer) {
                 const card = document.createElement("div");
                 card.className = "card category-card";
-                card.style.position = "relative";
+                card.onclick = function() {
+                    window.showBusCategory(key, cat.name, false);
+                };
                 
                 card.innerHTML = `
-                    <div style="position: relative; width: 315px; height: 235px; max-width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 15px; margin: 0 auto;">
-                        <img src="${cat.image}" alt="${cat.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="card-img-wrapper">
+                        <img src="${cat.image}" alt="${cat.name}">
                     </div>
-                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${cat.name}</h3>
-                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">${cat.desc || 'Kundi la mods'}</p>
-                    <button onclick="window.showBusCategory('${key}', '${cat.name}', false)" style="width: calc(100% - 30px); margin: 15px;">CHAGUA HAPA</button>
+                    <div class="card-content">
+                        <span class="card-tag">CATEGORY</span>
+                        <div class="card-title">${cat.name}</div>
+                        <div class="card-footer">
+                            <span>${cat.desc || 'Mods available'}</span>
+                            <span class="card-action-icon">&rsaquo;</span>
+                        </div>
+                    </div>
                 `;
                 
                 catContainer.appendChild(card);
             }
         }
         
-        // Populate admin category select dropdown
         let adminCatSelect = document.getElementById("adminCategorySelect");
         if (adminCatSelect) {
             adminCatSelect.innerHTML = '<option value="">-- Chagua Category ya Kuhariri --</option>';
@@ -307,9 +308,7 @@ window.loadCategories = function() {
     });
 }
 
-// =========================================================================
-// LOGO SLIDESHOW (PICHA + VIDEO)
-// =========================================================================
+// LOGO SLIDESHOW
 let slideshowItems = [];
 let slideshowIndex = 0;
 let slideshowTimer = null;
@@ -325,7 +324,6 @@ window.loadSlideshow = function() {
             slideshowIndex = 0;
             window.playSlideshowItem();
         } else {
-            // Hakuna slide zilizowekwa, onyesha logo.jpg ya kawaida
             const imgEl = document.getElementById('slideshow-img');
             const videoEl = document.getElementById('slideshow-video');
             if (videoEl) { videoEl.pause(); videoEl.style.display = 'none'; }
@@ -367,7 +365,6 @@ window.nextSlideshowItem = function() {
     window.playSlideshowItem();
 }
 
-// KUONGEZA PICHA/VIDEO MPYA KWENYE SLIDESHOW (ADMIN)
 window.addSlideshowItem = function() {
     const fileInput = document.getElementById('slideshowFile');
     if (!fileInput || fileInput.files.length === 0) { alert('Chagua picha au video kwanza!'); return; }
@@ -379,7 +376,7 @@ window.addSlideshowItem = function() {
     if (statusDiv) statusDiv.style.display = 'block';
 
     if (isVideo) {
-        if (statusDiv) statusDiv.textContent = 'Inapakia video, subiri (usifunge ukurasa)...';
+        if (statusDiv) statusDiv.textContent = 'Inapakia video, subiri...';
         const reader = new FileReader();
         reader.onload = function(e) {
             database.ref('slideshow').push().set({ type: 'video', src: e.target.result })
@@ -394,14 +391,10 @@ window.addSlideshowItem = function() {
                 if (statusDiv) statusDiv.style.display = 'none';
             });
         };
-        reader.onerror = function() {
-            alert('Hitilafu kusoma video hii!');
-            if (statusDiv) statusDiv.style.display = 'none';
-        };
         reader.readAsDataURL(file);
     } else {
         if (statusDiv) statusDiv.textContent = 'Inashindilia picha...';
-        window.compressImage(file, 1536, 828, 0.6, function(compressedBase64) {
+        window.compressImage(file, 1000, 600, 0.5, function(compressedBase64) {
             database.ref('slideshow').push().set({ type: 'image', src: compressedBase64 })
             .then(() => {
                 alert('Picha imeongezwa kwenye slideshow!');
@@ -417,7 +410,6 @@ window.addSlideshowItem = function() {
     }
 }
 
-// KUONYESHA ORODHA YA SLIDESHOW KWENYE ADMIN PANEL
 window.loadSlideshowAdminList = function() {
     const listEl = document.getElementById('slideshow-admin-list');
     if (!listEl) return;
@@ -428,7 +420,7 @@ window.loadSlideshowAdminList = function() {
         const entries = Object.entries(data);
 
         if (entries.length === 0) {
-            listEl.innerHTML = '<p style="color:#a4a6b0; font-size:13px;">Hakuna picha/video kwenye slideshow bado. Logo la kawaida (logo.jpg) linaonekana kwa sasa.</p>';
+            listEl.innerHTML = '<p style="color:#a4a6b0; font-size:13px;">Hakuna picha/video kwenye slideshow bado.</p>';
             return;
         }
 
@@ -448,7 +440,6 @@ window.loadSlideshowAdminList = function() {
     });
 }
 
-// KUFUTA ITEM KWENYE SLIDESHOW
 window.deleteSlideshowItem = function(key) {
     if (confirm('Unataka kufuta hii kwenye slideshow?')) {
         database.ref('slideshow/' + key).remove()
@@ -459,6 +450,7 @@ window.deleteSlideshowItem = function(key) {
     }
 }
 
+// ONYESHA MABASI YA CATEGORY ILIYOCHAGULIWA (ARRANGEMENT Sawa NA KADIA ZA GAMING)
 window.showBusCategory = function(catId, catName, isAdminMode = false) {
     database.ref('buses/' + catId).once('value', (snapshot) => {
         const buses = snapshot.val() || {};
@@ -483,50 +475,36 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
             card.className = "card bus-card";
             
             if (isAdmin) {
-                // Admin mode card
                 card.innerHTML = `
                     <div class="admin-card-wrapper" data-cat="${catId}" data-key="${key}">
                         <div style="position: relative;">
-                            <img src="${bus.image}" alt="${bus.name}" class="editable-image" style="width: 100%; height: 200px; object-fit: cover; border-radius: 15px; cursor: pointer;">
-                            <div class="long-press-hint" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #45f3ff; padding: 3px 8px; border-radius: 5px; font-size: 11px; display: none;">5s = Edit</div>
+                            <img src="${bus.image}" alt="${bus.name}" class="editable-image" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; cursor: pointer;">
                         </div>
-                        <h3 class="editable-title" style="margin: 15px 0 5px 0; cursor: pointer; color: #45f3ff;">${bus.name}</h3>
-                        <p class="editable-category" style="margin: 0; font-size: 12px; color: #7139e8; cursor: pointer;">${catName}</p>
-                        <p class="editable-desc" style="margin: 10px 0; font-size: 14px; line-height: 1.4; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; cursor: pointer;">
-                            ${bus.desc || 'Hakuna maelezo'}
-                        </p>
-                        <div style="display: flex; gap: 8px; margin: 10px 0;">
-                            <div style="flex: 1;">
-                                <label style="font-size: 11px; color: #a4a6b0;">Bei (Tsh):</label>
-                                <p class="editable-price" style="margin: 0; color: #ff007f; font-weight: bold; cursor: pointer; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;">${bus.price || 0}</p>
-                            </div>
-                            <div style="flex: 1;">
-                                <label style="font-size: 11px; color: #a4a6b0;">Link:</label>
-                                <p class="editable-link" style="margin: 0; color: #45f3ff; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;" title="${bus.link}">${bus.link ? bus.link.substring(0, 20) : ''}...</p>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; margin: 0;">FUTA</button>
-                            <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; margin: 0;">REFRESH</button>
+                        <h3 class="editable-title" style="margin: 10px 0 5px 0; cursor: pointer; color: #45f3ff; font-size:15px;">${bus.name}</h3>
+                        <p class="editable-price" style="margin: 0; color: #ff007f; font-weight: bold; cursor: pointer; font-size:13px;">Tsh ${bus.price || 0}</p>
+                        <div style="display: flex; gap: 8px; margin-top:10px;">
+                            <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; padding:6px; font-size:12px;">FUTA</button>
+                            <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; padding:6px; font-size:12px;">REFRESH</button>
                         </div>
                     </div>
                 `;
             } else {
-                // User mode card
+                card.onclick = function() {
+                    window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, catId, catName, bus.price || 0, key);
+                };
+                
                 card.innerHTML = `
-                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
-                        <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')">
+                    <div class="card-img-wrapper">
+                        <img src="${bus.image}" alt="${bus.name}">
                     </div>
-                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${bus.name}</h3>
-                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0; line-height: 1.4;">
-                        ${bus.desc || 'Hakuna maelezo'}
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin: 12px 0;">
-                        ${bus.price && parseInt(bus.price) > 0 ? 
-                            `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
-                            `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
+                    <div class="card-content">
+                        <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
+                        <div class="card-title">${bus.name}</div>
+                        <div class="card-footer">
+                            <span>1 link</span>
+                            <span class="card-action-icon">&rsaquo;</span>
+                        </div>
                     </div>
-                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${catId}', '${catName}', ${bus.price || 0}, '${key}')" style="width: calc(100% - 30px); margin: 15px;">TAZAMA & DOWNLOAD</button>
                 `;
             }
             
@@ -539,7 +517,7 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
         
         let backBtn = document.createElement("button");
         backBtn.textContent = "Rudi Nyuma";
-        backBtn.style.cssText = "display: block; margin: 20px auto; padding: 12px 30px; width: auto;";
+        backBtn.style.cssText = "display: block; margin: 25px auto; padding: 10px 25px; background: #7139e8; color: white; border: none; border-radius: 8px; cursor: pointer;";
         backBtn.onclick = function() {
             if (isAdmin) {
                 window.showAdminPanel();
@@ -558,62 +536,20 @@ window.reloadCategoryView = function(catId, catName) {
 window.setupAdminCardListeners = function(card, catId, key, bus) {
     const titleEl = card.querySelector('.editable-title');
     const priceEl = card.querySelector('.editable-price');
-    const linkEl = card.querySelector('.editable-link');
-    const descEl = card.querySelector('.editable-desc');
     const imageEl = card.querySelector('.editable-image');
-    const hintEl = card.querySelector('.long-press-hint');
-    
     let pressTimer;
     
     if (imageEl) {
-        imageEl.addEventListener('mousedown', () => {
-            if(hintEl) hintEl.style.display = 'block';
-            pressTimer = setTimeout(() => { window.editBusImage(catId, key, bus); }, 5000);
-        });
-        imageEl.addEventListener('mouseup', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
-        imageEl.addEventListener('mouseleave', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
-        
-        imageEl.addEventListener('touchstart', () => {
-            if(hintEl) hintEl.style.display = 'block';
-            pressTimer = setTimeout(() => { window.editBusImage(catId, key, bus); }, 5000);
-        });
-        imageEl.addEventListener('touchend', () => { clearTimeout(pressTimer); if(hintEl) hintEl.style.display = 'none'; });
+        imageEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusImage(catId, key, bus); }, 3000); });
+        imageEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
-    
     if (titleEl) {
-        titleEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'); }, 5000); });
-        titleEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
-        titleEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-        
-        titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'); }, 5000); });
+        titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'); }, 3000); });
         titleEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
-    
     if (priceEl) {
-        priceEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 5000); });
-        priceEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
-        priceEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-        
-        priceEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 5000); });
+        priceEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 3000); });
         priceEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-    }
-    
-    if (linkEl) {
-        linkEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'link', bus.link, 'Link ya Download'); }, 5000); });
-        linkEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
-        linkEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-        
-        linkEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'link', bus.link, 'Link ya Download'); }, 5000); });
-        linkEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-    }
-    
-    if (descEl) {
-        descEl.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo'); }, 5000); });
-        descEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
-        descEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-        
-        descEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo'); }, 5000); });
-        descEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
 }
 
@@ -637,21 +573,20 @@ window.editBusImage = function(catId, key, bus) {
     fileInput.onchange = function() {
         if (this.files.length > 0) {
             const file = this.files[0];
-            window.compressImage(file, 500, 500, 0.5, function(compressedBase64) {
+            window.compressImage(file, 500, 500, 0.4, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
-                        alert('Picha imebadilishwa kwa ufanisi!');
+                        alert('Picha imebadilishwa!');
                         window.reloadCategoryView(catId, '');
                     })
                     .catch(err => alert('Kosa: ' + err.message));
             });
         }
     };
-    
     fileInput.click();
 }
 
-// OPTIMIZED FAST UPLOAD BUS FUNCTION
+// UPLOAD BUS FUNCTION - OPTIMIZED FOR MAX UPLOAD SPEED
 window.uploadBus = function() {
     let cat = document.getElementById("uploadCategory").value;
     let name = document.getElementById("uploadName").value.trim();
@@ -668,12 +603,12 @@ window.uploadBus = function() {
 
     const statusDiv = document.getElementById("bus-upload-status");
     statusDiv.style.display = "block";
-    statusDiv.textContent = "Inashindilia picha kwa kasi kubwa na kupakia Firebase...";
+    statusDiv.textContent = "Inashindilia picha kwa kasi na kupakia Firebase...";
 
     const file = fileInput.files[0];
 
-    // Speed-optimized compression (500px width max & 0.5 JPEG quality)
-    window.compressImage(file, 500, 500, 0.5, function(compressedBase64) {
+    // Speed Compression (Max 500px, 0.4 quality kwa ajili ya upload ya haraka sana)
+    window.compressImage(file, 500, 500, 0.4, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
             name: name, 
@@ -684,7 +619,7 @@ window.uploadBus = function() {
             password: password ? password : "" 
         })
         .then(() => {
-            alert("Basi jipya limeongezwa kwa ufanisi mkubwa!");
+            alert("Basi jipya limeongezwa kwa kasi ya ajabu!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
@@ -754,7 +689,7 @@ window.checkCurrentLocation = function() {
     else { window.showcat(true); }
 }
 
-// LOGIC YA TAFUTA (SEARCH BAR)
+// SEARCH BAR LOGIC
 window.handleSearchInput = function(query) {
     const searchTerm = query.toLowerCase().trim();
     if(searchTerm === "") return;
@@ -784,20 +719,21 @@ window.handleSearchInput = function(query) {
                 const bus = item.bus;
                 const card = document.createElement("div");
                 card.className = "card bus-card";
+                card.onclick = function() {
+                    window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, item.catId, 'SEARCH', bus.price || 0, item.busKey);
+                };
                 card.innerHTML = `
-                    <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 15px;">
-                        <img src="${bus.image}" alt="${bus.name}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${item.catId}', 'SEARCH', ${bus.price || 0}, '${item.busKey}')">
+                    <div class="card-img-wrapper">
+                        <img src="${bus.image}" alt="${bus.name}">
                     </div>
-                    <h3 style="margin: 15px 0 5px 0; text-align: center;">${bus.name}</h3>
-                    <p style="margin: 0; font-size: 14px; text-align: center; color: #a4a6b0;">
-                        ${bus.desc || 'Hakuna maelezo'}
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; margin: 12px 0;">
-                        ${bus.price && parseInt(bus.price) > 0 ? 
-                            `<span style="background: #ff007f; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">Tsh ${bus.price}</span>` : 
-                            `<span style="background: #00AA00; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">FREE</span>`}
+                    <div class="card-content">
+                        <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
+                        <div class="card-title">${bus.name}</div>
+                        <div class="card-footer">
+                            <span>1 link</span>
+                            <span class="card-action-icon">&rsaquo;</span>
+                        </div>
                     </div>
-                    <button onclick="window.showDetails('${bus.name}', '${bus.image}', '${(bus.desc || '').replace(/'/g, "\\'")}', 'bus', '${bus.link}', '${item.catId}', 'SEARCH', ${bus.price || 0}, '${item.busKey}')" style="width: calc(100% - 30px); margin: 15px;">TAZAMA & DOWNLOAD</button>
                 `;
                 busList.appendChild(card);
             });
@@ -824,9 +760,7 @@ window.addEventListener("DOMContentLoaded", () => {
     window.checkCurrentLocation();
 });
 
-// =========================================================================
-// KITENGO AI ASSISTANT (OPTIMIZED)
-// =========================================================================
+// AI ASSISTANT
 const PART_A = "AQ.Ab8RN6LL0VgiZ";
 const PART_B = "gSXifpheeDVtaGlQ7V";
 const PART_C = "n4-8t42QCcrK885ck8w";

@@ -1,18 +1,18 @@
-// KITENGO GAMING - Service Worker
-// Inaruhusu app kufunguka bila internet (offline) na kuonyesha kitufe cha "Install App"
-
-const CACHE_NAME = "kitengo-gaming-v1";
+// KITENGO GAMING - Advanced Progressive Web App Service Worker
+const CACHE_NAME = "kitengo-gaming-v2";
 
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./game.js",
   "./manifest.json",
+  "./logo.jpg",
+  "./yutong2.jpg",
   "./icons/icon-192.png",
   "./icons/icon-512.png"
 ];
 
-// INSTALL: Hifadhi faili muhimu kwenye cache
+// INSTALL: Hifadhi rasilimali zote za msingi kwenye Cache
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -22,57 +22,68 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// ACTIVATE: Futa cache za zamani zisizohitajika tena
+// ACTIVATE: Futa cache zote za zamani zisizotumika
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
       );
     })
   );
   self.clients.claim();
 });
 
-// FETCH: Tumia cache kwanza kwa faili za tovuti (app shell),
-// lakini data za Firebase/Gemini ziende moja kwa moja mtandaoni (network)
+// FETCH: Mbinu ya Stale-While-Revalidate kwa matumizi ya haraka sana Offline na Online
 self.addEventListener("fetch", (event) => {
   const url = event.request.url;
 
-  // Usicache maombi ya Firebase, Gemini, au Netlify Functions - hizi zihitaji data mpya kila wakati
+  // Ruka maombi yote yanayoenda Firebase au Google API ili yawe ya papo kwa papo
   if (
     url.includes("firebaseio.com") ||
     url.includes("googleapis.com") ||
-    url.includes("/.netlify/functions/") ||
-    url.includes("firebasedatabase.app")
+    url.includes("firebasedatabase.app") ||
+    url.includes("/.netlify/functions/")
   ) {
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return new Response(JSON.stringify({ error: "Offline mode active for database" }), {
+          headers: { "Content-Type": "application/json" }
+        });
+      })
+    );
     return;
   }
 
+  // Mfumo wa Stale-While-Revalidate kwa Static Assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-
-      return fetch(event.request)
+      const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
-          // Hifadhi nakala mpya ya faili kwenye cache kwa matumizi ya baadae bila mtandao
-          if (event.request.method === "GET" && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
+          if (
+            event.request.method === "GET" &&
+            networkResponse &&
+            networkResponse.status === 200 &&
+            networkResponse.type === "basic"
+          ) {
+            const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
+              cache.put(event.request, responseToCache);
             });
           }
           return networkResponse;
         })
         .catch(() => {
-          // Ikiwa hakuna mtandao na hakuna cache, rudisha index.html kama fallback
           if (event.request.mode === "navigate") {
             return caches.match("./index.html");
           }
         });
+
+      return cachedResponse || fetchPromise;
     })
   );
 });

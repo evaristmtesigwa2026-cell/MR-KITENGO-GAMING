@@ -1,4 +1,5 @@
 {
+  "id": "/index.html",
   "name": "KITENGO GAMING",
   "short_name": "KITENGO GAMING",
   "description": "Kitengo Gaming - ETS2 na Indonesia Bus Simulator Mods",
@@ -8,6 +9,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0c10",
   "theme_color": "#0b0c10",
+  "categories": ["games", "utilities"],
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -32,6 +34,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fungua Home",
+      "short_name": "Home",
+      "description": "Tazama Mods zote za Kitengo Gaming",
+      "url": "./index.html#home"
+    },
+    {
+      "name": "Kitengo AI Assistant",
+      "short_name": "AI Assistant",
+      "description": "Ongea na Kitengo AI Msaidizi",
+      "url": "./index.html#ai"
     }
   ]
 }

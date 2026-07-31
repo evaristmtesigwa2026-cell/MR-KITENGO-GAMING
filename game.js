@@ -21,33 +21,44 @@ window.hideAllSections = function() {
         let el = document.getElementById(id);
         if (el) el.style.display = "none";
     });
-    document.getElementById("navicon").style.display = "none";
-}
+    const nav = document.getElementById("navicon");
+    if (nav) nav.style.display = "none";
+};
 
-window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; }
-window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; }
+window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; };
+window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; };
 
 window.register = function() {
-    let name = document.getElementById("regname").value;
-    let email = document.getElementById("regemail").value;
-    let password = document.getElementById("regpassword").value;
-    if (name == "" || email == "" || password == "") { alert("Jaza nafasi zote!"); } 
-    else { 
-        localStorage.setItem("name", name); localStorage.setItem("email", email); localStorage.setItem("password", password);
-        alert("hongera mkuu registration yako imekamilika!"); window.showlogin();
+    let name = document.getElementById("regname").value.trim();
+    let email = document.getElementById("regemail").value.trim();
+    let password = document.getElementById("regpassword").value.trim();
+    if (name === "" || email === "" || password === "") { 
+        alert("Jaza nafasi zote!"); 
+    } else { 
+        localStorage.setItem("name", name); 
+        localStorage.setItem("email", email); 
+        localStorage.setItem("password", password);
+        alert("Hongera mkuu registration yako imekamilika!"); 
+        window.showlogin();
     }
-}
+};
 
 window.login = function() {
-    let name = document.getElementById("logname").value;
-    let password = document.getElementById("logpassword").value;
+    let name = document.getElementById("logname").value.trim();
+    let password = document.getElementById("logpassword").value.trim();
     let dbname = localStorage.getItem("name");
     let dbpassword = localStorage.getItem("password");
-    if (name == "" || password == "") { alert("Jaza nafasi zote!"); } 
-    else if (name == dbname && password == dbpassword) {
-        alert("HONGERA SANA KARIBU KITENGO GAMING !"); history.replaceState({ page: "home" }, "Home", "#home"); window.showcat(true); 
-    } else { alert("Taarifa ulizoweka sio sahihi!"); }
-}
+    
+    if (name === "" || password === "") { 
+        alert("Jaza nafasi zote!"); 
+    } else if (name === dbname && password === dbpassword) {
+        alert("HONGERA SANA KARIBU KITENGO GAMING !"); 
+        history.replaceState({ page: "home" }, "Home", "#home"); 
+        window.showcat(true); 
+    } else { 
+        alert("Taarifa ulizoweka sio sahihi!"); 
+    }
+};
 
 window.showcat = function(isBackAction = false) {
     let dbname = localStorage.getItem("name");
@@ -56,7 +67,7 @@ window.showcat = function(isBackAction = false) {
     document.getElementById("cat").style.display = "block";
     document.getElementById("navicon").style.display = "flex"; 
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
-}
+};
 
 // LOGIC YA KICHUNGI CHA PREMIUM VS FREE + PASSWORD MODAL PREPARATION
 window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0, busKey = '') {
@@ -66,7 +77,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     
     document.getElementById("details-title").textContent = title;
     document.getElementById("details-img").src = image;
-    document.getElementById("details-desc").textContent = desc ? desc : "samahani mkuu Hakuna maelezo ya ziada yaliyowekwa kwenye item hii.";
+    document.getElementById("details-desc").textContent = desc ? desc : "Samahani mkuu, hakuna maelezo ya ziada yaliyowekwa kwenye item hii.";
     
     let btnContainer = document.getElementById("details-action-btn");
     btnContainer.innerHTML = "";
@@ -74,14 +85,14 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     if (type === 'category') {
         let btn = document.createElement("button");
         btn.textContent = "CHAGUA HAPA (FUNGUA MODS)";
-        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;";
+        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; min-height: 44px;";
         btn.onclick = function() { window.showBusCategory(targetLinkOrId, title); };
         btnContainer.appendChild(btn);
         
         window.currentDetailsBack = function() { window.showcat(); };
     } else {
         let btn = document.createElement("button");
-        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;";
+        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; min-height: 44px;";
         
         if (price && parseInt(price) > 0) {
             btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
@@ -94,45 +105,48 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
             a.target = "_blank";
             a.textContent = "DOWNLOAD NOW";
             a.style.color = "#ffffff";
+            a.style.textDecoration = "none";
             btn.appendChild(a);
         }
         
         btnContainer.appendChild(btn);
         window.currentDetailsBack = function() { window.showBusCategory(currentCatId, currentCatName); };
     }
-}
+};
 
 window.openPasswordModal = function(itemName, itemPrice, downloadLink, categoryId, busKey) {
     document.getElementById("pay-item-name").textContent = itemName;
     document.getElementById("pay-item-price").textContent = "Tsh " + itemPrice;
-    document.getElementById("pay-target-link").value = downloadLink;
     
-    document.getElementById("pay-target-link").dataset.catId = categoryId;
-    document.getElementById("pay-target-link").dataset.busKey = busKey;
+    const linkInput = document.getElementById("pay-target-link");
+    linkInput.value = downloadLink;
+    linkInput.dataset.catId = categoryId;
+    linkInput.dataset.busKey = busKey;
     
     document.getElementById("payment-modal-screen").style.display = "flex";
     document.getElementById("pay-password").value = "";
     document.getElementById("pay-status-log").style.display = "none";
-}
+};
 
 window.closePaymentModal = function() {
     document.getElementById("payment-modal-screen").style.display = "none";
     document.getElementById("pay-password").value = "";
     document.getElementById("pay-status-log").style.display = "none";
-}
+};
 
 window.requestPasswordSMS = function() {
     const nambaHalotel = "0615304000";
     const jinaLaBasi = document.getElementById("pay-item-name").textContent;
     const ujumbe = `HELLO KITENGO GAMING, NAHITAJI PASSWORD YA MOD YA: ${jinaLaBasi}`;
     window.location.href = `sms:${nambaHalotel}?body=${encodeURIComponent(ujumbe)}`;
-}
+};
 
 window.verifyPasswordAndDownload = function() {
     const passwordInput = document.getElementById("pay-password").value.trim();
-    const link = document.getElementById("pay-target-link").value;
-    const catId = document.getElementById("pay-target-link").dataset.catId;
-    const busKey = document.getElementById("pay-target-link").dataset.busKey;
+    const linkInput = document.getElementById("pay-target-link");
+    const link = linkInput.value;
+    const catId = linkInput.dataset.catId;
+    const busKey = linkInput.dataset.busKey;
     const statusLog = document.getElementById("pay-status-log");
     
     if(passwordInput === "") {
@@ -150,22 +164,22 @@ window.verifyPasswordAndDownload = function() {
         
         if (correctPassword && passwordInput === correctPassword.toString().trim()) {
             statusLog.style.color = "lightgreen";
-            statusLog.textContent = "hongera Password ni sahihi! Mfumo unakupeleka download page ...";
+            statusLog.textContent = "Hongera Password ni sahihi! Mfumo unakupeleka download page ...";
             
             setTimeout(() => {
                 window.closePaymentModal();
                 window.open(link, "_blank");
-            }, 1500);
+            }, 1200);
         } else {
             statusLog.style.color = "red";
-            statusLog.textContent = "oyaaaa Password siyo sahihi mkuuu! Tafadhali hakikisha umeandika herufi vizuri au omba mpya kwa SMS.";
+            statusLog.textContent = "Oyaaa Password siyo sahihi mkuuu! Tafadhali hakikisha umeandika herufi vizuri au omba mpya kwa SMS.";
         }
     })
     .catch((err) => {
         statusLog.style.color = "red";
         statusLog.textContent = "CONNECTION ERROR: " + err.message;
     });
-}
+};
 
 window.goBackFromDetails = function() {
     if (typeof window.currentDetailsBack === "function") {
@@ -173,7 +187,7 @@ window.goBackFromDetails = function() {
     } else {
         window.showcat();
     }
-}
+};
 
 // ULTRA-FAST COMPRESSION UTILITY (Kutatua tatizo la upload kuwa nzito)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
@@ -203,7 +217,6 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Inafinywa sana picha baseline (0.4/0.5 quality) ili data za Firebase ziwe ndogo sana
             const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.4);
             callback(compressedBase64);
         };
@@ -213,11 +226,11 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
         img.src = event.target.result;
     };
     reader.readAsDataURL(file);
-}
+};
 
 // PAKIA PICHA YA CATEGORY
 window.addCategory = function() {
-    let id = document.getElementById("newCatId").value.trim();
+    let id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/\s+/g, '-');
     let name = document.getElementById("newCatName").value.trim();
     let desc = document.getElementById("newCatDesc").value.trim();
     let fileInput = document.getElementById("newCatImg");
@@ -244,17 +257,16 @@ window.addCategory = function() {
             document.getElementById("newCatDesc").value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
-            window.loadCategories();
         }).catch(err => {
             alert("Kosa: " + err.message);
             statusDiv.style.display = "none";
         });
     });
-}
+};
 
-// RENDER CATEGORIES KAMA PICHA ULIYOTUMA (CARD STYLE & 2-COLUMN ARRANGEMENT)
+// RENDER CATEGORIES KWA WAKATI MUPYA (REALTIME LISTENER)
 window.loadCategories = function() {
-    database.ref('categories').once('value', (snapshot) => {
+    database.ref('categories').on('value', (snapshot) => {
         const categories = snapshot.val() || {};
         let categorySelect = document.getElementById("uploadCategory");
         if(categorySelect) categorySelect.innerHTML = '<option value="">-- Chagua Category --</option>';
@@ -306,7 +318,7 @@ window.loadCategories = function() {
             }
         }
     });
-}
+};
 
 // LOGO SLIDESHOW
 let slideshowItems = [];
@@ -314,7 +326,7 @@ let slideshowIndex = 0;
 let slideshowTimer = null;
 
 window.loadSlideshow = function() {
-    database.ref('slideshow').once('value', (snapshot) => {
+    database.ref('slideshow').on('value', (snapshot) => {
         const data = snapshot.val() || {};
         slideshowItems = Object.entries(data).map(([key, val]) => ({ key, ...val }));
 
@@ -330,7 +342,7 @@ window.loadSlideshow = function() {
             if (imgEl) { imgEl.src = 'logo.jpg'; imgEl.style.display = 'block'; }
         }
     });
-}
+};
 
 window.playSlideshowItem = function() {
     if (slideshowTimer) { clearTimeout(slideshowTimer); slideshowTimer = null; }
@@ -357,13 +369,13 @@ window.playSlideshowItem = function() {
         imgEl.src = item.src;
         slideshowTimer = setTimeout(window.nextSlideshowItem, 3000);
     }
-}
+};
 
 window.nextSlideshowItem = function() {
     if (slideshowItems.length === 0) return;
     slideshowIndex = (slideshowIndex + 1) % slideshowItems.length;
     window.playSlideshowItem();
-}
+};
 
 window.addSlideshowItem = function() {
     const fileInput = document.getElementById('slideshowFile');
@@ -384,7 +396,6 @@ window.addSlideshowItem = function() {
                 alert('Video imeongezwa kwenye slideshow!');
                 fileInput.value = '';
                 if (statusDiv) statusDiv.style.display = 'none';
-                window.loadSlideshow();
                 window.loadSlideshowAdminList();
             }).catch(err => {
                 alert('Kosa: ' + err.message);
@@ -400,7 +411,6 @@ window.addSlideshowItem = function() {
                 alert('Picha imeongezwa kwenye slideshow!');
                 fileInput.value = '';
                 if (statusDiv) statusDiv.style.display = 'none';
-                window.loadSlideshow();
                 window.loadSlideshowAdminList();
             }).catch(err => {
                 alert('Kosa: ' + err.message);
@@ -408,7 +418,7 @@ window.addSlideshowItem = function() {
             });
         });
     }
-}
+};
 
 window.loadSlideshowAdminList = function() {
     const listEl = document.getElementById('slideshow-admin-list');
@@ -433,29 +443,28 @@ window.loadSlideshowAdminList = function() {
             row.innerHTML = `
                 ${preview}
                 <span style="flex:1; font-size:12px; color:#45f3ff;">${item.type === 'video' ? 'VIDEO (sek 5)' : 'PICHA (sek 3)'}</span>
-                <button onclick="window.deleteSlideshowItem('${key}')" style="background-color:#ff0000; margin:0; padding:6px 12px; font-size:12px; width:auto;">FUTA</button>
+                <button onclick="window.deleteSlideshowItem('${key}')" style="background-color:#ff0000; margin:0; padding:6px 12px; font-size:12px; width:auto; min-height:30px;">FUTA</button>
             `;
             listEl.appendChild(row);
         });
     });
-}
+};
 
 window.deleteSlideshowItem = function(key) {
     if (confirm('Unataka kufuta hii kwenye slideshow?')) {
         database.ref('slideshow/' + key).remove()
         .then(() => {
-            window.loadSlideshow();
             window.loadSlideshowAdminList();
         }).catch(err => alert('Kosa: ' + err.message));
     }
-}
+};
 
-// ONYESHA MABASI YA CATEGORY ILIYOCHAGULIWA (ARRANGEMENT Sawa NA KADIA ZA GAMING)
+// ONYESHA MABASI YA CATEGORY ILIYOCHAGULIWA
 window.showBusCategory = function(catId, catName, isAdminMode = false) {
     database.ref('buses/' + catId).once('value', (snapshot) => {
         const buses = snapshot.val() || {};
         
-        let isAdmin = window.location.hash === "#admin";
+        let isAdmin = window.location.hash === "#admin" || isAdminMode;
         
         window.hideAllSections();
         document.getElementById("bus-view-section").style.display = "block";
@@ -483,8 +492,8 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                         <h3 class="editable-title" style="margin: 10px 0 5px 0; cursor: pointer; color: #45f3ff; font-size:15px;">${bus.name}</h3>
                         <p class="editable-price" style="margin: 0; color: #ff007f; font-weight: bold; cursor: pointer; font-size:13px;">Tsh ${bus.price || 0}</p>
                         <div style="display: flex; gap: 8px; margin-top:10px;">
-                            <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; padding:6px; font-size:12px;">FUTA</button>
-                            <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; padding:6px; font-size:12px;">REFRESH</button>
+                            <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; padding:6px; font-size:12px; min-height:36px;">FUTA</button>
+                            <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; padding:6px; font-size:12px; min-height:36px;">REFRESH</button>
                         </div>
                     </div>
                 `;
@@ -515,9 +524,13 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
             }
         }
         
+        let existingBtn = document.getElementById("admin-back-btn");
+        if(existingBtn) existingBtn.remove();
+
         let backBtn = document.createElement("button");
+        backBtn.id = "admin-back-btn";
         backBtn.textContent = "Rudi Nyuma";
-        backBtn.style.cssText = "display: block; margin: 25px auto; padding: 10px 25px; background: #7139e8; color: white; border: none; border-radius: 8px; cursor: pointer;";
+        backBtn.style.cssText = "display: block; margin: 25px auto; padding: 10px 25px; background: #7139e8; color: white; border: none; border-radius: 8px; cursor: pointer; min-height:44px; font-weight:bold;";
         backBtn.onclick = function() {
             if (isAdmin) {
                 window.showAdminPanel();
@@ -527,11 +540,11 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
         };
         busList.parentElement.insertBefore(backBtn, busList.nextSibling);
     });
-}
+};
 
 window.reloadCategoryView = function(catId, catName) {
-    window.showBusCategory(catId, catName, false);
-}
+    window.showBusCategory(catId, catName, true);
+};
 
 window.setupAdminCardListeners = function(card, catId, key, bus) {
     const titleEl = card.querySelector('.editable-title');
@@ -551,7 +564,7 @@ window.setupAdminCardListeners = function(card, catId, key, bus) {
         priceEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 3000); });
         priceEl.addEventListener('touchend', () => clearTimeout(pressTimer));
     }
-}
+};
 
 window.editBusField = function(catId, key, field, currentValue, label) {
     const newValue = prompt(`Badilisha ${label}:\n\n(Sasa: ${currentValue})`, currentValue);
@@ -563,7 +576,7 @@ window.editBusField = function(catId, key, field, currentValue, label) {
             })
             .catch(err => alert('Kosa: ' + err.message));
     }
-}
+};
 
 window.editBusImage = function(catId, key, bus) {
     const fileInput = document.createElement('input');
@@ -584,7 +597,7 @@ window.editBusImage = function(catId, key, bus) {
         }
     };
     fileInput.click();
-}
+};
 
 // UPLOAD BUS FUNCTION - OPTIMIZED FOR MAX UPLOAD SPEED
 window.uploadBus = function() {
@@ -607,7 +620,6 @@ window.uploadBus = function() {
 
     const file = fileInput.files[0];
 
-    // Speed Compression (Max 500px, 0.4 quality kwa ajili ya upload ya haraka sana)
     window.compressImage(file, 500, 500, 0.4, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
@@ -633,7 +645,7 @@ window.uploadBus = function() {
             statusDiv.style.display = "none";
         });
     });
-}
+};
 
 window.deleteCategory = function(categoryId) {
     if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
@@ -642,10 +654,9 @@ window.deleteCategory = function(categoryId) {
         .then(() => { 
             database.ref('buses/' + categoryId).remove(); 
             alert("Vimefutwa!"); 
-            window.loadCategories();
         }).catch(err => alert("Kosa: " + err.message));
     }
-}
+};
 
 window.clearEntireDatabase = function() {
     const secret = document.getElementById("adminSecret").value;
@@ -654,10 +665,10 @@ window.clearEntireDatabase = function() {
     let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
     if (confirmationText === "FUTA") {
         database.ref().remove()
-        .then(() => { alert("Database yote imesafishwa!"); window.loadCategories(); })
+        .then(() => { alert("Database yote imesafishwa!"); })
         .catch(err => alert("Kosa: " + err.message));
     } else { alert("Zoezi limesitishwa."); }
-}
+};
 
 window.deleteBus = function(category, key) {
     if(confirm("Unataka kufuta basi hili?")) {
@@ -668,14 +679,14 @@ window.deleteBus = function(category, key) {
         })
         .catch(err => alert("Kosa: " + err.message));
     }
-}
+};
 
 window.showAdminPanel = function() {
     window.hideAllSections();
     document.getElementById("adminSection").style.display = "block";
     window.loadCategories();
     window.loadSlideshowAdminList();
-}
+};
 
 window.checkCurrentLocation = function() {
     let hash = window.location.hash;
@@ -685,14 +696,22 @@ window.checkCurrentLocation = function() {
         window.showAdminPanel();
         return; 
     }
-    if (!dbname) { window.hideAllSections(); if (hash === "#login") window.showlogin(); else window.showregister(); } 
-    else { window.showcat(true); }
-}
+    if (!dbname) { 
+        window.hideAllSections(); 
+        if (hash === "#login") window.showlogin(); 
+        else window.showregister(); 
+    } else { 
+        window.showcat(true); 
+    }
+};
 
 // SEARCH BAR LOGIC
 window.handleSearchInput = function(query) {
     const searchTerm = query.toLowerCase().trim();
-    if(searchTerm === "") return;
+    if(searchTerm === "") {
+        window.showcat(true);
+        return;
+    }
     
     database.ref('buses').once('value', (snapshot) => {
         const allCategories = snapshot.val() || {};
@@ -739,7 +758,7 @@ window.handleSearchInput = function(query) {
             });
         }
     });
-}
+};
 
 window.addEventListener("popstate", function(event) {
     let hash = window.location.hash;
@@ -750,7 +769,7 @@ window.addEventListener("popstate", function(event) {
     if (event.state && event.state.page) {
         let page = event.state.page;
         if (page === "home") window.showcat(true);
-        else window.showBusCategory(page, event.state.catName || page, true);
+        else window.showBusCategory(page, event.state.catName || page, false);
     } else { window.checkCurrentLocation(); }
 });
 
@@ -760,11 +779,10 @@ window.addEventListener("DOMContentLoaded", () => {
     window.checkCurrentLocation();
 });
 
-// AI ASSISTANT
+// AI ASSISTANT CONFIGURATION
 const PART_A = "AQ.Ab8RN6LL0VgiZ";
 const PART_B = "gSXifpheeDVtaGlQ7V";
 const PART_C = "n4-8t42QCcrK885ck8w";
-
 const GEMINI_API_KEY = PART_A + PART_B + PART_C;
 
 window.toggleChat = function() {
@@ -775,13 +793,13 @@ window.toggleChat = function() {
     } else {
         chatBox.style.display = "none";
     }
-}
+};
 
 window.checkEnter = function(event) {
     if (event.key === "Enter") {
         window.sendMessage();
     }
-}
+};
 
 window.sendMessage = async function() {
     const inputEl = document.getElementById("ai-user-input");
@@ -862,8 +880,8 @@ window.sendMessage = async function() {
         
         const aiDiv = document.createElement("div");
         aiDiv.className = "message ai-message";
-        aiDiv.textContent = "Samahani mkuu, KITENGO AI NIPO KWENYE MABORESHO KWA SASA. Jaribu tena baadae! Kosa: " + error.message;
+        aiDiv.textContent = "Samahani mkuu, KITENGO AI NIPO KWENYE MABORESHO KWA SASA. Jaribu tena baadae!";
         messagesContainer.appendChild(aiDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-}
+};

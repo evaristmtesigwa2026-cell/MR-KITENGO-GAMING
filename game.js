@@ -25,8 +25,15 @@ window.hideAllSections = function() {
     if (nav) nav.style.display = "none";
 };
 
-window.showlogin = function() { window.hideAllSections(); document.getElementById("log").style.display = "block"; };
-window.showregister = function() { window.hideAllSections(); document.getElementById("reg").style.display = "block"; };
+window.showlogin = function() { 
+    window.hideAllSections(); 
+    document.getElementById("log").style.display = "block"; 
+};
+
+window.showregister = function() { 
+    window.hideAllSections(); 
+    document.getElementById("reg").style.display = "block"; 
+};
 
 window.register = function() {
     let name = document.getElementById("regname").value.trim();
@@ -66,6 +73,11 @@ window.showcat = function(isBackAction = false) {
     window.hideAllSections();
     document.getElementById("cat").style.display = "block";
     document.getElementById("navicon").style.display = "flex"; 
+    
+    // Hakikisha slideshow na categories zinaanza mara moja bila kushikilia refresh
+    window.loadCategories();
+    window.loadSlideshow();
+    
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 };
 
@@ -189,7 +201,7 @@ window.goBackFromDetails = function() {
     }
 };
 
-// ULTRA-FAST COMPRESSION UTILITY (Kutatua tatizo la upload kuwa nzito)
+// COMPRESSION UTILITY
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     if (!file) return;
     const reader = new FileReader();
@@ -228,7 +240,6 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     reader.readAsDataURL(file);
 };
 
-// PAKIA PICHA YA CATEGORY
 window.addCategory = function() {
     let id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/\s+/g, '-');
     let name = document.getElementById("newCatName").value.trim();
@@ -264,8 +275,9 @@ window.addCategory = function() {
     });
 };
 
-// RENDER CATEGORIES KWA WAKATI MUPYA (REALTIME LISTENER)
+// RENDER CATEGORIES
 window.loadCategories = function() {
+    database.ref('categories').off(); // Ondoa listener ya zamani kuzuia duplicates
     database.ref('categories').on('value', (snapshot) => {
         const categories = snapshot.val() || {};
         let categorySelect = document.getElementById("uploadCategory");
@@ -285,7 +297,9 @@ window.loadCategories = function() {
             if(catContainer) {
                 const card = document.createElement("div");
                 card.className = "card category-card";
-                card.onclick = function() {
+                card.style.cursor = "pointer";
+                card.onclick = function(e) {
+                    e.preventDefault();
                     window.showBusCategory(key, cat.name, false);
                 };
                 
@@ -326,6 +340,7 @@ let slideshowIndex = 0;
 let slideshowTimer = null;
 
 window.loadSlideshow = function() {
+    database.ref('slideshow').off(); // Ondoa listener ya zamani kuzuia kubaki nyuma
     database.ref('slideshow').on('value', (snapshot) => {
         const data = snapshot.val() || {};
         slideshowItems = Object.entries(data).map(([key, val]) => ({ key, ...val }));
@@ -599,7 +614,6 @@ window.editBusImage = function(catId, key, bus) {
     fileInput.click();
 };
 
-// UPLOAD BUS FUNCTION - OPTIMIZED FOR MAX UPLOAD SPEED
 window.uploadBus = function() {
     let cat = document.getElementById("uploadCategory").value;
     let name = document.getElementById("uploadName").value.trim();
@@ -774,8 +788,6 @@ window.addEventListener("popstate", function(event) {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-    window.loadCategories();
-    window.loadSlideshow();
     window.checkCurrentLocation();
 });
 

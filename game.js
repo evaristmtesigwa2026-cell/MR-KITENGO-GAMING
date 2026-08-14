@@ -81,7 +81,6 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     
     let btnContainer = document.getElementById("details-action-btn");
     btnContainer.innerHTML = "";
-    btnContainer.style.display = "block";
     
     if (type === 'category') {
         let btn = document.createElement("button");
@@ -92,12 +91,11 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         
         window.currentDetailsBack = function() { window.showcat(); };
     } else {
-        btnContainer.style.display = "flex";
-        btnContainer.style.gap = "10px";
-        btnContainer.style.alignItems = "stretch";
-        
+        let wrapper = document.createElement("div");
+        wrapper.style.cssText = "display: flex; gap: 8px; align-items: center; width: 100%;";
+
         let btn = document.createElement("button");
-        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; flex: 1; min-height: 44px;";
+        btn.style.cssText = "flex: 1; background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; min-height: 44px;";
         
         if (price && parseInt(price) > 0) {
             btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
@@ -111,22 +109,26 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
             a.textContent = "DOWNLOAD NOW";
             a.style.color = "#ffffff";
             a.style.textDecoration = "none";
+            a.style.display = "block";
             btn.appendChild(a);
         }
-        
-        btnContainer.appendChild(btn);
-        
+
+        wrapper.appendChild(btn);
+
+        // Kitufe cha SET kinatokea tu kama kuna tiktokLink
         if (tiktokLink && tiktokLink.trim() !== "") {
             let setBtn = document.createElement("button");
             setBtn.textContent = "SET";
-            setBtn.title = "Angalia video ya TikTok ya jinsi ya kuset";
-            setBtn.style.cssText = "background: linear-gradient(135deg, #ff007f, #7139e8); color: white; border: none; padding: 12px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; min-height: 44px; flex: 0 0 auto;";
-            setBtn.onclick = function() {
+            setBtn.title = "Angalia video ya TikTok jinsi ya kuset game hii";
+            setBtn.style.cssText = "background: #ff007f; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 900; cursor: pointer; min-height: 44px; letter-spacing: 1px; flex-shrink: 0;";
+            setBtn.onclick = function(e) {
+                e.stopPropagation();
                 window.open(tiktokLink, "_blank");
             };
-            btnContainer.appendChild(setBtn);
+            wrapper.appendChild(setBtn);
         }
         
+        btnContainer.appendChild(wrapper);
         window.currentDetailsBack = function() { window.showBusCategory(currentCatId, currentCatName); };
     }
 };
@@ -507,8 +509,9 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                             <img src="${bus.image}" alt="${bus.name}" class="editable-image" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; cursor: pointer;">
                         </div>
                         <h3 class="editable-title" style="margin: 10px 0 5px 0; cursor: pointer; color: #45f3ff; font-size:15px;">${bus.name}</h3>
+                        <p class="editable-desc" style="margin: 5px 0; cursor: pointer; color: #c5c6c7; font-size:12px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 5px;" title="Bonyeza sekunde 3 kuedit captions/maelezo">${bus.desc ? bus.desc : 'Bonyeza sekunde 3 kuweka maelezo/caption'}</p>
                         <p class="editable-price" style="margin: 0; color: #ff007f; font-weight: bold; cursor: pointer; font-size:13px;">Tsh ${bus.price || 0}</p>
-                        <p class="editable-tiktok" style="margin: 6px 0 0 0; color: #8a8d9b; cursor: pointer; font-size:12px;">${bus.tiktokLink && bus.tiktokLink.trim() !== '' ? '🎵 TikTok SET link ipo (Bonyeza sekunde 3 kubadilisha/kuondoa)' : '➕ Bonyeza sekunde 3 kuongeza TikTok SET link'}</p>
+                        <p class="editable-tiktok" style="margin: 5px 0; color: #ff007f; font-size: 11px; cursor: pointer;" title="Bonyeza sekunde 3 kuedit TikTok Link">TikTok: ${bus.tiktokLink ? bus.tiktokLink : '[BONYEZA SEK 3 KUWEKA LINK YA TIKTOK]'}</p>
                         <div style="display: flex; gap: 8px; margin-top:10px;">
                             <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; padding:6px; font-size:12px; min-height:36px;">FUTA</button>
                             <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; padding:6px; font-size:12px; min-height:36px;">REFRESH</button>
@@ -520,12 +523,19 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                     window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, catId, catName, bus.price || 0, key, bus.tiktokLink || '');
                 };
                 
+                let setBtnHtml = (bus.tiktokLink && bus.tiktokLink.trim() !== "") 
+                    ? `<button onclick="event.stopPropagation(); window.open('${bus.tiktokLink}', '_blank');" style="background:#ff007f; color:white; border:none; padding:3px 8px; border-radius:5px; font-size:10px; font-weight:900; cursor:pointer; margin-left: auto;">SET</button>` 
+                    : ``;
+
                 card.innerHTML = `
                     <div class="card-img-wrapper">
                         <img src="${bus.image}" alt="${bus.name}">
                     </div>
                     <div class="card-content">
-                        <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
+                            ${setBtnHtml}
+                        </div>
                         <div class="card-title">${bus.name}</div>
                         <div class="card-footer">
                             <span>1 link</span>
@@ -566,44 +576,26 @@ window.reloadCategoryView = function(catId, catName) {
 
 window.setupAdminCardListeners = function(card, catId, key, bus) {
     const titleEl = card.querySelector('.editable-title');
+    const descEl = card.querySelector('.editable-desc');
     const priceEl = card.querySelector('.editable-price');
-    const imageEl = card.querySelector('.editable-image');
     const tiktokEl = card.querySelector('.editable-tiktok');
+    const imageEl = card.querySelector('.editable-image');
     let pressTimer;
     
-    if (imageEl) {
-        imageEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusImage(catId, key, bus); }, 3000); });
-        imageEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-    }
-    if (titleEl) {
-        titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'); }, 3000); });
-        titleEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-    }
-    if (priceEl) {
-        priceEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'); }, 3000); });
-        priceEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-    }
-    if (tiktokEl) {
-        tiktokEl.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { window.editBusTiktokLink(catId, key, bus.tiktokLink || ''); }, 3000); });
-        tiktokEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-    }
-};
+    const bindLongPress = (element, callback) => {
+        if (!element) return;
+        element.addEventListener('touchstart', (e) => { pressTimer = setTimeout(() => { callback(); }, 3000); });
+        element.addEventListener('touchend', () => clearTimeout(pressTimer));
+        element.addEventListener('mousedown', (e) => { pressTimer = setTimeout(() => { callback(); }, 3000); });
+        element.addEventListener('mouseup', () => clearTimeout(pressTimer));
+        element.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+    };
 
-// WEKA/BADILISHA/ONDOA LINK YA TIKTOK (Button ya SET kwenye details ya mod)
-window.editBusTiktokLink = function(catId, key, currentValue) {
-    const newValue = prompt(
-        `Weka link ya video ya TikTok ya jinsi ya ku-SET mod hii.\n\nKama unataka kuondoa button ya SET, futa maandishi yote na uache wazi kisha bonyeza OK.\n\nLink ya sasa: ${currentValue ? currentValue : 'Hakuna'}`,
-        currentValue || ''
-    );
-    if (newValue !== null) {
-        const cleanValue = newValue.trim();
-        database.ref(`buses/${catId}/${key}/tiktokLink`).set(cleanValue)
-            .then(() => {
-                alert(cleanValue === '' ? 'Link ya TikTok imeondolewa! Button ya SET haitaonekana tena kwenye mod hii.' : 'Link ya TikTok imewekwa! Button ya SET itaonekana sasa kwenye mod hii.');
-                window.reloadCategoryView(catId, '');
-            })
-            .catch(err => alert('Kosa: ' + err.message));
-    }
+    bindLongPress(imageEl, () => window.editBusImage(catId, key, bus));
+    bindLongPress(titleEl, () => window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'));
+    bindLongPress(descEl, () => window.editBusField(catId, key, 'desc', bus.desc || '', 'Captions / Maelezo ya Mod'));
+    bindLongPress(priceEl, () => window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'));
+    bindLongPress(tiktokEl, () => window.editBusField(catId, key, 'tiktokLink', bus.tiktokLink || '', 'Link ya TikTok (Weka link au acha wazi kutoa SET button)'));
 };
 
 window.editBusField = function(catId, key, field, currentValue, label) {
@@ -644,11 +636,10 @@ window.uploadBus = function() {
     let cat = document.getElementById("uploadCategory").value;
     let name = document.getElementById("uploadName").value.trim();
     let link = document.getElementById("uploadLink").value.trim();
+    let tiktokLink = document.getElementById("uploadTikTokLink") ? document.getElementById("uploadTikTokLink").value.trim() : "";
     let desc = document.getElementById("uploadDesc").value.trim();
     let price = document.getElementById("uploadPrice").value;
     let password = document.getElementById("uploadPassword").value.trim();
-    let tiktokLinkEl = document.getElementById("uploadTiktokLink");
-    let tiktokLink = tiktokLinkEl ? tiktokLinkEl.value.trim() : "";
     let fileInput = document.getElementById("uploadImg");
 
     if (cat === "") { alert("Chagua Category kwanza!"); return; }
@@ -668,19 +659,19 @@ window.uploadBus = function() {
             name: name, 
             image: compressedBase64, 
             link: link, 
+            tiktokLink: tiktokLink,
             desc: desc, 
             price: price ? parseInt(price) : 0,
-            password: password ? password : "",
-            tiktokLink: tiktokLink ? tiktokLink : ""
+            password: password ? password : "" 
         })
         .then(() => {
             alert("Basi jipya limeongezwa kwa kasi ya ajabu!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
+            if (document.getElementById("uploadTikTokLink")) document.getElementById("uploadTikTokLink").value = "";
             document.getElementById("uploadPrice").value = "";
             document.getElementById("uploadPassword").value = "";
-            if (tiktokLinkEl) tiktokLinkEl.value = "";
             fileInput.value = "";
             statusDiv.style.display = "none";
             window.showBusCategory(cat, "MABASI", true);
@@ -785,12 +776,20 @@ window.handleSearchInput = function(query) {
                 card.onclick = function() {
                     window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, item.catId, 'SEARCH', bus.price || 0, item.busKey, bus.tiktokLink || '');
                 };
+
+                let setBtnHtml = (bus.tiktokLink && bus.tiktokLink.trim() !== "") 
+                    ? `<button onclick="event.stopPropagation(); window.open('${bus.tiktokLink}', '_blank');" style="background:#ff007f; color:white; border:none; padding:3px 8px; border-radius:5px; font-size:10px; font-weight:900; cursor:pointer; margin-left: auto;">SET</button>` 
+                    : ``;
+
                 card.innerHTML = `
                     <div class="card-img-wrapper">
                         <img src="${bus.image}" alt="${bus.name}">
                     </div>
                     <div class="card-content">
-                        <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
+                            ${setBtnHtml}
+                        </div>
                         <div class="card-title">${bus.name}</div>
                         <div class="card-footer">
                             <span>1 link</span>

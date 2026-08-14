@@ -2,8 +2,9 @@
 const firebaseConfig = {
   apiKey: "AIzaSyDA0ty5dOoBiPJx5fRdFI_hvddJyUbb6B4",
   authDomain: "msisi-38c20.firebaseapp.com",
-  projectId: "msisi-38c20",
   databaseURL: "https://msisi-38c20-default-rtdb.firebaseio.com",
+  projectId: "msisi-38c20",
+  storageBucket: "msisi-38c20.appspot.com",
   messagingSenderId: "881060609707",
   appId: "1:881060609707:web:bd9028db2b20c75d72c1ee",
   measurementId: "G-NFT0FB6V2T"
@@ -69,8 +70,8 @@ window.showcat = function(isBackAction = false) {
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 };
 
-// LOGIC YA KICHUNGI CHA PREMIUM VS FREE + PASSWORD MODAL PREPARATION
-window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0, busKey = '', tiktokLink = '') {
+// LOGIC YA KICHUNGI CHA PREMIUM VS FREE + PASSWORD MODAL PREPARATION + TIKTOK SET BUTTON
+window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0, busKey = '', setLink = '') {
     window.hideAllSections();
     document.getElementById("details-view-section").style.display = "block";
     document.getElementById("navicon").style.display = "flex";
@@ -81,6 +82,7 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
     
     let btnContainer = document.getElementById("details-action-btn");
     btnContainer.innerHTML = "";
+    btnContainer.style.cssText = "display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 15px; width: 100%;";
     
     if (type === 'category') {
         let btn = document.createElement("button");
@@ -91,11 +93,8 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         
         window.currentDetailsBack = function() { window.showcat(); };
     } else {
-        let wrapper = document.createElement("div");
-        wrapper.style.cssText = "display: flex; gap: 8px; align-items: center; width: 100%;";
-
         let btn = document.createElement("button");
-        btn.style.cssText = "flex: 1; background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; min-height: 44px;";
+        btn.style.cssText = "background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; flex: 1; min-height: 44px;";
         
         if (price && parseInt(price) > 0) {
             btn.textContent = `DOWNLOAD NOW (Tsh ${price})`;
@@ -110,25 +109,22 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
             a.style.color = "#ffffff";
             a.style.textDecoration = "none";
             a.style.display = "block";
+            a.style.width = "100%";
             btn.appendChild(a);
         }
+        
+        btnContainer.appendChild(btn);
 
-        wrapper.appendChild(btn);
-
-        // Kitufe cha SET kinatokea tu kama kuna tiktokLink
-        if (tiktokLink && tiktokLink.trim() !== "") {
-            let setBtn = document.createElement("button");
+        // KA-BUTTON KA SET (TikTok Video Link)
+        if (setLink && setLink.trim() !== "") {
+            let setBtn = document.createElement("a");
+            setBtn.href = setLink;
+            setBtn.target = "_blank";
             setBtn.textContent = "SET";
-            setBtn.title = "Angalia video ya TikTok jinsi ya kuset game hii";
-            setBtn.style.cssText = "background: #ff007f; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 900; cursor: pointer; min-height: 44px; letter-spacing: 1px; flex-shrink: 0;";
-            setBtn.onclick = function(e) {
-                e.stopPropagation();
-                window.open(tiktokLink, "_blank");
-            };
-            wrapper.appendChild(setBtn);
+            setBtn.style.cssText = "background: linear-gradient(135deg, #ff007f, #7139e8); color: white; border: none; padding: 12px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; min-height: 44px; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 10px rgba(255,0,127,0.5);";
+            btnContainer.appendChild(setBtn);
         }
         
-        btnContainer.appendChild(wrapper);
         window.currentDetailsBack = function() { window.showBusCategory(currentCatId, currentCatName); };
     }
 };
@@ -509,9 +505,9 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                             <img src="${bus.image}" alt="${bus.name}" class="editable-image" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; cursor: pointer;">
                         </div>
                         <h3 class="editable-title" style="margin: 10px 0 5px 0; cursor: pointer; color: #45f3ff; font-size:15px;">${bus.name}</h3>
-                        <p class="editable-desc" style="margin: 5px 0; cursor: pointer; color: #c5c6c7; font-size:12px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 5px;" title="Bonyeza sekunde 3 kuedit captions/maelezo">${bus.desc ? bus.desc : 'Bonyeza sekunde 3 kuweka maelezo/caption'}</p>
+                        <p class="editable-desc" style="margin: 5px 0; cursor: pointer; color: #a4a6b0; font-size:12px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 5px;">${bus.desc ? bus.desc : 'Bonyeza hapa sekunde 3 kuedit caption/maelezo'}</p>
                         <p class="editable-price" style="margin: 0; color: #ff007f; font-weight: bold; cursor: pointer; font-size:13px;">Tsh ${bus.price || 0}</p>
-                        <p class="editable-tiktok" style="margin: 5px 0; color: #ff007f; font-size: 11px; cursor: pointer;" title="Bonyeza sekunde 3 kuedit TikTok Link">TikTok: ${bus.tiktokLink ? bus.tiktokLink : '[BONYEZA SEK 3 KUWEKA LINK YA TIKTOK]'}</p>
+                        <p class="editable-setlink" style="margin: 5px 0; color: #00ff88; font-weight: bold; cursor: pointer; font-size:11px; word-break: break-all;">TikTok Link: ${bus.setLink ? bus.setLink : 'Haikuwekwa (Bonyeza sekunde 3 kuweka)'}</p>
                         <div style="display: flex; gap: 8px; margin-top:10px;">
                             <button onclick="window.deleteBus('${catId}', '${key}')" style="flex: 1; background-color: #ff0000; padding:6px; font-size:12px; min-height:36px;">FUTA</button>
                             <button onclick="window.reloadCategoryView('${catId}', '${catName}')" style="flex: 1; padding:6px; font-size:12px; min-height:36px;">REFRESH</button>
@@ -520,22 +516,15 @@ window.showBusCategory = function(catId, catName, isAdminMode = false) {
                 `;
             } else {
                 card.onclick = function() {
-                    window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, catId, catName, bus.price || 0, key, bus.tiktokLink || '');
+                    window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, catId, catName, bus.price || 0, key, bus.setLink || '');
                 };
                 
-                let setBtnHtml = (bus.tiktokLink && bus.tiktokLink.trim() !== "") 
-                    ? `<button onclick="event.stopPropagation(); window.open('${bus.tiktokLink}', '_blank');" style="background:#ff007f; color:white; border:none; padding:3px 8px; border-radius:5px; font-size:10px; font-weight:900; cursor:pointer; margin-left: auto;">SET</button>` 
-                    : ``;
-
                 card.innerHTML = `
                     <div class="card-img-wrapper">
                         <img src="${bus.image}" alt="${bus.name}">
                     </div>
                     <div class="card-content">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
-                            ${setBtnHtml}
-                        </div>
+                        <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
                         <div class="card-title">${bus.name}</div>
                         <div class="card-footer">
                             <span>1 link</span>
@@ -574,28 +563,38 @@ window.reloadCategoryView = function(catId, catName) {
     window.showBusCategory(catId, catName, true);
 };
 
+// LISTENERS KWA UPANDE WA ADMIN (INAHUSISHA PRESS KWA SEKUNDE 3)
 window.setupAdminCardListeners = function(card, catId, key, bus) {
     const titleEl = card.querySelector('.editable-title');
     const descEl = card.querySelector('.editable-desc');
     const priceEl = card.querySelector('.editable-price');
-    const tiktokEl = card.querySelector('.editable-tiktok');
+    const setLinkEl = card.querySelector('.editable-setlink');
     const imageEl = card.querySelector('.editable-image');
     let pressTimer;
-    
+
     const bindLongPress = (element, callback) => {
         if (!element) return;
-        element.addEventListener('touchstart', (e) => { pressTimer = setTimeout(() => { callback(); }, 3000); });
+        
+        // Touch events (Mobile)
+        element.addEventListener('touchstart', (e) => { 
+            pressTimer = setTimeout(() => { callback(); }, 3000); 
+        });
         element.addEventListener('touchend', () => clearTimeout(pressTimer));
-        element.addEventListener('mousedown', (e) => { pressTimer = setTimeout(() => { callback(); }, 3000); });
+        element.addEventListener('touchmove', () => clearTimeout(pressTimer));
+        
+        // Mouse events (Desktop)
+        element.addEventListener('mousedown', () => {
+            pressTimer = setTimeout(() => { callback(); }, 3000);
+        });
         element.addEventListener('mouseup', () => clearTimeout(pressTimer));
         element.addEventListener('mouseleave', () => clearTimeout(pressTimer));
     };
-
+    
     bindLongPress(imageEl, () => window.editBusImage(catId, key, bus));
     bindLongPress(titleEl, () => window.editBusField(catId, key, 'name', bus.name, 'Jina la Mod'));
-    bindLongPress(descEl, () => window.editBusField(catId, key, 'desc', bus.desc || '', 'Captions / Maelezo ya Mod'));
+    bindLongPress(descEl, () => window.editBusField(catId, key, 'desc', bus.desc || '', 'Maelezo / Caption ya Content'));
     bindLongPress(priceEl, () => window.editBusField(catId, key, 'price', bus.price || 0, 'Bei ya Mod'));
-    bindLongPress(tiktokEl, () => window.editBusField(catId, key, 'tiktokLink', bus.tiktokLink || '', 'Link ya TikTok (Weka link au acha wazi kutoa SET button)'));
+    bindLongPress(setLinkEl, () => window.editBusField(catId, key, 'setLink', bus.setLink || '', 'TikTok Video Link (Kama hautaki button ijadiliane acha wazi)'));
 };
 
 window.editBusField = function(catId, key, field, currentValue, label) {
@@ -636,7 +635,7 @@ window.uploadBus = function() {
     let cat = document.getElementById("uploadCategory").value;
     let name = document.getElementById("uploadName").value.trim();
     let link = document.getElementById("uploadLink").value.trim();
-    let tiktokLink = document.getElementById("uploadTikTokLink") ? document.getElementById("uploadTikTokLink").value.trim() : "";
+    let setLink = document.getElementById("uploadSetLink").value.trim();
     let desc = document.getElementById("uploadDesc").value.trim();
     let price = document.getElementById("uploadPrice").value;
     let password = document.getElementById("uploadPassword").value.trim();
@@ -659,7 +658,7 @@ window.uploadBus = function() {
             name: name, 
             image: compressedBase64, 
             link: link, 
-            tiktokLink: tiktokLink,
+            setLink: setLink,
             desc: desc, 
             price: price ? parseInt(price) : 0,
             password: password ? password : "" 
@@ -669,7 +668,7 @@ window.uploadBus = function() {
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";
-            if (document.getElementById("uploadTikTokLink")) document.getElementById("uploadTikTokLink").value = "";
+            document.getElementById("uploadSetLink").value = "";
             document.getElementById("uploadPrice").value = "";
             document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
@@ -774,22 +773,14 @@ window.handleSearchInput = function(query) {
                 const card = document.createElement("div");
                 card.className = "card bus-card";
                 card.onclick = function() {
-                    window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, item.catId, 'SEARCH', bus.price || 0, item.busKey, bus.tiktokLink || '');
+                    window.showDetails(bus.name, bus.image, bus.desc, 'bus', bus.link, item.catId, 'SEARCH', bus.price || 0, item.busKey, bus.setLink || '');
                 };
-
-                let setBtnHtml = (bus.tiktokLink && bus.tiktokLink.trim() !== "") 
-                    ? `<button onclick="event.stopPropagation(); window.open('${bus.tiktokLink}', '_blank');" style="background:#ff007f; color:white; border:none; padding:3px 8px; border-radius:5px; font-size:10px; font-weight:900; cursor:pointer; margin-left: auto;">SET</button>` 
-                    : ``;
-
                 card.innerHTML = `
                     <div class="card-img-wrapper">
                         <img src="${bus.image}" alt="${bus.name}">
                     </div>
                     <div class="card-content">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
-                            ${setBtnHtml}
-                        </div>
+                        <span class="card-tag">${bus.price && parseInt(bus.price) > 0 ? `PREMIUM (Tsh ${bus.price})` : 'FREE MOD'}</span>
                         <div class="card-title">${bus.name}</div>
                         <div class="card-footer">
                             <span>1 link</span>

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>KITENGO GAMING</title>
+    
+    <meta name="description" content="Kitengo Gaming - Mods kali za Euro Truck Simulator 2 na Indonesia Bus Simulator (Maleo). Download mods za ubora wa hali ya juu.">
+    <meta name="theme-color" content="#0b0c10">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/jpeg" href="yutong2.jpg">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KITENGO GAMING">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================
+           1. USANIFU WA MSINGI (BASE DESIGN)
+        ========================================== */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Rajdhani', sans-serif;
+            color: #c5c6c7;
+            background-color: #0b0c10;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(31, 40, 51, 0.3) 0, transparent 50%),
+                radial-gradient(at 50% 0%, rgba(113, 57, 232, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(69, 243, 255, 0.1) 0, transparent 50%);
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(69, 243, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -10%;
+            left: -10%;
+            z-index: -1;
+            animation: floatingGlow 15s ease-in-out infinite alternate;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.1) 0%, rgba(0,0,0,0) 70%);
+            bottom: -10%;
+            right: -10%;
+            z-index: -1;
+            animation: floatingGlow 20s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatingGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.2); }
+        }
+
+        /* ==========================================
+           2. MODERN NAVBAR & HEADER DESIGN
+        ========================================== */
+        .navbar {
+            background-color: rgba(11, 12, 16, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(69, 243, 255, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .navbar a.nav-item {
+            color: #ffffff;
+            text-align: center;
+            padding: 8px 14px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            border-radius: 6px;
+        }
+
+        .navbar a.nav-item::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: #45f3ff;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar a.nav-item:hover {
+            color: #45f3ff;
+            background: rgba(69, 243, 255, 0.1);
+            text-shadow: 0 0 10px rgba(69, 243, 255, 0.8);
+        }
+
+        .navbar a.nav-item:hover::after {
+            width: 80%;
+        }
+
+        .nav-search-container {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(69, 243, 255, 0.4);
+            border-radius: 20px;
+            padding: 4px 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 280px;
+            min-width: 160px;
+        }
+
+        .nav-search-container:focus-within {
+            border-color: #ff007f;
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.4);
+        }
+
+        .nav-search-container input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            width: 100%;
+            padding: 4px 6px;
+        }
+
+        .nav-search-container input::placeholder {
+            color: #8a8d9b;
+        }
+
+        .search-icon-btn {
+            background: none;
+            border: none;
+            color: #45f3ff;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-action-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .phone-btn {
+            background: linear-gradient(135deg, #00aa00, #45f3ff);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .phone-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .phone-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: rgba(11, 12, 16, 0.98);
+            border: 1px solid rgba(69, 243, 255, 0.4);
+            border-radius: 12px;
+            min-width: 170px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 1001;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .phone-dropdown a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .phone-dropdown a:hover {
+            background: rgba(69, 243, 255, 0.15);
+            color: #45f3ff;
+        }
+
+        .phone-action-container:hover .phone-dropdown {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                justify-content: space-between;
+                padding: 10px 12px;
+            }
+            .nav-links {
+                order: 1;
+                width: 100%;
+                justify-content: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                padding-top: 6px;
+                margin-top: 4px;
+            }
+            .nav-search-container {
+                order: 2;
+                max-width: 70%;
+            }
+            .phone-action-container {
+                order: 3;
+            }
+        }
+
+        /* ==========================================
+           3. HEADINGS AND TEXTS
+        ========================================== */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: 3px;
+            font-size: 2.2rem;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(69, 243, 255, 0.6);
+            background: linear-gradient(135deg, #45f3ff, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            padding: 20px 10px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: #45f3ff;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(69, 243, 255, 0.3);
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        p {
+            color: #a4a6b0;
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.6;
+            padding: 0 15px;
+        }    
+        
+        a {
+            color: #45f3ff;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: #ff007f;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+
+        .hero-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        #about {
+            background: rgba(31, 40, 51, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            margin-top: 15px;
+        }
+        
+        /* ==========================================
+           4. CATEGORY & ITEM GRID SYSTEM
+        ========================================== */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .cat-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .cat-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .card {
+            background: #14161d;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(69, 243, 255, 0.4);
+            box-shadow: 0 12px 30px rgba(69, 243, 255, 0.15);
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .card-img-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 12px 4px 4px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-tag {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffaa00;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 2px 0;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+            color: #8a8d9b;
+            font-size: 13px;
+        }
+
+        .card-action-icon {
+            color: #a4a6b0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .details-box {
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.6), rgba(113, 57, 232, 0.15)) !important;
+            border: 2px solid rgba(69, 243, 255, 0.3) !important;
+        }
+
+        .divider {
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #45f3ff, transparent);
+            border: none;
+            margin: 30px auto;
+        }
+
+        /* ==========================================
+           5. LOGIN & REGISTER FORMS
+        ========================================== */
+        .log, .reg {
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 30px;
+            background: rgba(31, 40, 51, 0.6);
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .log input, .reg input, #adminSecret {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border-radius: 10px;
+            transition: border 0.3s;
+        }
+
+        .log input:focus, .reg input:focus, #adminSecret:focus {
+            outline: none;
+            border-color: #45f3ff;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.3);
+        }
+
+        .log button, .reg button {
+            background: linear-gradient(135deg, #7139e8, #ff007f);
+            border: none;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+
+        .log button:hover, .reg button:hover {
+            background: linear-gradient(135deg, #ff007f, #7139e8);
+            transform: scale(1.02);
+        }
+
+        /* ==========================================
+           6. ADMIN PANEL STYLES
+        ========================================== */
+        .admin-panel {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(31, 40, 51, 0.4);
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-panel h3 {
+            color: #45f3ff;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-panel input, .admin-panel select {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .admin-panel input:focus, .admin-panel select:focus {
+            outline: none;
+            border-color: #45f3ff;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.3);
+        }
+
+        .admin-panel button {
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+
+        .admin-panel button:hover {
+            background: linear-gradient(135deg, #45f3ff, #7139e8);
+            transform: scale(1.02);
+        }
+
+        .file-label {
+            display: block;
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            color: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .file-label:hover {
+            opacity: 0.9;
+        }
+
+        .status-msg {
+            background: rgba(0, 0, 0, 0.3);
+            color: #45f3ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            border: 1px solid rgba(69, 243, 255, 0.2);
+        }
+
+        /* ==========================================
+           6b. GLOBAL LOADING ANIMATION
+        ========================================== */
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 12, 16, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .loader-overlay.active {
+            display: flex;
+        }
+
+        .loader-ring {
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+
+        .loader-ring div {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+
+        .loader-ring div:nth-child(1) {
+            border-top-color: #45f3ff;
+            border-right-color: #45f3ff;
+            animation: loaderSpin 0.9s linear infinite;
+            box-shadow: 0 0 15px rgba(69, 243, 255, 0.6);
+        }
+
+        .loader-ring div:nth-child(2) {
+            width: 78%;
+            height: 78%;
+            top: 11%;
+            left: 11%;
+            border-bottom-color: #ff007f;
+            border-left-color: #ff007f;
+            animation: loaderSpin 1.3s linear infinite reverse;
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.6);
+        }
+
+        .loader-text {
+            color: #45f3ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: loaderPulse 1.1s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(69, 243, 255, 0.6);
+        }
+
+        @keyframes loaderSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 0.45; }
+            50% { opacity: 1; }
+        }
+
+        /* ==========================================
+           7. PAYMENT MODAL
+        ========================================== */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-card {
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.95), rgba(113, 57, 232, 0.25));
+            border: 2px solid rgba(69, 243, 255, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .payment-card h3 {
+            color: #45f3ff;
+            text-align: center;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .payment-card input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border-radius: 10px;
+        }
+
+        .payment-card input:focus {
+            outline: none;
+            border-color: #45f3ff;
+        }
+
+        .payment-card button {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            min-height: 44px;
+        }
+
+        /* ==========================================
+           8. AI CHAT BOX
+        ========================================== */
+        #ai-chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(113, 57, 232, 0.5);
+            transition: all 0.3s;
+            z-index: 500;
+        }
+
+        #ai-chat-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(69, 243, 255, 0.7);
+        }
+
+        #ai-chat-box {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            max-width: calc(100vw - 40px);
+            height: 500px;
+            max-height: calc(100vh - 120px);
+            background: linear-gradient(135deg, rgba(11, 12, 16, 0.98), rgba(31, 40, 51, 0.95));
+            border: 2px solid rgba(69, 243, 255, 0.3);
+            border-radius: 15px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 501;
+        }
+
+        #ai-chat-header {
+            background: linear-gradient(135deg, #7139e8, #45f3ff);
+            color: white;
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+        }
+
+        #ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #7139e8, #ff007f);
+            color: white;
+            align-self: flex-end;
+            border-radius: 10px 0px 10px 10px;
+        }
+
+        .ai-message {
+            background: rgba(31, 40, 51, 0.8);
+            color: #e0e0e0;
+            align-self: flex-start;
+            border-radius: 0px 10px 10px 10px;
+            border-left: 3px solid #45f3ff;
+        }
+
+        #ai-chat-input-container {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #ai-user-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(69, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        #ai-user-input:focus {
+            outline: none;
+            border-color: #45f3ff;
+        }
+
+        #ai-send-btn { 
+            background: linear-gradient(135deg, #7139e8, #ff007f); 
+            border: none; 
+            color: white; 
+            padding: 10px 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: bold; 
+            font-family: 'Orbitron', sans-serif;
+            min-height: 40px;
+        }
+
+        .admin-card-wrapper {
+            padding: 10px;
+            position: relative;
+        }
+    </style>
+
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="game.js" defer></script>
+</head>
+<body>
+
+<div class="navbar" id="navicon" style="display:none;">
+    <div class="nav-links">
+        <a href="javascript:void(0);" class="nav-item" onclick="window.showcat()">Home</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Karibu Kitengo Gaming! Hapa tunatoa Mods bora za ETS2 na Bus Simulator Indonesia.')">About Us</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 & Maleo Mods kali, skinning, na usaidizi wa kiufundi!')">Our Services</a>
+    </div>
+
+    <!-- Search Bar in Header -->
+    <div class="nav-search-container">
+        <input type="text" id="global-search-input" placeholder="Tafuta Mod..." oninput="window.handleSearchInput(this.value)">
+        <button class="search-icon-btn" aria-label="Tafuta Mod">&#128099;</button>
+    </div>
+
+    <!-- Phone/Contact Icon Dropdown -->
+    <div class="phone-action-container">
+        <button class="phone-btn" title="Wasiliana Nasi" aria-label="Wasiliana Nasi">&#128222;</button>
+        <div class="phone-dropdown">
+            <a href="tel:0615304000">&#128222; Piga Simu</a>
+            <a href="sms:0615304000?body=HABARI%20KITENGO%20GAMING">&#128172; Tuma SMS</a>
+        </div>
+    </div>
+</div>
+
+<div id="cat" style="display:none;">
+    <div class="hero-section">
+        <h1>KITENGO GAMING</h1>
+        <br>
+        <div id="logo-slideshow" style="position: relative; margin: 0 auto; width: 100%; max-width: 1536px; aspect-ratio: 1531 / 824; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.6); background: #000;">
+            <img id="slideshow-img" src="logo.jpg" alt="Kitengo Gaming Logo" style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+            <video id="slideshow-video" muted playsinline style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+        </div>
+        <br>
+        <a href="https://www.mediafire.com/file/38dm5iuqtw4735z/_KITENGO_GAMING_20017914.apk/file" style="display:inline-block; background:linear-gradient(135deg,#00ff88,#00bfff); color:#000; padding:15px 25px; border-radius:12px; font-size:20px; font-weight:900; text-decoration:none; font-family:Arial,sans-serif; box-shadow:0 0 15px #00ff88;">
+            🎮 DOWNLOAD KITENGO GAMING APP 🎮
+        </a> <br>
+
+        <div id="about">
+            <marquee direction="left" behavior="scroll" loop="infinite">
+               KATIBU  KITENGO GAMING ⭐ UJIPATIE GAMES MBALI MBALI KAMA EURO TRUCK SIMULATOR2 TZ, MALEO NEW UPDATE TZ, GTA, RACING, FOOTBALL GAMES ZA ZINGINE KIBAO⭐NYOTE MNAKARIBISHWA  ⭐
+            </marquee>
+        </div>
+        <hr class="divider">
+        <h2>CATEGORIES ZA MODS</h2>
+    </div>
+    
+    <div class="cat-grid" id="categories-container"></div>
+
+    <div class="hero-section" id="contact" style="margin-top: 50px;">
+        <hr class="divider">
+        <h2>CONTACT US</h2>
+        <p>Msaada au Malipo: <strong>0615304000</strong> | DEPLOYED AND GENERATED BY MR KITENGO</p>
+        <br><br>
+    </div>
+</div>
+
+<div id="bus-view-section" style="display:none;">
+    <h2 id="dynamic-bus-title" style="background-color: rgba(255,255,255,0.05); text-transform: uppercase; padding: 15px; color: #45f3ff; text-align: center; border-radius: 10px; max-width: 600px; margin: 20px auto; border: 1px solid rgba(69, 243, 255, 0.2);">MABASI</h2>
+    <div class="cat-grid" id="dynamic-bus-list"></div>
+</div>
+
+<div id="details-view-section" style="display:none; padding: 20px;">
+    <button onclick="window.goBackFromDetails()" aria-label="Rudi Nyuma" style="margin: 10px auto 25px auto; display: block; background: #7139e8; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer;">&larr; Rudi Nyuma</button>
+    <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
+        <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
+        <img id="details-img" src="" alt="Mod Preview" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
+        <p id="details-desc" style="margin-top: 20px; font-size: 16px; line-height: 1.5; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></p>
+        <div id="details-action-btn" style="margin-top: 15px;"></div>
+    </div>
+</div>
+
+<div id="log" class="log" style="display:none">
+    <h1>LOGIN</h1> <br>
+    <input type="text" id="logname" placeholder="Username"><br>
+    <input type="password" id="logpassword" placeholder="Password"><br>
+    <button onclick="window.login()">LOGIN</button><br><br>
+    <p>I don't have an account? <a href="javascript:void(0);" onclick="window.showregister()">REGISTER HERE</a></p>
+</div>
+
+<div id="reg" class="reg" style="display:none;">
+    <h1>REGISTER</h1> <br>
+    <input type="text" id="regname" placeholder="Username"><br>
+    <input type="email" id="regemail" placeholder="Email"><br>
+    <input type="password" id="regpassword" placeholder="Password"><br>
+    <button onclick="window.register()">REGISTER</button><br><br>
+    <p>Already have an account? <a href="javascript:void(0);" onclick="window.showlogin()">LOGIN</a></p>
+</div>
+
+<div id="adminSection" class="admin-panel" style="display:none;">
+    <h1>ADMIN PANEL</h1>
+    <input type="password" id="adminSecret" placeholder="Kodi ya Siri ya Admin">
+    <hr>
+    
+    <h3>1. USIMAMIZI WA CATEGORIES</h3>
+    <input type="text" id="newCatId" placeholder="ID ya Category (Mfano: yutong)">
+    <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
+    <input type="text" id="newCatDesc" placeholder="Maelezo mafupi ya kundi hili (Optional)">
+    
+    <label class="file-label" for="newCatImg">&#128193; CHAGUA PICHA YA KUNDI</label>
+    <input type="file" id="newCatImg" accept="image/*" style="display: none;">
+    <div id="cat-upload-status" class="status-msg">Inashindilia picha...</div>
+    
+    <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
+    <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
+    <hr>
+
+    <h3>1b. HARIRI CATEGORY (Jina, Picha na Maelezo)</h3>
+    <p style="color: #45f3ff; font-size: 13px;">Chagua category unayotaka kuihariri:</p>
+    <select id="editCategorySelect" onchange="window.loadCategoryForEdit(this.value)"></select>
+    <img id="editCatCurrentImg" src="" alt="Picha ya sasa" style="display:none; width:110px; height:110px; object-fit:cover; border-radius:12px; margin:10px auto; border:2px solid #45f3ff;">
+    <input type="text" id="editCatName" placeholder="Jina jipya la Category">
+    <input type="text" id="editCatDesc" placeholder="Maelezo mapya ya Category">
+
+    <label class="file-label" for="editCatImg">&#128193; BADILISHA PICHA (Optional)</label>
+    <input type="file" id="editCatImg" accept="image/*" style="display: none;">
+    <div id="edit-cat-upload-status" class="status-msg">Inashindilia picha...</div>
+
+    <button onclick="window.updateCategory()">HIFADHI MABADILIKO YA CATEGORY</button>
+    <hr>
+
+    <h3>2. UPLOAD BUS MPYA</h3>
+    <label style="color: #45f3ff;">Chagua Category:</label>
+    <select id="uploadCategory"></select>
+    <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
+    <input type="text" id="uploadDesc" placeholder="Maelezo mafupi ya basi hili (Optional)">
+    
+    <label class="file-label" for="uploadImg">&#128193; CHAGUA PICHA YA BASI</label>
+    <input type="file" id="uploadImg" accept="image/*" style="display: none;">
+    <div id="bus-upload-status" class="status-msg">Inashindilia picha...</div>
+    
+    <input type="text" id="uploadLink" placeholder="Link ya Mediafire (Download Link)">
+    <input type="text" id="uploadSetLink" placeholder="TikTok Video Link (Optional - Ya Button ya SET)">
+    
+    <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
+    <input type="text" id="uploadPassword" placeholder="Weka Password ya Premium Mod hapa">
+    
+    <button onclick="window.uploadBus()">UPLOAD ITEM</button>
+    <hr>
+
+    <h3>3. MABASI YA KUHARIRI (Bonyeza kwa sekunde 3)</h3>
+    <p style="color: #45f3ff; font-size: 13px;">Chagua category ili kuhariri jina, maelezo/captions, picha au kuongeza/kutoa link ya TikTok:</p>
+    <select id="adminCategorySelect" onchange="if(this.value) window.showBusCategory(this.value, this.value, true)"></select>
+    <hr>
+
+    <h3>4. USIMAMIZI WA SLIDESHOW (LOGO)</h3>
+    <p style="color: #45f3ff; font-size: 13px;">Ongeza picha au video kwenye slideshow ya juu ya ukurasa.</p>
+    <label class="file-label" for="slideshowFile">&#128193; CHAGUA PICHA AU VIDEO</label>
+    <input type="file" id="slideshowFile" accept="image/*,video/*" style="display: none;">
+    <div id="slideshow-upload-status" class="status-msg">Inapakia...</div>
+    <button onclick="window.addSlideshowItem()">ONGEZA KWENYE SLIDESHOW</button>
+    <div id="slideshow-admin-list" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
+    <hr>
+
+    <h3>5. RESET SYSTEM</h3>
+    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta data zote za categories na mabasi</p>
+    <button onclick="window.clearEntireDatabase()" style="background-color: #ff0000;">SAFISHA DATABASE YOTE</button>
+</div>
+
+<!-- Modal ya Payment na SMS Password -->
+<div id="payment-modal-screen" class="payment-modal">
+    <div class="payment-card">
+        <h3>DOWNLOAD PREMIUM MOD</h3>
+        <p style="text-align: center; color: #45f3ff; font-weight: bold;" id="pay-item-name"></p>
+        <p style="text-align: center; color: #ff007f; font-size: 20px; font-weight: bold;" id="pay-item-price"></p>
+        <input type="hidden" id="pay-target-link">
+        
+        <p style="font-size: 13px; text-align: center;">Kama hujaweka malipo, bonyeza button chini kutuma SMS upewe password:</p>
+        <button onclick="window.requestPasswordSMS()" style="background: linear-gradient(135deg, #00aa00, #45f3ff); color: white;">1. OMBA PASSWORD (SMS)</button>
+        
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+        
+        <input type="text" id="pay-password" placeholder="Ingiza Password Hapa">
+        <div id="pay-status-log" style="display:none; font-size: 12px; text-align: center; margin: 5px 0;"></div>
+        
+        <button onclick="window.verifyPasswordAndDownload()" style="background: linear-gradient(135deg, #7139e8, #ff007f); color: white;">2. THIBITISHA & DOWNLOAD</button>
+        <button onclick="window.closePaymentModal()" style="background: transparent; color: #a4a6b0; border: 1px solid #a4a6b0; margin-top: 10px;">FUNGA</button>
+    </div>
+</div>
+
+<!-- Global Loading Overlay -->
+<div id="global-loader" class="loader-overlay">
+    <div class="loader-ring"><div></div><div></div></div>
+    <div class="loader-text">INAPAKIA...</div>
+</div>
+
+<!-- AI Chat Assistant Float -->
+<div id="ai-chat-icon" onclick="window.toggleChat()" title="Ongea na Kitengo AI">
+    <span style="font-size: 26px;">&#129302;</span>
+</div>
+
+<div id="ai-chat-box">
+    <div id="ai-chat-header">
+        <span>KITENGO AI ASSISTANT</span>
+        <span onclick="window.toggleChat()" style="cursor: pointer; font-size: 20px;">&times;</span>
+    </div>
+    <div id="ai-chat-messages">
+        <div class="message ai-message">Habari! Mimi ni Kitengo AI Assistant. Ninaweza kukusaidia vipi leo kuhusu mods zetu au utatuzi wa changamoto za ETS2 na Bus Simulator?</div>
+    </div>
+    <div id="ai-chat-input-container">
+        <input type="text" id="ai-user-input" placeholder="Andika ujumbe wako..." onkeypress="window.checkEnter(event)">
+        <button id="ai-send-btn" onclick="window.sendMessage()">TUMA</button>
+    </div>
+</div>
+
+<script>
+    // Sajili Service Worker ya Progressive Web App (PWA)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then((reg) => console.log('Kitengo Gaming SW registered:', reg.scope))
+                .catch((err) => console.log('Kitengo Gaming SW registration failed:', err));
+        });
+    }
+</script>
+
+</body>
+</html>

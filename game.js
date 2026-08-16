@@ -10,7 +10,6 @@ const firebaseConfig = {
   measurementId: "G-NFT0FB6V2T"
 };
 
-// Kuanzisha Firebase
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -81,7 +80,6 @@ window.showcat = function(isBackAction = false) {
     if (!isBackAction) history.pushState({ page: "home" }, "Home", "#home");
 };
 
-// LOGIC YA KICHUNGI CHA PREMIUM VS FREE + PASSWORD MODAL PREPARATION + TIKTOK SET BUTTON
 window.showDetails = function(title, image, desc, type, targetLinkOrId, currentCatId = '', currentCatName = '', price = 0, busKey = '', setLink = '') {
     window.hideAllSections();
     document.getElementById("details-view-section").style.display = "block";
@@ -126,7 +124,6 @@ window.showDetails = function(title, image, desc, type, targetLinkOrId, currentC
         
         btnContainer.appendChild(btn);
 
-        // KA-BUTTON KA SET (TikTok Video Link)
         if (setLink && setLink.trim() !== "") {
             let setBtn = document.createElement("a");
             setBtn.href = setLink;
@@ -215,7 +212,7 @@ window.goBackFromDetails = function() {
     }
 };
 
-// ULTRA-FAST COMPRESSION UTILITY (Kutatua tatizo la upload kuwa nzito)
+// HIGH-SPEED COMPRESSION UTILITY (Inapunguza ukubwa wa picha hadi KB chache kwa ajili ya Upload ya Haraka sana)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     if (!file) return;
     const reader = new FileReader();
@@ -243,11 +240,13 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.4);
+            // Scaled down quality to 0.25 to ensure instant firebase writes
+            const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.25);
             callback(compressedBase64);
         };
         img.onerror = function() {
             alert("Hitilafu kwenye picha! Jaribu picha nyingine.");
+            window.hideLoader();
         };
         img.src = event.target.result;
     };
@@ -256,12 +255,13 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
 
 // PAKIA PICHA YA CATEGORY
 window.addCategory = function() {
-    let id = document.getElementById("newCatId").value.trim().toLowerCase().replace(/\s+/g, '-');
+    let rawId = document.getElementById("newCatId").value.trim();
     let name = document.getElementById("newCatName").value.trim();
     let desc = document.getElementById("newCatDesc").value.trim();
     let fileInput = document.getElementById("newCatImg");
     
-    if (id === "" || name === "") { alert("Jaza ID na Jina!"); return; }
+    if (rawId === "" || name === "") { alert("Jaza ID na Jina!"); return; }
+    let id = rawId.toLowerCase().replace(/\s+/g, '-');
     if (fileInput.files.length === 0) { alert("Chagua picha ya kundi!"); return; }
     
     const statusDiv = document.getElementById("cat-upload-status");
@@ -271,7 +271,7 @@ window.addCategory = function() {
     
     const file = fileInput.files[0];
     
-    window.compressImage(file, 400, 400, 0.4, function(compressedBase64) {
+    window.compressImage(file, 300, 300, 0.25, function(compressedBase64) {
         database.ref('categories/' + id).set({ 
             name: name, 
             image: compressedBase64, 
@@ -293,7 +293,6 @@ window.addCategory = function() {
     });
 };
 
-// HARIRI CATEGORY: PAKIA TAARIFA ZA SASA ZA CATEGORY KWENYE FOMU YA KUHARIRI
 window.loadCategoryForEdit = function(id) {
     const nameInput = document.getElementById("editCatName");
     const descInput = document.getElementById("editCatDesc");
@@ -326,7 +325,6 @@ window.loadCategoryForEdit = function(id) {
     });
 };
 
-// HARIRI CATEGORY: HIFADHI MABADILIKO (JINA, MAELEZO, PICHA)
 window.updateCategory = function() {
     const id = document.getElementById("editCategorySelect").value;
     if (!id) { alert("Chagua category unayotaka kuihariri kwanza!"); return; }
@@ -362,7 +360,7 @@ window.updateCategory = function() {
             statusDiv.style.display = "block";
             statusDiv.textContent = "Inashindilia picha mpya...";
         }
-        window.compressImage(fileInput.files[0], 400, 400, 0.4, function(compressedBase64) {
+        window.compressImage(fileInput.files[0], 300, 300, 0.25, function(compressedBase64) {
             saveUpdate(compressedBase64);
         });
     } else {
@@ -370,7 +368,6 @@ window.updateCategory = function() {
     }
 };
 
-// RENDER CATEGORIES KWA WAKATI MUPYA (REALTIME LISTENER)
 window.loadCategories = function() {
     database.ref('categories').on('value', (snapshot) => {
         const categories = snapshot.val() || {};
@@ -441,7 +438,6 @@ window.loadCategories = function() {
     });
 };
 
-// LOGO SLIDESHOW
 let slideshowItems = [];
 let slideshowIndex = 0;
 let slideshowTimer = null;
@@ -529,7 +525,7 @@ window.addSlideshowItem = function() {
         reader.readAsDataURL(file);
     } else {
         if (statusDiv) statusDiv.textContent = 'Inashindilia picha...';
-        window.compressImage(file, 1000, 600, 0.5, function(compressedBase64) {
+        window.compressImage(file, 600, 400, 0.25, function(compressedBase64) {
             database.ref('slideshow').push().set({ type: 'image', src: compressedBase64 })
             .then(() => {
                 alert('Picha imeongezwa kwenye slideshow!');
@@ -590,7 +586,6 @@ window.deleteSlideshowItem = function(key) {
     }
 };
 
-// ONYESHA MABASI YA CATEGORY ILIYOCHAGULIWA
 window.showBusCategory = function(catId, catName, isAdminMode = false) {
     window.showLoader();
     database.ref('buses/' + catId).once('value', (snapshot) => {
@@ -681,7 +676,6 @@ window.reloadCategoryView = function(catId, catName) {
     window.showBusCategory(catId, catName, true);
 };
 
-// LISTENERS KWA UPANDE WA ADMIN (INAHUSISHA PRESS KWA SEKUNDE 3)
 window.setupAdminCardListeners = function(card, catId, key, bus) {
     const titleEl = card.querySelector('.editable-title');
     const descEl = card.querySelector('.editable-desc');
@@ -693,14 +687,12 @@ window.setupAdminCardListeners = function(card, catId, key, bus) {
     const bindLongPress = (element, callback) => {
         if (!element) return;
         
-        // Touch events (Mobile)
         element.addEventListener('touchstart', (e) => { 
             pressTimer = setTimeout(() => { callback(); }, 3000); 
         });
         element.addEventListener('touchend', () => clearTimeout(pressTimer));
         element.addEventListener('touchmove', () => clearTimeout(pressTimer));
         
-        // Mouse events (Desktop)
         element.addEventListener('mousedown', () => {
             pressTimer = setTimeout(() => { callback(); }, 3000);
         });
@@ -740,7 +732,7 @@ window.editBusImage = function(catId, key, bus) {
         if (this.files.length > 0) {
             const file = this.files[0];
             window.showLoader();
-            window.compressImage(file, 500, 500, 0.4, function(compressedBase64) {
+            window.compressImage(file, 300, 300, 0.25, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
                         alert('Picha imebadilishwa!');
@@ -756,7 +748,6 @@ window.editBusImage = function(catId, key, bus) {
     fileInput.click();
 };
 
-// UPLOAD BUS FUNCTION - OPTIMIZED FOR MAX UPLOAD SPEED
 window.uploadBus = function() {
     let cat = document.getElementById("uploadCategory").value;
     let name = document.getElementById("uploadName").value.trim();
@@ -779,7 +770,7 @@ window.uploadBus = function() {
 
     const file = fileInput.files[0];
 
-    window.compressImage(file, 500, 500, 0.4, function(compressedBase64) {
+    window.compressImage(file, 300, 300, 0.25, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
             name: name, 
@@ -809,20 +800,45 @@ window.uploadBus = function() {
     });
 };
 
-window.deleteCategory = function(categoryId) {
-    if (!categoryId) { alert("Weka ID ya category unayotaka kuifuta."); return; }
-    if(confirm("Je, una uhakika unataka kufuta GROUP la '" + categoryId + "' na kila kitu chake?")) {
-        window.showLoader();
-        database.ref('categories/' + categoryId).remove()
-        .then(() => { 
-            database.ref('buses/' + categoryId).remove(); 
-            alert("Vimefutwa!"); 
-            window.hideLoader();
-        }).catch(err => {
-            alert("Kosa: " + err.message);
-            window.hideLoader();
-        });
+// ACCURATE DELETE CATEGORY WITH PRE-CHECK VALIDATION
+window.deleteCategory = function(rawId) {
+    if (!rawId || rawId.trim() === "") { 
+        alert("Weka au Chagua ID ya Category unayotaka kuifuta."); 
+        return; 
     }
+    
+    let categoryId = rawId.trim().toLowerCase().replace(/\s+/g, '-');
+
+    window.showLoader();
+    database.ref('categories/' + categoryId).once('value')
+    .then((snapshot) => {
+        if (!snapshot.exists()) {
+            window.hideLoader();
+            alert("CATEGORY ERROR: Hakuna Category yenye ID ya '" + categoryId + "' kwenye Mfumo!");
+            return;
+        }
+
+        if(confirm("Je, una uhakika unataka kufuta Category ya '" + categoryId + "' pamoja na mabasi yake yote?")) {
+            database.ref('categories/' + categoryId).remove()
+            .then(() => { 
+                return database.ref('buses/' + categoryId).remove(); 
+            })
+            .then(() => {
+                alert("Category na vifaa vyake vyote vimefutwa kikamilifu!"); 
+                window.hideLoader();
+            })
+            .catch(err => {
+                alert("Kosa: " + err.message);
+                window.hideLoader();
+            });
+        } else {
+            window.hideLoader();
+        }
+    })
+    .catch((err) => {
+        window.hideLoader();
+        alert("Kosa la mtandao: " + err.message);
+    });
 };
 
 window.clearEntireDatabase = function() {
@@ -876,7 +892,6 @@ window.checkCurrentLocation = function() {
     }
 };
 
-// SEARCH BAR LOGIC
 window.handleSearchInput = function(query) {
     const searchTerm = query.toLowerCase().trim();
     if(searchTerm === "") {
@@ -954,7 +969,6 @@ window.addEventListener("DOMContentLoaded", () => {
     window.checkCurrentLocation();
 });
 
-// AI ASSISTANT CONFIGURATION
 const PART_A = "AQ.Ab8RN6LL0VgiZ";
 const PART_B = "gSXifpheeDVtaGlQ7V";
 const PART_C = "n4-8t42QCcrK885ck8w";

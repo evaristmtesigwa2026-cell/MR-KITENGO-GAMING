@@ -212,45 +212,61 @@ window.goBackFromDetails = function() {
     }
 };
 
-// HIGH-SPEED COMPRESSION UTILITY (Inapunguza ukubwa wa picha hadi KB chache kwa ajili ya Upload ya Haraka sana)
+// HIGH-SPEED INSTANT COMPRESSION UTILITY (Inatumia ObjectURL bila kulemea Memory ya Simu)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(event) {
+    if (!file) {
+        window.hideLoader();
+        return;
+    }
+    
+    try {
+        const objectUrl = URL.createObjectURL(file);
         const img = new Image();
+        
         img.onload = function() {
-            const canvas = document.createElement("canvas");
-            let width = img.width;
-            let height = img.height;
-            
-            if (width > height) {
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
+            try {
+                const canvas = document.createElement("canvas");
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
                 }
-            } else {
-                if (height > maxHeight) {
-                    width = Math.round((width * maxHeight) / height);
-                    height = maxHeight;
-                }
+                
+                canvas.width = width || 300;
+                canvas.height = height || 300;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.3);
+                URL.revokeObjectURL(objectUrl);
+                callback(compressedBase64);
+            } catch (canvasErr) {
+                URL.revokeObjectURL(objectUrl);
+                alert("Hitilafu kwenye kashindilia picha: " + canvasErr.message);
+                window.hideLoader();
             }
-            
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            // Scaled down quality to 0.25 to ensure instant firebase writes
-            const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.25);
-            callback(compressedBase64);
         };
+        
         img.onerror = function() {
+            URL.revokeObjectURL(objectUrl);
             alert("Hitilafu kwenye picha! Jaribu picha nyingine.");
             window.hideLoader();
         };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
+        
+        img.src = objectUrl;
+    } catch (err) {
+        alert("Hitilafu wakati wa kusoma picha: " + err.message);
+        window.hideLoader();
+    }
 };
 
 // PAKIA PICHA YA CATEGORY
@@ -265,13 +281,15 @@ window.addCategory = function() {
     if (fileInput.files.length === 0) { alert("Chagua picha ya kundi!"); return; }
     
     const statusDiv = document.getElementById("cat-upload-status");
-    statusDiv.style.display = "block";
-    statusDiv.textContent = "Inashindilia picha ya kundi kwa kasi kubwa...";
+    if (statusDiv) {
+        statusDiv.style.display = "block";
+        statusDiv.textContent = "Inashindilia picha ya kundi kwa kasi kubwa...";
+    }
     window.showLoader();
     
     const file = fileInput.files[0];
     
-    window.compressImage(file, 300, 300, 0.25, function(compressedBase64) {
+    window.compressImage(file, 300, 300, 0.3, function(compressedBase64) {
         database.ref('categories/' + id).set({ 
             name: name, 
             image: compressedBase64, 
@@ -283,11 +301,11 @@ window.addCategory = function() {
             document.getElementById("newCatName").value = "";
             document.getElementById("newCatDesc").value = "";
             fileInput.value = "";
-            statusDiv.style.display = "none";
+            if (statusDiv) statusDiv.style.display = "none";
             window.hideLoader();
         }).catch(err => {
-            alert("Kosa: " + err.message);
-            statusDiv.style.display = "none";
+            alert("Kosa la Firebase: " + err.message);
+            if (statusDiv) statusDiv.style.display = "none";
             window.hideLoader();
         });
     });
@@ -360,7 +378,7 @@ window.updateCategory = function() {
             statusDiv.style.display = "block";
             statusDiv.textContent = "Inashindilia picha mpya...";
         }
-        window.compressImage(fileInput.files[0], 300, 300, 0.25, function(compressedBase64) {
+        window.compressImage(fileInput.files[0], 300, 300, 0.3, function(compressedBase64) {
             saveUpdate(compressedBase64);
         });
     } else {
@@ -522,10 +540,15 @@ window.addSlideshowItem = function() {
                 window.hideLoader();
             });
         };
+        reader.onerror = function() {
+            alert('Hitilafu wakati wa kusoma video.');
+            if (statusDiv) statusDiv.style.display = 'none';
+            window.hideLoader();
+        };
         reader.readAsDataURL(file);
     } else {
         if (statusDiv) statusDiv.textContent = 'Inashindilia picha...';
-        window.compressImage(file, 600, 400, 0.25, function(compressedBase64) {
+        window.compressImage(file, 600, 400, 0.3, function(compressedBase64) {
             database.ref('slideshow').push().set({ type: 'image', src: compressedBase64 })
             .then(() => {
                 alert('Picha imeongezwa kwenye slideshow!');
@@ -732,7 +755,7 @@ window.editBusImage = function(catId, key, bus) {
         if (this.files.length > 0) {
             const file = this.files[0];
             window.showLoader();
-            window.compressImage(file, 300, 300, 0.25, function(compressedBase64) {
+            window.compressImage(file, 300, 300, 0.3, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
                         alert('Picha imebadilishwa!');
@@ -764,13 +787,15 @@ window.uploadBus = function() {
     if (price && parseInt(price) > 0 && password === "") { alert("Tafadhali weka password ya mod hii ya kulipia!"); return; }
 
     const statusDiv = document.getElementById("bus-upload-status");
-    statusDiv.style.display = "block";
-    statusDiv.textContent = "Inashindilia picha kwa kasi na kupakia Firebase...";
+    if (statusDiv) {
+        statusDiv.style.display = "block";
+        statusDiv.textContent = "Inashindilia picha kwa kasi na kupakia Firebase...";
+    }
     window.showLoader();
 
     const file = fileInput.files[0];
 
-    window.compressImage(file, 300, 300, 0.25, function(compressedBase64) {
+    window.compressImage(file, 300, 300, 0.3, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
             name: name, 
@@ -790,11 +815,11 @@ window.uploadBus = function() {
             document.getElementById("uploadPrice").value = "";
             document.getElementById("uploadPassword").value = "";
             fileInput.value = "";
-            statusDiv.style.display = "none";
+            if (statusDiv) statusDiv.style.display = "none";
             window.showBusCategory(cat, "MABASI", true);
         }).catch(err => {
             alert("Kosa la Firebase: " + err.message);
-            statusDiv.style.display = "none";
+            if (statusDiv) statusDiv.style.display = "none";
             window.hideLoader();
         });
     });

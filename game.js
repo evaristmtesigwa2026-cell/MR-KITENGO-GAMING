@@ -212,7 +212,7 @@ window.goBackFromDetails = function() {
     }
 };
 
-// HIGH-SPEED INSTANT COMPRESSION UTILITY (Inatumia ObjectURL bila kulemea Memory ya Simu)
+// HIGH-QUALITY & BALANCED IMAGE COMPRESSION UTILITY (Kiwango cha HD)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     if (!file) {
         window.hideLoader();
@@ -229,6 +229,7 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
                 let width = img.width;
                 let height = img.height;
                 
+                // Mfumo wa kukokotoa vipimo bila kupoteza aspect ratio
                 if (width > height) {
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
@@ -241,17 +242,23 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
                     }
                 }
                 
-                canvas.width = width || 300;
-                canvas.height = height || 300;
+                canvas.width = width || 1080;
+                canvas.height = height || 1080;
                 const ctx = canvas.getContext("2d");
+                
+                // Boresha resampling quality ya canvas
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                const compressedBase64 = canvas.toDataURL("image/jpeg", quality || 0.3);
+                // Matumizi ya quality mpya (0.85 default badala ya 0.3)
+                const targetQuality = quality ? quality : 0.85;
+                const compressedBase64 = canvas.toDataURL("image/jpeg", targetQuality);
                 URL.revokeObjectURL(objectUrl);
                 callback(compressedBase64);
             } catch (canvasErr) {
                 URL.revokeObjectURL(objectUrl);
-                alert("Hitilafu kwenye kashindilia picha: " + canvasErr.message);
+                alert("Hitilafu kwenye kuchakata picha: " + canvasErr.message);
                 window.hideLoader();
             }
         };
@@ -269,7 +276,7 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     }
 };
 
-// PAKIA PICHA YA CATEGORY
+// PAKIA PICHA YA CATEGORY (HD Resolution: Max 1080px, Quality 0.85)
 window.addCategory = function() {
     let rawId = document.getElementById("newCatId").value.trim();
     let name = document.getElementById("newCatName").value.trim();
@@ -283,20 +290,20 @@ window.addCategory = function() {
     const statusDiv = document.getElementById("cat-upload-status");
     if (statusDiv) {
         statusDiv.style.display = "block";
-        statusDiv.textContent = "Inashindilia picha ya kundi kwa kasi kubwa...";
+        statusDiv.textContent = "Inachakata picha katika ubora wa hali ya juu (HD)...";
     }
     window.showLoader();
     
     const file = fileInput.files[0];
     
-    window.compressImage(file, 300, 300, 0.3, function(compressedBase64) {
+    window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
         database.ref('categories/' + id).set({ 
             name: name, 
             image: compressedBase64, 
             desc: desc
         })
         .then(() => {
-            alert("Kundi jipya limeongezwa!");
+            alert("Kundi jipya limeongezwa kwa ubora wa juu!");
             document.getElementById("newCatId").value = "";
             document.getElementById("newCatName").value = "";
             document.getElementById("newCatDesc").value = "";
@@ -376,9 +383,9 @@ window.updateCategory = function() {
     if (fileInput && fileInput.files.length > 0) {
         if (statusDiv) {
             statusDiv.style.display = "block";
-            statusDiv.textContent = "Inashindilia picha mpya...";
+            statusDiv.textContent = "Inachakata picha mpya katika ubora wa HD...";
         }
-        window.compressImage(fileInput.files[0], 300, 300, 0.3, function(compressedBase64) {
+        window.compressImage(fileInput.files[0], 1080, 1080, 0.85, function(compressedBase64) {
             saveUpdate(compressedBase64);
         });
     } else {
@@ -547,8 +554,8 @@ window.addSlideshowItem = function() {
         };
         reader.readAsDataURL(file);
     } else {
-        if (statusDiv) statusDiv.textContent = 'Inashindilia picha...';
-        window.compressImage(file, 600, 400, 0.3, function(compressedBase64) {
+        if (statusDiv) statusDiv.textContent = 'Inachakata picha ya slideshow katika ubora wa Full HD...';
+        window.compressImage(file, 1920, 1080, 0.85, function(compressedBase64) {
             database.ref('slideshow').push().set({ type: 'image', src: compressedBase64 })
             .then(() => {
                 alert('Picha imeongezwa kwenye slideshow!');
@@ -755,10 +762,10 @@ window.editBusImage = function(catId, key, bus) {
         if (this.files.length > 0) {
             const file = this.files[0];
             window.showLoader();
-            window.compressImage(file, 300, 300, 0.3, function(compressedBase64) {
+            window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
-                        alert('Picha imebadilishwa!');
+                        alert('Picha imebadilishwa katika ubora wa HD!');
                         window.reloadCategoryView(catId, '');
                     })
                     .catch(err => {
@@ -789,13 +796,13 @@ window.uploadBus = function() {
     const statusDiv = document.getElementById("bus-upload-status");
     if (statusDiv) {
         statusDiv.style.display = "block";
-        statusDiv.textContent = "Inashindilia picha kwa kasi na kupakia Firebase...";
+        statusDiv.textContent = "Inachakata picha katika ubora wa hali ya juu (HD)...";
     }
     window.showLoader();
 
     const file = fileInput.files[0];
 
-    window.compressImage(file, 300, 300, 0.3, function(compressedBase64) {
+    window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
             name: name, 
@@ -807,7 +814,7 @@ window.uploadBus = function() {
             password: password ? password : "" 
         })
         .then(() => {
-            alert("Basi jipya limeongezwa kwa kasi ya ajabu!");
+            alert("Basi jipya limeongezwa kwa ubora wa juu (HD)!");
             document.getElementById("uploadName").value = "";
             document.getElementById("uploadDesc").value = "";
             document.getElementById("uploadLink").value = "";

@@ -131,7 +131,15 @@
         }
         .card:hover { transform: translateY(-4px); border-color: rgba(69, 243, 255, 0.4); box-shadow: 0 12px 30px rgba(69, 243, 255, 0.15); }
         .card-img-wrapper { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; background: #000; }
-        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        
+        /* Optimization kwa picha za HD */
+        .card-img-wrapper img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            image-rendering: -webkit-optimize-contrast;
+            transition: transform 0.4s ease; 
+        }
         .card:hover .card-img-wrapper img { transform: scale(1.05); }
         .card-content { padding: 12px 4px 4px 4px; display: flex; flex-direction: column; gap: 4px; }
         .card-tag { font-size: 11px; font-weight: 800; color: #ffaa00; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -216,7 +224,7 @@
         <h1>KITENGO GAMING</h1>
         <br>
         <div id="logo-slideshow" style="position: relative; margin: 0 auto; width: 100%; max-width: 1536px; aspect-ratio: 1531 / 824; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.6); background: #000;">
-            <img id="slideshow-img" src="logo.jpg" alt="Kitengo Gaming Logo" style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+            <img id="slideshow-img" src="logo.jpg" alt="Kitengo Gaming Logo" style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: -webkit-optimize-contrast;">
             <video id="slideshow-video" muted playsinline style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
         </div>
         <br>
@@ -252,7 +260,7 @@
     <button onclick="window.goBackFromDetails()" aria-label="Rudi Nyuma" style="margin: 10px auto 25px auto; display: block; background: #7139e8; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer;">&larr; Rudi Nyuma</button>
     <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
         <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
-        <img id="details-img" src="" alt="Mod Preview" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
+        <img id="details-img" src="" alt="Mod Preview" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); image-rendering: -webkit-optimize-contrast;">
         <p id="details-desc" style="margin-top: 20px; font-size: 16px; line-height: 1.5; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></p>
         <div id="details-action-btn" style="margin-top: 15px;"></div>
     </div>

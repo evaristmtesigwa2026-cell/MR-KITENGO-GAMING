@@ -531,7 +531,7 @@ window.addSlideshowItem = function() {
     window.showLoader();
 
     if (isVideo) {
-        if (statusDiv) statusDiv.textContent = 'Inapakia video, subiri...';
+        if (statusDiv) statusDiv.textContent = 'LOADING...';
         const reader = new FileReader();
         reader.onload = function(e) {
             database.ref('slideshow').push().set({ type: 'video', src: e.target.result })

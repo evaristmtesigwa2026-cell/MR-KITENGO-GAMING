@@ -80,7 +80,6 @@
         }
         .navbar a.nav-item:hover::after { width: 80%; }
         
-        /* NAV SEARCH ENHANCEMENTS (YOUTUBE STYLE) */
         .nav-search-container {
             display: flex; align-items: center; background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(69, 243, 255, 0.4); border-radius: 20px;
@@ -100,7 +99,6 @@
         }
         .search-clear-btn:hover { color: #ff007f; }
 
-        /* YOUTUBE STYLE AUTO-SUGGEST DOCK */
         .search-suggestions-dropdown {
             display: none; position: absolute; top: 110%; left: 0; width: 100%;
             background: rgba(15, 17, 23, 0.98); border: 1px solid rgba(69, 243, 255, 0.4);
@@ -199,7 +197,6 @@
         .file-label:hover { opacity: 0.9; }
         .status-msg { background: rgba(0, 0, 0, 0.3); color: #45f3ff; padding: 10px; margin: 10px 0; border-radius: 8px; text-align: center; display: none; border: 1px solid rgba(69, 243, 255, 0.2); }
         
-        /* ENHANCED LOADER OVERLAY WITH CANCEL BUTTON */
         .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
         .loader-overlay.active { display: flex; }
         .loader-ring { position: relative; width: 64px; height: 64px; }
@@ -252,13 +249,11 @@
         <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 & Maleo Mods kali, skinning, na usaidizi wa kiufundi!')">Our Services</a>
     </div>
 
-    <!-- IMPROVED YOUTUBE-STYLE SEARCH CONTAINER -->
     <div class="nav-search-container">
         <input type="text" id="global-search-input" placeholder="Tafuta Mod, Category..." oninput="window.handleSearchInput(this.value)" onfocus="window.handleSearchInput(this.value)" autocomplete="off">
         <button class="search-clear-btn" id="search-clear-btn" onclick="window.clearSearchInput()" title="Futa Search">&times;</button>
         <button class="search-icon-btn" aria-label="Tafuta Mod">&#128099;</button>
         
-        <!-- AUTO-SUGGESTIONS DROPDOWN (YOUTUBE STYLE) -->
         <div id="search-suggestions" class="search-suggestions-dropdown"></div>
     </div>
 
@@ -425,7 +420,6 @@
     </div>
 </div>
 
-<!-- GLOBAL LOADER WITH CANCEL OPTION -->
 <div id="global-loader" class="loader-overlay">
     <div class="loader-ring"><div></div><div></div></div>
     <div class="loader-text" id="loader-text-label">LOADING...</div>

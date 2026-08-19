@@ -241,127 +241,93 @@ window.goBackFromDetails = function() {
     }
 };
 
-/* ==========================================================================
-   ULTRA-OPTIMIZED HD IMAGE COMPRESSION ENGINE (MEMORY SAFE & INSTANT UPLOAD)
-   ========================================================================== */
+// HIGH-QUALITY & STABLE IMAGE COMPRESSION UTILITY (WITH DUAL FALLBACK READER & FULL HD SUPPORT)
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     if (!file) {
         window.hideLoader();
         return;
     }
 
-    const targetMaxW = maxWidth || 1280;
-    const targetMaxH = maxHeight || 1280;
-    const targetQuality = quality || 0.85;
+    const processImageElement = function(img, cleanupCallback) {
+        try {
+            const canvas = document.createElement("canvas");
+            let width = img.naturalWidth || img.width;
+            let height = img.naturalHeight || img.height;
 
-    // FAST PATH: Tumia createImageBitmap (Hardware accelerated & Zero memory leak)
-    if (window.createImageBitmap) {
-        createImageBitmap(file)
-            .then(imgBitmap => {
-                try {
-                    let width = imgBitmap.width;
-                    let height = imgBitmap.height;
+            const targetMaxW = maxWidth || 1920;
+            const targetMaxH = maxHeight || 1080;
 
-                    if (width > height) {
-                        if (width > targetMaxW) {
-                            height = Math.round((height * targetMaxW) / width);
-                            width = targetMaxW;
-                        }
-                    } else {
-                        if (height > targetMaxH) {
-                            width = Math.round((width * targetMaxH) / height);
-                            height = targetMaxH;
-                        }
-                    }
-
-                    const canvas = document.createElement("canvas");
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext("2d", { alpha: false, willReadFrequently: false });
-
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = "high";
-                    ctx.drawImage(imgBitmap, 0, 0, width, height);
-
-                    const compressedBase64 = canvas.toDataURL("image/jpeg", targetQuality);
-                    imgBitmap.close(); // Clean GPU memory
-                    callback(compressedBase64);
-                } catch (err) {
-                    console.warn("Bitmap conversion warning, fallbacking...", err);
-                    window.fallbackCompressImage(file, targetMaxW, targetMaxH, targetQuality, callback);
+            if (width > targetMaxW || height > targetMaxH) {
+                if (width / height > targetMaxW / targetMaxH) {
+                    height = Math.round((height * targetMaxW) / width);
+                    width = targetMaxW;
+                } else {
+                    width = Math.round((width * targetMaxH) / height);
+                    height = targetMaxH;
                 }
-            })
-            .catch(() => {
-                window.fallbackCompressImage(file, targetMaxW, targetMaxH, targetQuality, callback);
-            });
-    } else {
-        window.fallbackCompressImage(file, targetMaxW, targetMaxH, targetQuality, callback);
-    }
-};
+            }
 
-// FALLBACK METHOD FOR OLDER BROWSERS WITH MEMORY CLEANUP
-window.fallbackCompressImage = function(file, maxWidth, maxHeight, quality, callback) {
-    let objectUrl = null;
+            canvas.width = Math.max(width, 1);
+            canvas.height = Math.max(height, 1);
+            const ctx = canvas.getContext("2d");
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const targetQuality = quality ? quality : 0.88;
+            const compressedBase64 = canvas.toDataURL("image/jpeg", targetQuality);
+            
+            if (cleanupCallback) cleanupCallback();
+            callback(compressedBase64);
+        } catch (canvasErr) {
+            if (cleanupCallback) cleanupCallback();
+            alert("Hitilafu kwenye kuchakata picha: " + canvasErr.message);
+            window.hideLoader();
+        }
+    };
+
+    // Primary Attempt: URL.createObjectURL
     try {
-        objectUrl = URL.createObjectURL(file);
+        const objectUrl = URL.createObjectURL(file);
         const img = new Image();
 
         img.onload = function() {
-            try {
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round((width * maxHeight) / height);
-                        height = maxHeight;
-                    }
-                }
-
-                const canvas = document.createElement("canvas");
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d", { alpha: false });
-
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = "high";
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
-                
-                // Cleanup Memory Immediate
-                if (objectUrl) URL.revokeObjectURL(objectUrl);
-                img.onload = null;
-                img.onerror = null;
-
-                callback(compressedBase64);
-            } catch (canvasErr) {
-                if (objectUrl) URL.revokeObjectURL(objectUrl);
-                alert("Hitilafu kwenye kuchakata picha: " + canvasErr.message);
-                window.hideLoader();
-            }
+            processImageElement(img, function() {
+                URL.revokeObjectURL(objectUrl);
+            });
         };
 
         img.onerror = function() {
-            if (objectUrl) URL.revokeObjectURL(objectUrl);
-            alert("Hitilafu kwenye picha! Picha hii haiwezi kusomwa au ni haribifu. Jaribu picha nyingine.");
-            window.hideLoader();
+            URL.revokeObjectURL(objectUrl);
+            // Fallback Attempt: FileReader
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgFallback = new Image();
+                imgFallback.onload = function() {
+                    processImageElement(imgFallback, null);
+                };
+                imgFallback.onerror = function() {
+                    alert("Hitilafu kwenye picha hii! Jaribu picha nyingine iliyo katika format ya JPG/PNG.");
+                    window.hideLoader();
+                };
+                imgFallback.src = e.target.result;
+            };
+            reader.onerror = function() {
+                alert("Imeshindwa kusoma picha kutoka kwenye kifaa chako.");
+                window.hideLoader();
+            };
+            reader.readAsDataURL(file);
         };
 
         img.src = objectUrl;
     } catch (err) {
-        if (objectUrl) URL.revokeObjectURL(objectUrl);
-        alert("Hitilafu wakati wa kusoma picha: " + err.message);
+        alert("Hitilafu wakati wa kuanza kusoma picha: " + err.message);
         window.hideLoader();
     }
 };
 
-// PAKIA PICHA YA CATEGORY (HD Resolution: Max 1080px, Quality 0.85)
+// PAKIA PICHA YA CATEGORY (HD Resolution: Max 1920px, Quality 0.88)
 window.addCategory = function() {
     let rawId = document.getElementById("newCatId").value.trim();
     let name = document.getElementById("newCatName").value.trim();
@@ -381,7 +347,7 @@ window.addCategory = function() {
     
     const file = fileInput.files[0];
     
-    window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
+    window.compressImage(file, 1920, 1080, 0.88, function(compressedBase64) {
         database.ref('categories/' + id).set({ 
             name: name, 
             image: compressedBase64, 
@@ -470,7 +436,7 @@ window.updateCategory = function() {
             statusDiv.style.display = "block";
             statusDiv.textContent = "Inachakata picha mpya katika ubora wa HD...";
         }
-        window.compressImage(fileInput.files[0], 1080, 1080, 0.85, function(compressedBase64) {
+        window.compressImage(fileInput.files[0], 1920, 1080, 0.88, function(compressedBase64) {
             saveUpdate(compressedBase64);
         });
     } else {
@@ -481,7 +447,7 @@ window.updateCategory = function() {
 window.loadCategories = function() {
     database.ref('categories').on('value', (snapshot) => {
         const categories = snapshot.val() || {};
-        window.cachedCategories = categories; // Cache update
+        window.cachedCategories = categories;
         
         let categorySelect = document.getElementById("uploadCategory");
         if(categorySelect) categorySelect.innerHTML = '<option value="">-- Chagua Category --</option>';
@@ -524,7 +490,6 @@ window.loadCategories = function() {
         }
     });
 
-    // LISTEN FOR ALL BUSES FOR INSTANT GLOBAL SEARCH INDEXING
     database.ref('buses').on('value', (snapshot) => {
         window.cachedBuses = snapshot.val() || {};
     });
@@ -589,7 +554,6 @@ window.closeSearchSuggestions = function() {
     if (dropdown) dropdown.style.display = "none";
 };
 
-// Document Click Event to Close Suggestions when clicking outside
 document.addEventListener('click', function(e) {
     const searchContainer = document.querySelector('.nav-search-container');
     if (searchContainer && !searchContainer.contains(e.target)) {
@@ -609,7 +573,6 @@ window.executeLiveSearch = function(query) {
 
     const q = query.toLowerCase();
     
-    // 1. FILTER CATEGORIES
     const matchedCategories = [];
     for (const [key, cat] of Object.entries(window.cachedCategories || {})) {
         const nameMatch = cat.name && cat.name.toLowerCase().includes(q);
@@ -619,7 +582,6 @@ window.executeLiveSearch = function(query) {
         }
     }
 
-    // 2. FILTER BUSES/MODS ACROSS ALL CATEGORIES
     const matchedBuses = [];
     for (const [catId, busesMap] of Object.entries(window.cachedBuses || {})) {
         const catName = window.cachedCategories[catId] ? window.cachedCategories[catId].name : 'BUS';
@@ -632,7 +594,6 @@ window.executeLiveSearch = function(query) {
         }
     }
 
-    // UPDATE HOME VIEW CATEGORIES CARDS IN REAL-TIME IF ON HOME VIEW
     const homeCatSection = document.getElementById("cat");
     if (homeCatSection && homeCatSection.style.display !== "none") {
         const filteredObj = {};
@@ -640,7 +601,6 @@ window.executeLiveSearch = function(query) {
         window.renderFilteredCategories(filteredObj);
     }
 
-    // RENDER YOUTUBE-STYLE DROPDOWN SUGGESTIONS
     if (matchedCategories.length === 0 && matchedBuses.length === 0) {
         dropdown.innerHTML = `<div style="padding:15px; text-align:center; color:#8a8d9b; font-size:13px;">Hakuna Mod au Category inayomatch na "<strong>${query}</strong>"</div>`;
         dropdown.style.display = "block";
@@ -649,7 +609,6 @@ window.executeLiveSearch = function(query) {
 
     let html = "";
 
-    // CATEGORIES GROUP
     if (matchedCategories.length > 0) {
         html += `<div class="search-suggestion-group">`;
         html += `<div class="search-suggestion-header">CATEGORIES</div>`;
@@ -668,7 +627,6 @@ window.executeLiveSearch = function(query) {
         html += `</div>`;
     }
 
-    // BUSES / MODS GROUP
     if (matchedBuses.length > 0) {
         html += `<div class="search-suggestion-group">`;
         html += `<div class="search-suggestion-header">MODS & MABASI</div>`;
@@ -800,7 +758,7 @@ window.addSlideshowItem = function() {
         reader.readAsDataURL(file);
     } else {
         if (statusDiv) statusDiv.textContent = 'Inachakata picha ya slideshow katika ubora wa Full HD...';
-        window.compressImage(file, 1920, 1080, 0.85, function(compressedBase64) {
+        window.compressImage(file, 1920, 1080, 0.88, function(compressedBase64) {
             database.ref('slideshow').push().set({ type: 'image', src: compressedBase64 })
             .then(() => {
                 alert('Picha imeongezwa kwenye slideshow!');
@@ -1007,7 +965,7 @@ window.editBusImage = function(catId, key, bus) {
         if (this.files.length > 0) {
             const file = this.files[0];
             window.showLoader("INAPAKIA PICHA MPYA...");
-            window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
+            window.compressImage(file, 1920, 1080, 0.88, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
                         alert('Picha imebadilishwa katika ubora wa HD!');
@@ -1062,7 +1020,7 @@ window.uploadBus = function() {
 
     const file = fileInput.files[0];
 
-    window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
+    window.compressImage(file, 1920, 1080, 0.88, function(compressedBase64) {
         const newBusRef = database.ref('buses/' + cat).push();
         newBusRef.set({ 
             name: name, 
@@ -1157,7 +1115,6 @@ window.clearEntireDatabase = function() {
     }
 };
 
-// INITIALIZATION ON PAGE LOAD
 window.addEventListener('DOMContentLoaded', () => {
     window.loadCategories();
     window.loadSlideshow();

@@ -241,23 +241,76 @@ window.goBackFromDetails = function() {
     }
 };
 
-// HIGH-QUALITY & BALANCED IMAGE COMPRESSION UTILITY (Kiwango cha HD)
+/* ==========================================================================
+   ULTRA-OPTIMIZED HD IMAGE COMPRESSION ENGINE (MEMORY SAFE & INSTANT UPLOAD)
+   ========================================================================== */
 window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
     if (!file) {
         window.hideLoader();
         return;
     }
-    
+
+    const targetMaxW = maxWidth || 1280;
+    const targetMaxH = maxHeight || 1280;
+    const targetQuality = quality || 0.85;
+
+    // FAST PATH: Tumia createImageBitmap (Hardware accelerated & Zero memory leak)
+    if (window.createImageBitmap) {
+        createImageBitmap(file)
+            .then(imgBitmap => {
+                try {
+                    let width = imgBitmap.width;
+                    let height = imgBitmap.height;
+
+                    if (width > height) {
+                        if (width > targetMaxW) {
+                            height = Math.round((height * targetMaxW) / width);
+                            width = targetMaxW;
+                        }
+                    } else {
+                        if (height > targetMaxH) {
+                            width = Math.round((width * targetMaxH) / height);
+                            height = targetMaxH;
+                        }
+                    }
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d", { alpha: false, willReadFrequently: false });
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = "high";
+                    ctx.drawImage(imgBitmap, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL("image/jpeg", targetQuality);
+                    imgBitmap.close(); // Clean GPU memory
+                    callback(compressedBase64);
+                } catch (err) {
+                    console.warn("Bitmap conversion warning, fallbacking...", err);
+                    window.fallbackCompressImage(file, targetMaxW, targetMaxH, targetQuality, callback);
+                }
+            })
+            .catch(() => {
+                window.fallbackCompressImage(file, targetMaxW, targetMaxH, targetQuality, callback);
+            });
+    } else {
+        window.fallbackCompressImage(file, targetMaxW, targetMaxH, targetQuality, callback);
+    }
+};
+
+// FALLBACK METHOD FOR OLDER BROWSERS WITH MEMORY CLEANUP
+window.fallbackCompressImage = function(file, maxWidth, maxHeight, quality, callback) {
+    let objectUrl = null;
     try {
-        const objectUrl = URL.createObjectURL(file);
+        objectUrl = URL.createObjectURL(file);
         const img = new Image();
-        
+
         img.onload = function() {
             try {
-                const canvas = document.createElement("canvas");
                 let width = img.width;
                 let height = img.height;
-                
+
                 if (width > height) {
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
@@ -269,34 +322,40 @@ window.compressImage = function(file, maxWidth, maxHeight, quality, callback) {
                         height = maxHeight;
                     }
                 }
-                
-                canvas.width = width || 1080;
-                canvas.height = height || 1080;
-                const ctx = canvas.getContext("2d");
-                
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d", { alpha: false });
+
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = "high";
                 ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
                 
-                const targetQuality = quality ? quality : 0.85;
-                const compressedBase64 = canvas.toDataURL("image/jpeg", targetQuality);
-                URL.revokeObjectURL(objectUrl);
+                // Cleanup Memory Immediate
+                if (objectUrl) URL.revokeObjectURL(objectUrl);
+                img.onload = null;
+                img.onerror = null;
+
                 callback(compressedBase64);
             } catch (canvasErr) {
-                URL.revokeObjectURL(objectUrl);
+                if (objectUrl) URL.revokeObjectURL(objectUrl);
                 alert("Hitilafu kwenye kuchakata picha: " + canvasErr.message);
                 window.hideLoader();
             }
         };
-        
+
         img.onerror = function() {
-            URL.revokeObjectURL(objectUrl);
-            alert("Hitilafu kwenye picha! Jaribu picha nyingine.");
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+            alert("Hitilafu kwenye picha! Picha hii haiwezi kusomwa au ni haribifu. Jaribu picha nyingine.");
             window.hideLoader();
         };
-        
+
         img.src = objectUrl;
     } catch (err) {
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
         alert("Hitilafu wakati wa kusoma picha: " + err.message);
         window.hideLoader();
     }

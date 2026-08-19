@@ -36,8 +36,7 @@
         body::before {
             content: "";
             position: fixed;
-            width: 400px;
-            height: 400px;
+            width: 400px; height: 400px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(69, 243, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
             top: -10%; left: -10%; z-index: -1;
@@ -68,36 +67,21 @@
         .navbar a.nav-item {
             color: #ffffff; text-align: center; padding: 8px 14px; text-decoration: none;
             font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; border-radius: 6px;
+            transition: all 0.3s ease; position: relative; border-radius: 6px;
         }
-        .navbar a.nav-item::after {
-            content: ''; position: absolute; width: 0; height: 2px; bottom: 2px; left: 50%;
-            background-color: #45f3ff; transition: all 0.3s ease; transform: translateX(-50%);
-        }
-        .navbar a.nav-item:hover {
-            color: #45f3ff; background: rgba(69, 243, 255, 0.1);
-            text-shadow: 0 0 10px rgba(69, 243, 255, 0.8);
-        }
-        .navbar a.nav-item:hover::after { width: 80%; }
+        .navbar a.nav-item:hover { color: #45f3ff; background: rgba(69, 243, 255, 0.1); }
         
         .nav-search-container {
             display: flex; align-items: center; background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(69, 243, 255, 0.4); border-radius: 20px;
-            padding: 4px 12px; transition: all 0.3s ease; flex: 1; max-width: 320px; min-width: 180px;
-            position: relative;
+            padding: 4px 12px; flex: 1; max-width: 320px; min-width: 180px; position: relative;
         }
-        .nav-search-container:focus-within { border-color: #ff007f; box-shadow: 0 0 12px rgba(255, 0, 127, 0.4); }
         .nav-search-container input {
             background: transparent; border: none; outline: none; color: #ffffff;
             font-family: 'Rajdhani', sans-serif; font-size: 14px; width: 100%; padding: 4px 6px;
         }
-        .nav-search-container input::placeholder { color: #8a8d9b; }
-        .search-icon-btn { background: none; border: none; color: #45f3ff; cursor: pointer; font-size: 16px; padding: 0; display: flex; align-items: center; justify-content: center; }
-        .search-clear-btn {
-            background: none; border: none; color: #8a8d9b; cursor: pointer; font-size: 14px;
-            display: none; padding: 0 4px; line-height: 1;
-        }
-        .search-clear-btn:hover { color: #ff007f; }
+        .search-icon-btn { background: none; border: none; color: #45f3ff; cursor: pointer; font-size: 16px; }
+        .search-clear-btn { background: none; border: none; color: #8a8d9b; cursor: pointer; font-size: 14px; display: none; }
 
         .search-suggestions-dropdown {
             display: none; position: absolute; top: 110%; left: 0; width: 100%;
@@ -106,134 +90,78 @@
             z-index: 2000; max-height: 380px; overflow-y: auto; backdrop-filter: blur(15px);
         }
         .search-suggestion-group { padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .search-suggestion-group:last-child { border-bottom: none; }
-        .search-suggestion-header {
-            font-size: 10px; font-weight: 800; color: #ff007f; text-transform: uppercase;
-            letter-spacing: 1.2px; padding: 6px 14px 2px 14px; font-family: 'Orbitron', sans-serif;
-        }
-        .search-suggestion-item {
-            padding: 8px 14px; display: flex; align-items: center; gap: 10px;
-            cursor: pointer; transition: background 0.2s ease;
-        }
+        .search-suggestion-header { font-size: 10px; font-weight: 800; color: #ff007f; text-transform: uppercase; padding: 6px 14px; }
+        .search-suggestion-item { padding: 8px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .search-suggestion-item:hover { background: rgba(69, 243, 255, 0.15); }
-        .search-suggestion-item img {
-            width: 32px; height: 32px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(69, 243, 255, 0.3);
-        }
-        .search-suggestion-text { display: flex; flex-direction: column; overflow: hidden; }
-        .search-suggestion-title { color: #ffffff; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .search-suggestion-subtitle { color: #8a8d9b; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-suggestion-item img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
         .search-highlight { color: #45f3ff; font-weight: 800; }
 
         .phone-action-container { position: relative; display: inline-block; }
         .phone-btn {
             background: linear-gradient(135deg, #00aa00, #45f3ff); border: none; color: white;
-            width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; cursor: pointer; box-shadow: 0 0 10px rgba(69, 243, 255, 0.4); transition: transform 0.3s ease;
+            width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
-        .phone-btn:hover { transform: scale(1.1); }
         .phone-dropdown {
             display: none; position: absolute; right: 0; top: 45px; background: rgba(11, 12, 16, 0.98);
-            border: 1px solid rgba(69, 243, 255, 0.4); border-radius: 12px; min-width: 170px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1001; overflow: hidden; backdrop-filter: blur(10px);
+            border: 1px solid rgba(69, 243, 255, 0.4); border-radius: 12px; min-width: 170px; z-index: 1001;
         }
-        .phone-dropdown a { color: #ffffff; padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; transition: background 0.2s; }
-        .phone-dropdown a:hover { background: rgba(69, 243, 255, 0.15); color: #45f3ff; }
+        .phone-dropdown a { color: #ffffff; padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 14px; }
         .phone-action-container:hover .phone-dropdown { display: block; }
         
-        @media (max-width: 768px) {
-            .navbar { justify-content: space-between; padding: 10px 12px; }
-            .nav-links { order: 1; width: 100%; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 6px; margin-top: 4px; }
-            .nav-search-container { order: 2; max-width: 70%; }
-            .phone-action-container { order: 3; }
-        }
-        
-        h1 {
-            font-family: 'Orbitron', sans-serif; text-align: center; font-weight: 900; letter-spacing: 3px; font-size: 2.2rem; color: #ffffff;
-            text-shadow: 0 0 15px rgba(69, 243, 255, 0.6); background: linear-gradient(135deg, #45f3ff, #ff007f);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding: 20px 10px;
-        }
-        h2 { font-family: 'Orbitron', sans-serif; text-align: center; color: #45f3ff; letter-spacing: 1.5px; text-shadow: 0 0 8px rgba(69, 243, 255, 0.3); padding: 10px; margin-top: 20px; }
+        h1 { font-family: 'Orbitron', sans-serif; text-align: center; font-weight: 900; font-size: 2.2rem; background: linear-gradient(135deg, #45f3ff, #ff007f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding: 20px 10px; }
+        h2 { font-family: 'Orbitron', sans-serif; text-align: center; color: #45f3ff; padding: 10px; margin-top: 20px; }
         p { color: #a4a6b0; text-align: center; font-size: 15px; line-height: 1.6; padding: 0 15px; }    
-        a { color: #45f3ff; text-decoration: none; transition: 0.3s; font-weight: 600; }
-        a:hover { color: #ff007f; text-shadow: 0 0 10px rgba(255, 0, 127, 0.5); }
+        
         .hero-section { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        #about { background: rgba(31, 40, 51, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; backdrop-filter: blur(5px); margin-top: 15px; }
+        #about { background: rgba(31, 40, 51, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; margin-top: 15px; }
         .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 12px; max-width: 1200px; margin: 0 auto; }
-        @media (min-width: 768px) { .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+        @media (min-width: 768px) { .cat-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1024px) { .cat-grid { grid-template-columns: repeat(4, 1fr); } }
+        
         .card {
-            background: #14161d; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); transition: transform 0.3s ease, border-color 0.3s ease; cursor: pointer;
+            background: #14161d; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); cursor: pointer; transition: transform 0.3s ease;
         }
-        .card:hover { transform: translateY(-4px); border-color: rgba(69, 243, 255, 0.4); box-shadow: 0 12px 30px rgba(69, 243, 255, 0.15); }
+        .card:hover { transform: translateY(-4px); border-color: rgba(69, 243, 255, 0.4); }
         .card-img-wrapper { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; background: #000; }
-        
-        .card-img-wrapper img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            image-rendering: -webkit-optimize-contrast;
-            transition: transform 0.4s ease; 
-        }
-        .card:hover .card-img-wrapper img { transform: scale(1.05); }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
         .card-content { padding: 12px 4px 4px 4px; display: flex; flex-direction: column; gap: 4px; }
-        .card-tag { font-size: 11px; font-weight: 800; color: #ffaa00; text-transform: uppercase; letter-spacing: 0.8px; }
-        .card-title { font-size: 16px; font-weight: 700; color: #ffffff; margin: 2px 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; color: #8a8d9b; font-size: 13px; }
-        .card-action-icon { color: #a4a6b0; font-size: 16px; font-weight: bold; }
-        .details-box { background: linear-gradient(135deg, rgba(31, 40, 51, 0.6), rgba(113, 57, 232, 0.15)) !important; border: 2px solid rgba(69, 243, 255, 0.3) !important; }
-        .divider { width: 50%; height: 2px; background: linear-gradient(90deg, transparent, #45f3ff, transparent); border: none; margin: 30px auto; }
-        .log, .reg { max-width: 400px; margin: 60px auto; padding: 30px; background: rgba(31, 40, 51, 0.6); border: 2px solid rgba(69, 243, 255, 0.2); border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
-        .log input, .reg input, #adminSecret { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: #ffffff; border-radius: 10px; transition: border 0.3s; }
-        .log input:focus, .reg input:focus, #adminSecret:focus { outline: none; border-color: #45f3ff; box-shadow: 0 0 10px rgba(69, 243, 255, 0.3); }
-        .log button, .reg button { background: linear-gradient(135deg, #7139e8, #ff007f); border: none; color: white; padding: 12px; width: 100%; margin: 10px 0; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; font-family: 'Orbitron', sans-serif; text-transform: uppercase; transition: all 0.3s; min-height: 44px; }
-        .log button:hover, .reg button:hover { background: linear-gradient(135deg, #ff007f, #7139e8); transform: scale(1.02); }
-        .admin-panel { max-width: 1200px; margin: 20px auto; padding: 20px; background: rgba(31, 40, 51, 0.4); border: 2px solid rgba(69, 243, 255, 0.2); border-radius: 20px; backdrop-filter: blur(10px); }
-        .admin-panel h3 { color: #45f3ff; margin-top: 30px; text-transform: uppercase; letter-spacing: 1px; }
-        .admin-panel input, .admin-panel select { display: block; width: 100%; padding: 12px; margin: 10px 0; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: #ffffff; border-radius: 10px; font-family: 'Rajdhani', sans-serif; }
-        .admin-panel input:focus, .admin-panel select:focus { outline: none; border-color: #45f3ff; box-shadow: 0 0 10px rgba(69, 243, 255, 0.3); }
-        .admin-panel button { background: linear-gradient(135deg, #7139e8, #45f3ff); border: none; color: white; padding: 12px 20px; margin: 10px 0; width: 100%; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: bold; font-family: 'Orbitron', sans-serif; text-transform: uppercase; transition: all 0.3s; min-height: 44px; }
-        .admin-panel button:hover { background: linear-gradient(135deg, #45f3ff, #7139e8); transform: scale(1.02); }
-        .file-label { display: block; background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; padding: 12px; margin: 10px 0; border-radius: 10px; cursor: pointer; text-align: center; font-weight: bold; text-transform: uppercase; }
-        .file-label:hover { opacity: 0.9; }
-        .status-msg { background: rgba(0, 0, 0, 0.3); color: #45f3ff; padding: 10px; margin: 10px 0; border-radius: 8px; text-align: center; display: none; border: 1px solid rgba(69, 243, 255, 0.2); }
-        
-        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
-        .loader-overlay.active { display: flex; }
-        .loader-ring { position: relative; width: 64px; height: 64px; }
-        .loader-ring div { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; }
-        .loader-ring div:nth-child(1) { border-top-color: #45f3ff; border-right-color: #45f3ff; animation: loaderSpin 0.9s linear infinite; box-shadow: 0 0 15px rgba(69, 243, 255, 0.6); }
-        .loader-ring div:nth-child(2) { width: 78%; height: 78%; top: 11%; left: 11%; border-bottom-color: #ff007f; border-left-color: #ff007f; animation: loaderSpin 1.3s linear infinite reverse; box-shadow: 0 0 12px rgba(255, 0, 127, 0.6); }
-        .loader-text { color: #45f3ff; font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; animation: loaderPulse 1.1s ease-in-out infinite; text-shadow: 0 0 10px rgba(69, 243, 255, 0.6); }
-        .loader-cancel-btn {
-            background: rgba(255, 0, 127, 0.15); border: 1px solid #ff007f; color: #ffffff;
-            padding: 8px 20px; border-radius: 20px; font-family: 'Orbitron', sans-serif;
-            font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
-            transition: all 0.3s ease; text-transform: uppercase; box-shadow: 0 0 10px rgba(255,0,127,0.3);
-        }
-        .loader-cancel-btn:hover { background: #ff007f; color: #fff; transform: scale(1.05); }
+        .card-tag { font-size: 11px; font-weight: 800; color: #ffaa00; text-transform: uppercase; }
+        .card-title { font-size: 16px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-footer { display: flex; align-items: center; justify-content: space-between; color: #8a8d9b; font-size: 13px; }
 
-        @keyframes loaderSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes loaderPulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+        .log, .reg { max-width: 400px; margin: 60px auto; padding: 30px; background: rgba(31, 40, 51, 0.6); border: 2px solid rgba(69, 243, 255, 0.2); border-radius: 20px; }
+        .log input, .reg input, #adminSecret { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: #ffffff; border-radius: 10px; }
+        .log button, .reg button { background: linear-gradient(135deg, #7139e8, #ff007f); border: none; color: white; padding: 12px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+        
+        .admin-panel { max-width: 1200px; margin: 20px auto; padding: 20px; background: rgba(31, 40, 51, 0.4); border: 2px solid rgba(69, 243, 255, 0.2); border-radius: 20px; }
+        .admin-panel input, .admin-panel select { display: block; width: 100%; padding: 12px; margin: 10px 0; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: #ffffff; border-radius: 10px; }
+        .admin-panel button { background: linear-gradient(135deg, #7139e8, #45f3ff); border: none; color: white; padding: 12px; margin: 10px 0; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+        
+        .file-label { display: block; background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; padding: 12px; margin: 10px 0; border-radius: 10px; cursor: pointer; text-align: center; font-weight: bold; }
+        .status-msg { background: rgba(0, 0, 0, 0.3); color: #45f3ff; padding: 10px; margin: 10px 0; border-radius: 8px; text-align: center; display: none; }
+        
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 12, 16, 0.85); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
+        .loader-overlay.active { display: flex; }
+        .loader-ring { width: 64px; height: 64px; border: 4px solid #45f3ff; border-top-color: transparent; border-radius: 50%; animation: loaderSpin 0.9s linear infinite; }
+        .loader-text { color: #45f3ff; font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+        .loader-cancel-btn { background: rgba(255, 0, 127, 0.2); border: 1px solid #ff007f; color: white; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; }
+        @keyframes loaderSpin { 100% { transform: rotate(360deg); } }
         
         .payment-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; }
-        .payment-card { background: linear-gradient(135deg, rgba(31, 40, 51, 0.95), rgba(113, 57, 232, 0.25)); border: 2px solid rgba(69, 243, 255, 0.4); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); }
-        .payment-card h3 { color: #45f3ff; text-align: center; text-transform: uppercase; margin-top: 0; }
+        .payment-card { background: rgba(31, 40, 51, 0.95); border: 2px solid rgba(69, 243, 255, 0.4); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; }
         .payment-card input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: #ffffff; border-radius: 10px; }
-        .payment-card input:focus { outline: none; border-color: #45f3ff; }
-        .payment-card button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-family: 'Orbitron', sans-serif; text-transform: uppercase; min-height: 44px; }
-        #ai-chat-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: linear-gradient(135deg, #7139e8, #45f3ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 20px rgba(113, 57, 232, 0.5); transition: all 0.3s; z-index: 500; }
-        #ai-chat-icon:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(69, 243, 255, 0.7); }
-        #ai-chat-box { position: fixed; bottom: 90px; right: 20px; width: 350px; max-width: calc(100vw - 40px); height: 500px; max-height: calc(100vh - 120px); background: linear-gradient(135deg, rgba(11, 12, 16, 0.98), rgba(31, 40, 51, 0.95)); border: 2px solid rgba(69, 243, 255, 0.3); border-radius: 15px; display: none; flex-direction: column; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 501; }
-        #ai-chat-header { background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; padding: 15px; border-radius: 13px 13px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-size: 13px; }
+        .payment-card button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+        
+        #ai-chat-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: linear-gradient(135deg, #7139e8, #45f3ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 500; }
+        #ai-chat-box { position: fixed; bottom: 90px; right: 20px; width: 350px; max-width: calc(100vw - 40px); height: 500px; background: rgba(11, 12, 16, 0.98); border: 2px solid rgba(69, 243, 255, 0.3); border-radius: 15px; display: none; flex-direction: column; z-index: 501; }
+        #ai-chat-header { background: linear-gradient(135deg, #7139e8, #45f3ff); color: white; padding: 15px; border-radius: 13px 13px 0 0; font-weight: bold; display: flex; justify-content: space-between; }
         #ai-chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 10px 15px; border-radius: 10px; max-width: 85%; word-wrap: break-word; line-height: 1.4; font-size: 14px; }
-        .user-message { background: linear-gradient(135deg, #7139e8, #ff007f); color: white; align-self: flex-end; border-radius: 10px 0px 10px 10px; }
-        .ai-message { background: rgba(31, 40, 51, 0.8); color: #e0e0e0; align-self: flex-start; border-radius: 0px 10px 10px 10px; border-left: 3px solid #45f3ff; }
-        #ai-chat-input-container { display: flex; gap: 8px; padding: 12px; border-top: 1px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.2); }
-        #ai-user-input { flex: 1; padding: 10px; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: #ffffff; border-radius: 10px; font-family: 'Rajdhani', sans-serif; }
-        #ai-user-input:focus { outline: none; border-color: #45f3ff; }
-        #ai-send-btn { background: linear-gradient(135deg, #7139e8, #ff007f); border: none; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; font-family: 'Orbitron', sans-serif; min-height: 40px; }
-        .admin-card-wrapper { padding: 10px; position: relative; }
+        .message { padding: 10px 15px; border-radius: 10px; max-width: 85%; font-size: 14px; }
+        .user-message { background: linear-gradient(135deg, #7139e8, #ff007f); color: white; align-self: flex-end; }
+        .ai-message { background: rgba(31, 40, 51, 0.8); color: #e0e0e0; align-self: flex-start; border-left: 3px solid #45f3ff; }
+        #ai-chat-input-container { display: flex; gap: 8px; padding: 12px; background: rgba(0, 0, 0, 0.2); }
+        #ai-user-input { flex: 1; padding: 10px; border: 2px solid rgba(69, 243, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: white; border-radius: 10px; }
+        #ai-send-btn { background: linear-gradient(135deg, #7139e8, #ff007f); border: none; color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: bold; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -245,20 +173,19 @@
 <div class="navbar" id="navicon" style="display:none;">
     <div class="nav-links">
         <a href="javascript:void(0);" class="nav-item" onclick="window.showcat()">Home</a>
-        <a href="javascript:void(0);" class="nav-item" onclick="alert('Karibu Kitengo Gaming! Hapa tunatoa Mods bora za ETS2 na Bus Simulator Indonesia.')">About Us</a>
-        <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 & Maleo Mods kali, skinning, na usaidizi wa kiufundi!')">Our Services</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Karibu Kitengo Gaming! Tunatoa Mods bora za ETS2 na Bus Simulator Indonesia.')">About Us</a>
+        <a href="javascript:void(0);" class="nav-item" onclick="alert('Tunatoa ETS2 & Maleo Mods, skinning, na usaidizi wa kiufundi!')">Our Services</a>
     </div>
 
     <div class="nav-search-container">
         <input type="text" id="global-search-input" placeholder="Tafuta Mod, Category..." oninput="window.handleSearchInput(this.value)" onfocus="window.handleSearchInput(this.value)" autocomplete="off">
-        <button class="search-clear-btn" id="search-clear-btn" onclick="window.clearSearchInput()" title="Futa Search">&times;</button>
-        <button class="search-icon-btn" aria-label="Tafuta Mod">&#128099;</button>
-        
+        <button class="search-clear-btn" id="search-clear-btn" onclick="window.clearSearchInput()">&times;</button>
+        <button class="search-icon-btn">&#128099;</button>
         <div id="search-suggestions" class="search-suggestions-dropdown"></div>
     </div>
 
     <div class="phone-action-container">
-        <button class="phone-btn" title="Wasiliana Nasi" aria-label="Wasiliana Nasi">&#128222;</button>
+        <button class="phone-btn" title="Wasiliana Nasi">&#128222;</button>
         <div class="phone-dropdown">
             <a href="tel:0615304000">&#128222; Piga Simu</a>
             <a href="sms:0615304000?body=HABARI%20KITENGO%20GAMING">&#128172; Tuma SMS</a>
@@ -270,45 +197,44 @@
     <div class="hero-section">
         <h1>KITENGO GAMING</h1>
         <br>
-        <div id="logo-slideshow" style="position: relative; margin: 0 auto; width: 100%; max-width: 1536px; aspect-ratio: 1531 / 824; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.6); background: #000;">
-            <img id="slideshow-img" src="logo.jpg" alt="Kitengo Gaming Logo" style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: -webkit-optimize-contrast;">
-            <video id="slideshow-video" muted playsinline style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+        <div id="logo-slideshow" style="position: relative; margin: 0 auto; width: 100%; max-width: 1536px; aspect-ratio: 1531 / 824; border-radius: 15px; overflow: hidden; background: #000;">
+            <img id="slideshow-img" src="logo.jpg" alt="Kitengo Gaming Logo" style="display: block; position: absolute; width: 100%; height: 100%; object-fit: cover;">
+            <video id="slideshow-video" muted playsinline style="display: none; position: absolute; width: 100%; height: 100%; object-fit: cover;"></video>
         </div>
         <br>
-        <a href="https://www.mediafire.com/file/38dm5iuqtw4735z/_KITENGO_GAMING_20017914.apk/file" style="display:inline-block; background:linear-gradient(135deg,#00ff88,#00bfff); color:#000; padding:15px 25px; border-radius:12px; font-size:20px; font-weight:900; text-decoration:none; font-family:Arial,sans-serif; box-shadow:0 0 15px #00ff88;">
+        <a href="https://www.mediafire.com/file/38dm5iuqtw4735z/_KITENGO_GAMING_20017914.apk/file" style="display:inline-block; background:linear-gradient(135deg,#00ff88,#00bfff); color:#000; padding:15px 25px; border-radius:12px; font-size:20px; font-weight:900; text-decoration:none;">
             🎮 DOWNLOAD KITENGO GAMING APP 🎮
         </a> <br>
 
         <div id="about">
             <marquee direction="left" behavior="scroll" loop="infinite">
-               KARIBU KITENGO GAMING ⭐ UJIPATIE GAMES MBALI MBALI KAMA EURO TRUCK SIMULATOR2 TZ, MALEO NEW UPDATE TZ, GTA, RACING, FOOTBALL GAMES ZA ZINGINE KIBAO⭐NYOTE MNAKARIBISHWA ⭐
+               KARIBU KITENGO GAMING ⭐ UJIPATIE GAMES MBALI MBALI KAMA EURO TRUCK SIMULATOR2 TZ, MALEO NEW UPDATE TZ, GTA, RACING, FOOTBALL GAMES ⭐
             </marquee>
         </div>
-        <hr class="divider">
+        <hr style="border-color: rgba(69, 243, 255, 0.2); margin: 30px 0;">
         <h2>CATEGORIES</h2>
     </div>
     
     <div class="cat-grid" id="categories-container"></div>
 
     <div class="hero-section" id="contact" style="margin-top: 50px;">
-        <hr class="divider">
+        <hr style="border-color: rgba(69, 243, 255, 0.2);">
         <h2>CONTACT US</h2>
-        <p>Msaada au Malipo: <strong>0615304000</strong> | DEPLOYED AND GENERATED BY MR KITENGO</p>
-        <br><br>
+        <p>Msaada au Malipo: <strong>0615304000</strong> | DEPLOYED BY MR KITENGO</p>
     </div>
 </div>
 
 <div id="bus-view-section" style="display:none;">
-    <h2 id="dynamic-bus-title" style="background-color: rgba(255,255,255,0.05); text-transform: uppercase; padding: 15px; color: #45f3ff; text-align: center; border-radius: 10px; max-width: 600px; margin: 20px auto; border: 1px solid rgba(69, 243, 255, 0.2);">MABASI</h2>
+    <h2 id="dynamic-bus-title" style="background-color: rgba(255,255,255,0.05); padding: 15px; color: #45f3ff; text-align: center; border-radius: 10px; max-width: 600px; margin: 20px auto;">MABASI</h2>
     <div class="cat-grid" id="dynamic-bus-list"></div>
 </div>
 
 <div id="details-view-section" style="display:none; padding: 20px;">
-    <button onclick="window.goBackFromDetails()" aria-label="Rudi Nyuma" style="margin: 10px auto 25px auto; display: block; background: #7139e8; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer;">&larr; Rudi Nyuma</button>
-    <div class="card details-box" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto;">
-        <h2 id="details-title" style="color: white; margin-top: 0; text-transform: uppercase;"></h2>
-        <img id="details-img" src="" alt="Mod Preview" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); image-rendering: -webkit-optimize-contrast;">
-        <p id="details-desc" style="margin-top: 20px; font-size: 16px; line-height: 1.5; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></p>
+    <button onclick="window.goBackFromDetails()" style="margin: 10px auto 25px auto; display: block; background: #7139e8; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer;">&larr; Rudi Nyuma</button>
+    <div class="card" style="width: 90%; max-width: 550px; padding: 25px; border-radius: 25px; margin: 0 auto; background: rgba(31, 40, 51, 0.8);">
+        <h2 id="details-title" style="color: white; margin-top: 0;"></h2>
+        <img id="details-img" src="" alt="Preview" style="width: 100%; max-height: 380px; object-fit: contain; border-radius: 15px;">
+        <p id="details-desc" style="margin-top: 20px; font-size: 16px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></p>
         <div id="details-action-btn" style="margin-top: 15px;"></div>
     </div>
 </div>
@@ -318,7 +244,7 @@
     <input type="text" id="logname" placeholder="Username"><br>
     <input type="password" id="logpassword" placeholder="Password"><br>
     <button onclick="window.login()">LOGIN</button><br><br>
-    <p>I don't have an account? <a href="javascript:void(0);" onclick="window.showregister()">REGISTER HERE</a></p>
+    <p>I don't have an account? <a href="javascript:void(0);" onclick="window.showregister()" style="color:#45f3ff;">REGISTER HERE</a></p>
 </div>
 
 <div id="reg" class="reg" style="display:none;">
@@ -327,31 +253,30 @@
     <input type="email" id="regemail" placeholder="Email"><br>
     <input type="password" id="regpassword" placeholder="Password"><br>
     <button onclick="window.register()">REGISTER</button><br><br>
-    <p>Already have an account? <a href="javascript:void(0);" onclick="window.showlogin()">LOGIN</a></p>
+    <p>Already have an account? <a href="javascript:void(0);" onclick="window.showlogin()" style="color:#45f3ff;">LOGIN</a></p>
 </div>
 
 <div id="adminSection" class="admin-panel" style="display:none;">
     <h1>ADMIN PANEL</h1>
     <input type="password" id="adminSecret" placeholder="Kodi ya Siri ya Admin">
-    <hr>
+    <hr style="border-color: rgba(69, 243, 255, 0.2);">
     
     <h3>1. USIMAMIZI WA CATEGORIES</h3>
     <input type="text" id="newCatId" placeholder="ID ya Category (Mfano: yutong)">
     <input type="text" id="newCatName" placeholder="Jina la kuonyesha (Mfano: YUTONG MOD)">
-    <input type="text" id="newCatDesc" placeholder="Maelezo mafupi ya kundi hili (Optional)">
+    <input type="text" id="newCatDesc" placeholder="Maelezo mafupi">
     
     <label class="file-label" for="newCatImg">&#128193; CHAGUA PICHA YA KUNDI</label>
     <input type="file" id="newCatImg" accept="image/*" style="display: none;">
     <div id="cat-upload-status" class="status-msg">Inashindilia picha...</div>
     
     <button onclick="window.addCategory()">ONGEZA CATEGORY</button>
-    <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000; margin-top: 5px;">FUTA CATEGORY MAALUM</button>
-    <hr>
+    <button onclick="window.deleteCategory(document.getElementById('newCatId').value)" style="background-color: #ff0000;">FUTA CATEGORY MAALUM</button>
+    <hr style="border-color: rgba(69, 243, 255, 0.2);">
 
-    <h3>1b. HARIRI CATEGORY (Jina, Picha na Maelezo)</h3>
-    <p style="color: #45f3ff; font-size: 13px;">Chagua category unayotaka kuihariri:</p>
+    <h3>1b. HARIRI CATEGORY</h3>
     <select id="editCategorySelect" onchange="window.loadCategoryForEdit(this.value)"></select>
-    <img id="editCatCurrentImg" src="" alt="Picha ya sasa" style="display:none; width:110px; height:110px; object-fit:cover; border-radius:12px; margin:10px auto; border:2px solid #45f3ff;">
+    <img id="editCatCurrentImg" src="" alt="Picha ya sasa" style="display:none; width:110px; height:110px; object-fit:cover; border-radius:12px; margin:10px auto;">
     <input type="text" id="editCatName" placeholder="Jina jipya la Category">
     <input type="text" id="editCatDesc" placeholder="Maelezo mapya ya Category">
 
@@ -359,44 +284,40 @@
     <input type="file" id="editCatImg" accept="image/*" style="display: none;">
     <div id="edit-cat-upload-status" class="status-msg">Inashindilia picha...</div>
 
-    <button onclick="window.updateCategory()">HIFADHI MABADILIKO YA CATEGORY</button>
-    <hr>
+    <button onclick="window.updateCategory()">HIFADHI MABADILIKO</button>
+    <hr style="border-color: rgba(69, 243, 255, 0.2);">
 
     <h3>2. UPLOAD BUS MPYA</h3>
     <label style="color: #45f3ff;">Chagua Category:</label>
     <select id="uploadCategory"></select>
     <input type="text" id="uploadName" placeholder="Jina la Basi (Mfano: ABOOD)">
-    <input type="text" id="uploadDesc" placeholder="Maelezo mafupi ya basi hili (Optional)">
+    <input type="text" id="uploadDesc" placeholder="Maelezo mafupi ya basi hili">
     
     <label class="file-label" for="uploadImg">&#128193; CHAGUA PICHA YA BASI</label>
     <input type="file" id="uploadImg" accept="image/*" style="display: none;">
     <div id="bus-upload-status" class="status-msg">Inashindilia picha...</div>
     
-    <input type="text" id="uploadLink" placeholder="Link ya Mediafire (Download Link)">
-    <input type="text" id="uploadSetLink" placeholder="TikTok Video Link (Optional - Ya Button ya SET)">
-    
-    <input type="number" id="uploadPrice" placeholder="Bei ya Mod (Mfano: 1000). Acha 0 kama ni ya bure.">
-    <input type="text" id="uploadPassword" placeholder="Weka Password ya Premium Mod hapa">
+    <input type="text" id="uploadLink" placeholder="Link ya Mediafire">
+    <input type="text" id="uploadSetLink" placeholder="TikTok Video Link (Optional)">
+    <input type="number" id="uploadPrice" placeholder="Bei (Tsh). Acha 0 kama ni bure.">
+    <input type="text" id="uploadPassword" placeholder="Password ya Premium Mod">
     
     <button onclick="window.uploadBus()">UPLOAD ITEM</button>
-    <hr>
+    <hr style="border-color: rgba(69, 243, 255, 0.2);">
 
     <h3>3. MABASI YA KUHARIRI (Bonyeza kwa sekunde 3)</h3>
-    <p style="color: #45f3ff; font-size: 13px;">Chagua category ili kuhariri jina, maelezo/captions, picha au kuongeza/kutoa link ya TikTok:</p>
     <select id="adminCategorySelect" onchange="if(this.value) window.showBusCategory(this.value, this.value, true)"></select>
-    <hr>
+    <hr style="border-color: rgba(69, 243, 255, 0.2);">
 
-    <h3>4. USIMAMIZI WA SLIDESHOW (LOGO)</h3>
-    <p style="color: #45f3ff; font-size: 13px;">Ongeza picha au video kwenye slideshow ya juu ya ukurasa.</p>
+    <h3>4. USIMAMIZI WA SLIDESHOW</h3>
     <label class="file-label" for="slideshowFile">&#128193; CHAGUA PICHA AU VIDEO</label>
     <input type="file" id="slideshowFile" accept="image/*,video/*" style="display: none;">
     <div id="slideshow-upload-status" class="status-msg">LOADING...</div>
     <button onclick="window.addSlideshowItem()">ONGEZA KWENYE SLIDESHOW</button>
     <div id="slideshow-admin-list" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
-    <hr>
+    <hr style="border-color: rgba(69, 243, 255, 0.2);">
 
     <h3>5. RESET SYSTEM</h3>
-    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta data zote za categories na mabasi</p>
     <button onclick="window.clearEntireDatabase()" style="background-color: #ff0000;">SAFISHA DATABASE YOTE</button>
 </div>
 
@@ -407,11 +328,7 @@
         <p style="text-align: center; color: #ff007f; font-size: 20px; font-weight: bold;" id="pay-item-price"></p>
         <input type="hidden" id="pay-target-link">
         
-        <p style="font-size: 13px; text-align: center;">Kama hujaweka malipo, bonyeza button chini kutuma SMS upewe password:</p>
         <button onclick="window.requestPasswordSMS()" style="background: linear-gradient(135deg, #00aa00, #45f3ff); color: white;">1. OMBA PASSWORD (SMS)</button>
-        
-        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
-        
         <input type="text" id="pay-password" placeholder="Ingiza Password Hapa">
         <div id="pay-status-log" style="display:none; font-size: 12px; text-align: center; margin: 5px 0;"></div>
         
@@ -421,22 +338,22 @@
 </div>
 
 <div id="global-loader" class="loader-overlay">
-    <div class="loader-ring"><div></div><div></div></div>
+    <div class="loader-ring"></div>
     <div class="loader-text" id="loader-text-label">LOADING...</div>
-    <button class="loader-cancel-btn" onclick="window.cancelLoader()" title="Sitisha Mchakato">CANCEL / SITISHA</button>
+    <button class="loader-cancel-btn" onclick="window.cancelLoader()">SITISHA</button>
 </div>
 
-<div id="ai-chat-icon" onclick="window.toggleChat()" title="Ongea na Kitengo AI">
+<div id="ai-chat-icon" onclick="window.toggleChat()">
     <span style="font-size: 26px;">&#129302;</span>
 </div>
 
 <div id="ai-chat-box">
     <div id="ai-chat-header">
         <span>KITENGO AI ASSISTANT</span>
-        <span onclick="window.toggleChat()" style="cursor: pointer; font-size: 20px;">&times;</span>
+        <span onclick="window.toggleChat()" style="cursor: pointer;">&times;</span>
     </div>
     <div id="ai-chat-messages">
-        <div class="message ai-message">Habari! Mimi ni Kitengo AI Assistant. Ninaweza kukusaidia vipi leo kuhusu mods zetu au utatuzi wa changamoto za ETS2 na Bus Simulator?</div>
+        <div class="message ai-message">Habari! Mimi ni Kitengo AI Assistant. Ninakusaidiaje leo?</div>
     </div>
     <div id="ai-chat-input-container">
         <input type="text" id="ai-user-input" placeholder="Andika ujumbe wako..." onkeypress="window.checkEnter(event)">
@@ -448,8 +365,8 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then((reg) => console.log('Kitengo Gaming SW registered:', reg.scope))
-                .catch((err) => console.log('Kitengo Gaming SW registration failed:', err));
+                .then((reg) => console.log('Kitengo Gaming SW registered'))
+                .catch((err) => console.log('Kitengo Gaming SW failed', err));
         });
     }
 </script>

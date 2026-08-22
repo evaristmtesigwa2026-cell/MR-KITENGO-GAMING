@@ -20,38 +20,8 @@
     <style>
         * { box-sizing: border-box; }
 
-        /* ===== THEME VARIABLES (DARK = DEFAULT, KAMA ILIVYO SASA) ===== */
+        /* ===== THEME VARIABLES (LIGHT = DEFAULT) ===== */
         :root {
-            --bg-color: #0b0c10;
-            --text-color: #c5c6c7;
-            --text-secondary: #a4a6b0;
-            --text-muted: #8a8d9b;
-            --white-text: #ffffff;
-            --accent-cyan: #45f3ff;
-            --accent-pink: #ff007f;
-            --accent-purple: #7139e8;
-            --navbar-bg: rgba(11, 12, 16, 0.95);
-            --utility-bar-bg: rgba(11, 12, 16, 0.92);
-            --card-bg: #14161d;
-            --card-border: rgba(255, 255, 255, 0.08);
-            --input-bg: rgba(0, 0, 0, 0.3);
-            --search-bg: rgba(0, 0, 0, 0.5);
-            --dropdown-bg: rgba(15, 17, 23, 0.98);
-            --about-bg: rgba(31, 40, 51, 0.4);
-            --panel-bg: rgba(31, 40, 51, 0.6);
-            --admin-bg: rgba(31, 40, 51, 0.4);
-            --status-bg: rgba(0, 0, 0, 0.3);
-            --loader-bg: rgba(11, 12, 16, 0.85);
-            --payment-card-bg: linear-gradient(135deg, rgba(31, 40, 51, 0.95), rgba(113, 57, 232, 0.25));
-            --glow-blob-1: rgba(69, 243, 255, 0.15);
-            --glow-blob-2: rgba(255, 0, 127, 0.1);
-            --glow-1: rgba(31, 40, 51, 0.3);
-            --glow-2: rgba(113, 57, 232, 0.15);
-            --glow-3: rgba(69, 243, 255, 0.1);
-        }
-
-        /* ===== LIGHT THEME OVERRIDES ===== */
-        body.light-theme {
             --bg-color: #f2f4f8;
             --text-color: #23252b;
             --text-secondary: #52545e;
@@ -78,6 +48,36 @@
             --glow-1: rgba(31, 40, 51, 0.04);
             --glow-2: rgba(113, 57, 232, 0.06);
             --glow-3: rgba(69, 243, 255, 0.06);
+        }
+
+        /* ===== DARK THEME OVERRIDES ===== */
+        body.dark-theme {
+            --bg-color: #0b0c10;
+            --text-color: #c5c6c7;
+            --text-secondary: #a4a6b0;
+            --text-muted: #8a8d9b;
+            --white-text: #ffffff;
+            --accent-cyan: #45f3ff;
+            --accent-pink: #ff007f;
+            --accent-purple: #7139e8;
+            --navbar-bg: rgba(11, 12, 16, 0.95);
+            --utility-bar-bg: rgba(11, 12, 16, 0.92);
+            --card-bg: #14161d;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --search-bg: rgba(0, 0, 0, 0.5);
+            --dropdown-bg: rgba(15, 17, 23, 0.98);
+            --about-bg: rgba(31, 40, 51, 0.4);
+            --panel-bg: rgba(31, 40, 51, 0.6);
+            --admin-bg: rgba(31, 40, 51, 0.4);
+            --status-bg: rgba(0, 0, 0, 0.3);
+            --loader-bg: rgba(11, 12, 16, 0.85);
+            --payment-card-bg: linear-gradient(135deg, rgba(31, 40, 51, 0.95), rgba(113, 57, 232, 0.25));
+            --glow-blob-1: rgba(69, 243, 255, 0.15);
+            --glow-blob-2: rgba(255, 0, 127, 0.1);
+            --glow-1: rgba(31, 40, 51, 0.3);
+            --glow-2: rgba(113, 57, 232, 0.15);
+            --glow-3: rgba(69, 243, 255, 0.1);
         }
 
         body {
@@ -123,7 +123,7 @@
             backdrop-filter: blur(12px);
             border-bottom: 2px solid rgba(69, 243, 255, 0.3);
             display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-            padding: 10px 20px; position: sticky; top: 44px; z-index: 1000;
+            padding: 10px 20px; position: sticky; top: 50px; z-index: 1000;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.35); gap: 12px;
             transition: background-color 0.35s ease;
         }
@@ -205,37 +205,74 @@
         .phone-dropdown a:hover { background: rgba(69, 243, 255, 0.15); color: var(--accent-cyan); }
         .phone-action-container:hover .phone-dropdown { display: block; }
 
-        /* ===== TOP UTILITY BAR: THEME TOGGLE + INSTALL APP (JUU KABISA) ===== */
+        /* ===== TOP UTILITY BAR: HEADING + DOWNLOAD BOX + THEME TOGGLE (JUU KABISA) ===== */
         #top-utility-bar {
-            position: sticky; top: 0; z-index: 1100; height: 44px; box-sizing: border-box;
+            position: sticky; top: 0; z-index: 1100; min-height: 50px; box-sizing: border-box;
             display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; padding: 0 12px;
+            gap: 10px; padding: 4px 12px;
             background: var(--utility-bar-bg); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(69, 243, 255, 0.25);
             box-shadow: 0 4px 15px rgba(0,0,0,0.25);
         }
-        #install-app-pill {
-            display: flex; align-items: center; gap: 6px;
-            background: linear-gradient(135deg, #00ff88, #00bfff); color: #05261c;
-            padding: 6px 14px; border-radius: 20px; text-decoration: none;
-            font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800;
-            letter-spacing: 0.6px; box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        .top-brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 1.5px;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
         }
-        #install-app-pill:hover { transform: scale(1.05); box-shadow: 0 0 18px rgba(0, 255, 136, 0.6); color: #05261c; }
-        #install-app-pill .install-icon { font-size: 14px; line-height: 1; }
+        .app-download-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 4px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+        .app-download-box:hover {
+            background: rgba(0, 255, 136, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+        .app-download-box .download-icon {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .app-download-box .install-text {
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
         #theme-toggle-btn {
             background: var(--card-bg); border: 1px solid rgba(69, 243, 255, 0.4);
-            color: var(--text-color); width: 32px; height: 32px; border-radius: 50%;
+            color: var(--text-color); width: 34px; height: 34px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
             font-size: 16px; transition: transform 0.3s ease, background 0.3s ease; padding: 0;
+            flex-shrink: 0;
         }
         #theme-toggle-btn:hover { transform: rotate(20deg) scale(1.1); border-color: var(--accent-cyan); }
-        @media (max-width: 480px) {
-            #install-app-pill .install-text { display: none; }
-            #install-app-pill { padding: 6px 10px; }
-        }
         
+        @media (max-width: 600px) {
+            .top-brand-title { font-size: 1rem; letter-spacing: 1px; }
+            .app-download-box { padding: 4px 8px; gap: 4px; }
+            .app-download-box .install-text { font-size: 10px; }
+        }
+
         @media (max-width: 768px) {
             .navbar { justify-content: space-between; padding: 10px 12px; }
             .nav-links { order: 1; width: 100%; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 6px; margin-top: 4px; }
@@ -243,11 +280,6 @@
             .phone-action-container { order: 3; }
         }
         
-        h1 {
-            font-family: 'Orbitron', sans-serif; text-align: center; font-weight: 900; letter-spacing: 3px; font-size: 2.2rem; color: var(--white-text);
-            text-shadow: 0 0 15px rgba(69, 243, 255, 0.4); background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; padding: 20px 10px;
-        }
         h2 { font-family: 'Orbitron', sans-serif; text-align: center; color: var(--accent-cyan); letter-spacing: 1.5px; text-shadow: 0 0 8px rgba(69, 243, 255, 0.3); padding: 10px; margin-top: 20px; }
         p { color: var(--text-secondary); text-align: center; font-size: 15px; line-height: 1.6; padding: 0 15px; }    
         a { color: var(--accent-cyan); text-decoration: none; transition: 0.3s; font-weight: 600; }
@@ -339,14 +371,27 @@
 </head>
 <body>
 
-<!-- TOP UTILITY BAR: INSTALL APP + DARK/LIGHT THEME TOGGLE (JUU KABISA YA APP) -->
+<!-- GLOBAL LOADER OVERLAY -->
+<div id="global-loader" class="loader-overlay">
+    <div class="loader-ring">
+        <div></div>
+        <div></div>
+    </div>
+    <div id="loader-text-label" class="loader-text">LOADING...</div>
+    <button class="loader-cancel-btn" onclick="window.cancelLoader()">GHAREBI / CANCEL</button>
+</div>
+
+<!-- TOP UTILITY BAR: HEADING + DOWNLOAD BOX + DARK/LIGHT THEME TOGGLE (JUU KABISA YA APP) -->
 <div id="top-utility-bar">
-    <a id="install-app-pill" href="https://www.mediafire.com/file/38dm5iuqtw4735z/_KITENGO_GAMING_20017914.apk/file" target="_blank" rel="noopener" title="Pakua Kitengo Gaming App">
-        <span class="install-icon">&#11015;&#65039;</span>
-        <span class="install-text">INSTALL APP</span>
+    <div class="top-brand-title">KITENGO GAMING</div>
+    
+    <a class="app-download-box" href="https://www.mediafire.com/file/38dm5iuqtw4735z/_KITENGO_GAMING_20017914.apk/file" target="_blank" rel="noopener" title="Pakua Kitengo Gaming App">
+        <span class="download-icon">&#11015;&#65039;</span>
+        <span class="install-text">INSTALL</span>
     </a>
+
     <button id="theme-toggle-btn" onclick="window.toggleTheme()" title="Badilisha Mandhari (Dark/Light)" aria-label="Badilisha Theme">
-        <span id="theme-toggle-icon">&#127769;</span>
+        <span id="theme-toggle-icon">&#9728;&#65039;</span>
     </button>
 </div>
 
@@ -378,9 +423,7 @@
 
 <div id="cat" style="display:none;">
     <div class="hero-section">
-        <h1>KITENGO GAMING</h1>
-        <br>
-        <div id="logo-slideshow" style="position: relative; margin: 0 auto; width: 100%; max-width: 1536px; aspect-ratio: 1531 / 824; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.6); background: #000;">
+        <div id="logo-slideshow" style="position: relative; margin: 10px auto 0 auto; width: 100%; max-width: 1536px; aspect-ratio: 1531 / 824; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.6); background: #000;">
             <img id="slideshow-img" src="logo.jpg" alt="Kitengo Gaming Logo" style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: -webkit-optimize-contrast;">
             <video id="slideshow-video" muted playsinline style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
         </div>
@@ -488,73 +531,48 @@
     <hr>
 
     <h3>4. USIMAMIZI WA SLIDESHOW (LOGO)</h3>
-    <p style="color: #45f3ff; font-size: 13px;">Ongeza picha au video kwenye slideshow ya juu ya ukurasa.</p>
-    <label class="file-label" for="slideshowFile">&#128193; CHAGUA PICHA AU VIDEO</label>
+    <p style="color: #45f3ff; font-size: 13px;">Ongeza picha au video zitakazobadilishana juu ya Categories:</p>
+    <label class="file-label" for="slideshowFile">&#128193; CHAGUA PICHA AU VIDEO YA SLIDESHOW</label>
     <input type="file" id="slideshowFile" accept="image/*,video/*" style="display: none;">
-    <div id="slideshow-upload-status" class="status-msg">LOADING...</div>
+    <div id="slideshow-upload-status" class="status-msg">Inapakia slideshow...</div>
     <button onclick="window.addSlideshowItem()">ONGEZA KWENYE SLIDESHOW</button>
+    
     <div id="slideshow-admin-list" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
     <hr>
 
-    <h3>5. RESET SYSTEM</h3>
-    <p style="color: yellow; font-size: 12px; margin: 5px 0;">Onyo: Hii itafuta data zote za categories na mabasi</p>
-    <button onclick="window.clearEntireDatabase()" style="background-color: #ff0000;">SAFISHA DATABASE YOTE</button>
+    <h3>5. SAFISHA DATABASE YOTE</h3>
+    <button onclick="window.clearEntireDatabase()" style="background-color: #ff0000; font-weight: bold;">SAFISHA DATABASE YOTE (RESET)</button>
 </div>
 
+<!-- PAYMENT & PASSWORD MODAL -->
 <div id="payment-modal-screen" class="payment-modal">
     <div class="payment-card">
-        <h3>DOWNLOAD PREMIUM MOD</h3>
-        <p style="text-align: center; color: #45f3ff; font-weight: bold;" id="pay-item-name"></p>
-        <p style="text-align: center; color: #ff007f; font-size: 20px; font-weight: bold;" id="pay-item-price"></p>
+        <h3>LIPA KUPATA PASSWORD</h3>
+        <p style="text-align: center; color: var(--accent-cyan); margin-bottom: 5px;" id="pay-item-name">MOD NAME</p>
+        <p style="text-align: center; color: var(--accent-pink); font-size: 20px; font-weight: bold; margin-top: 0;" id="pay-item-price">Tsh 0</p>
+        
+        <p style="font-size: 13px; text-align: left; color: var(--text-color);">
+            1. Lipa kiasi hicho kwa TigoPesa / M-Pesa / Airtel Money kwenda namba <strong>0615304000</strong>.<br>
+            2. Baada ya kulipia, bonyeza button ya <strong>OMBA PASSWORD KWA SMS</strong> kupata password yako.
+        </p>
+        
+        <button onclick="window.requestPasswordSMS()" style="background: linear-gradient(135deg, #00aa00, #45f3ff); color: white; margin-bottom: 15px;">
+            &#128172; OMBA PASSWORD KWA SMS
+        </button>
+        
+        <input type="text" id="pay-password" placeholder="Ingiza Password Hapa...">
         <input type="hidden" id="pay-target-link">
         
-        <p style="font-size: 13px; text-align: center;">Kama hujaweka malipo, bonyeza button chini kutuma SMS upewe password:</p>
-        <button onclick="window.requestPasswordSMS()" style="background: linear-gradient(135deg, #00aa00, #45f3ff); color: white;">1. OMBA PASSWORD (SMS)</button>
+        <div id="pay-status-log" style="display:none; font-size:12px; margin:10px 0; text-align:center; font-weight:bold;"></div>
         
-        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
-        
-        <input type="text" id="pay-password" placeholder="Ingiza Password Hapa">
-        <div id="pay-status-log" style="display:none; font-size: 12px; text-align: center; margin: 5px 0;"></div>
-        
-        <button onclick="window.verifyPasswordAndDownload()" style="background: linear-gradient(135deg, #7139e8, #ff007f); color: white;">2. THIBITISHA & DOWNLOAD</button>
-        <button onclick="window.closePaymentModal()" style="background: transparent; color: #a4a6b0; border: 1px solid #a4a6b0; margin-top: 10px;">FUNGA</button>
+        <button onclick="window.verifyPasswordAndDownload()" style="background: linear-gradient(135deg, #7139e8, #ff007f); color: white;">
+            THIBITISHA NA DOWNLOAD
+        </button>
+        <button onclick="window.closePaymentModal()" style="background: transparent; border: 1px solid #ff007f; color: #ff007f; margin-top: 10px;">
+            FUNGA
+        </button>
     </div>
 </div>
-
-<!-- GLOBAL LOADER WITH CANCEL OPTION -->
-<div id="global-loader" class="loader-overlay">
-    <div class="loader-ring"><div></div><div></div></div>
-    <div class="loader-text" id="loader-text-label">LOADING...</div>
-    <button class="loader-cancel-btn" onclick="window.cancelLoader()" title="Sitisha Mchakato">CANCEL / SITISHA</button>
-</div>
-
-<div id="ai-chat-icon" onclick="window.toggleChat()" title="Ongea na Kitengo AI">
-    <span style="font-size: 26px;">&#129302;</span>
-</div>
-
-<div id="ai-chat-box">
-    <div id="ai-chat-header">
-        <span>KITENGO AI ASSISTANT</span>
-        <span onclick="window.toggleChat()" style="cursor: pointer; font-size: 20px;">&times;</span>
-    </div>
-    <div id="ai-chat-messages">
-        <div class="message ai-message">Habari! Mimi ni Kitengo AI Assistant. Ninaweza kukusaidia vipi leo kuhusu mods zetu au utatuzi wa changamoto za ETS2 na Bus Simulator?</div>
-    </div>
-    <div id="ai-chat-input-container">
-        <input type="text" id="ai-user-input" placeholder="Andika ujumbe wako..." onkeypress="window.checkEnter(event)">
-        <button id="ai-send-btn" onclick="window.sendMessage()">TUMA</button>
-    </div>
-</div>
-
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then((reg) => console.log('Kitengo Gaming SW registered:', reg.scope))
-                .catch((err) => console.log('Kitengo Gaming SW registration failed:', err));
-        });
-    }
-</script>
 
 </body>
 </html>

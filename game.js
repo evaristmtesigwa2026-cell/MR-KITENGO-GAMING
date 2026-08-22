@@ -15,29 +15,29 @@ if (!firebase.apps.length) {
 }
 const database = firebase.database();
 
-// ===== DARK / LIGHT THEME TOGGLE =====
+// ===== DARK / LIGHT THEME TOGGLE (LIGHT THEME NI DEFAULT) =====
 window.applyTheme = function(theme) {
     const body = document.body;
     const icon = document.getElementById('theme-toggle-icon');
-    if (theme === 'light') {
-        body.classList.add('light-theme');
-        if (icon) icon.innerHTML = '&#9728;&#65039;'; // sun icon
-    } else {
-        body.classList.remove('light-theme');
+    if (theme === 'dark') {
+        body.classList.add('dark-theme');
         if (icon) icon.innerHTML = '&#127769;'; // moon icon
+    } else {
+        body.classList.remove('dark-theme');
+        if (icon) icon.innerHTML = '&#9728;&#65039;'; // sun icon
     }
 };
 
 window.toggleTheme = function() {
-    const isLight = document.body.classList.contains('light-theme');
-    const newTheme = isLight ? 'dark' : 'light';
+    const isDark = document.body.classList.contains('dark-theme');
+    const newTheme = isDark ? 'light' : 'dark';
     try { localStorage.setItem('kitengoTheme', newTheme); } catch (e) {}
     window.applyTheme(newTheme);
 };
 
 (function initTheme() {
-    let saved = 'dark';
-    try { saved = localStorage.getItem('kitengoTheme') || 'dark'; } catch (e) {}
+    let saved = 'light';
+    try { saved = localStorage.getItem('kitengoTheme') || 'light'; } catch (e) {}
     window.applyTheme(saved);
 })();
 
@@ -344,7 +344,7 @@ window.addCategory = function() {
         statusDiv.style.display = "block";
         statusDiv.textContent = "Inachakata picha katika ubora wa hali ya juu (HD)...";
     }
-    window.showLoader("INAPAKIA CATEGORY...");
+    window.showLoader("LOADING...");
     
     const file = fileInput.files[0];
     
@@ -384,7 +384,7 @@ window.loadCategoryForEdit = function(id) {
         return;
     }
 
-    window.showLoader("INASOMA CATEGORY...");
+    window.showLoader("LOADING...");
     database.ref('categories/' + id).once('value').then((snapshot) => {
         const cat = snapshot.val();
         window.hideLoader();
@@ -430,7 +430,7 @@ window.updateCategory = function() {
         });
     };
 
-    window.showLoader("INASASISHA CATEGORY...");
+    window.showLoader("LOADING...");
 
     if (fileInput && fileInput.files.length > 0) {
         if (statusDiv) {
@@ -740,7 +740,7 @@ window.addSlideshowItem = function() {
     const isVideo = file.type.startsWith('video/');
 
     if (statusDiv) statusDiv.style.display = 'block';
-    window.showLoader("UNAPAKIA SLIDESHOW...");
+    window.showLoader("LOADING...");
 
     if (isVideo) {
         if (statusDiv) statusDiv.textContent = 'LOADING...';
@@ -816,7 +816,7 @@ window.loadSlideshowAdminList = function() {
 
 window.deleteSlideshowItem = function(key) {
     if (confirm('Unataka kufuta hii kwenye slideshow?')) {
-        window.showLoader("INAFUTA SLIDESHOW...");
+        window.showLoader("LOADING...");
         database.ref('slideshow/' + key).remove()
         .then(() => {
             window.loadSlideshowAdminList();
@@ -829,7 +829,7 @@ window.deleteSlideshowItem = function(key) {
 };
 
 window.showBusCategory = function(catId, catName, isAdminMode = false) {
-    window.showLoader("INAPAKIA MABASI...");
+    window.showLoader("LOADING...");
     database.ref('buses/' + catId).once('value', (snapshot) => {
         const buses = snapshot.val() || {};
         
@@ -952,7 +952,7 @@ window.setupAdminCardListeners = function(card, catId, key, bus) {
 window.editBusField = function(catId, key, field, currentValue, label) {
     const newValue = prompt(`Badilisha ${label}:\n\n(Sasa: ${currentValue})`, currentValue);
     if (newValue !== null && newValue !== currentValue) {
-        window.showLoader("INABABILISHA...");
+        window.showLoader("LOADING...");
         database.ref(`buses/${catId}/${key}/${field}`).set(newValue)
             .then(() => {
                 alert('Imebadilishwa kwa ufanisi!');
@@ -973,7 +973,7 @@ window.editBusImage = function(catId, key, bus) {
     fileInput.onchange = function() {
         if (this.files.length > 0) {
             const file = this.files[0];
-            window.showLoader("INAPAKIA PICHA MPYA...");
+            window.showLoader("LOADING...");
             window.compressImage(file, 1080, 1080, 0.85, function(compressedBase64) {
                 database.ref(`buses/${catId}/${key}/image`).set(compressedBase64)
                     .then(() => {
@@ -992,7 +992,7 @@ window.editBusImage = function(catId, key, bus) {
 
 window.deleteBus = function(catId, busKey) {
     if (confirm("Je, una uhakika unataka kufuta Mod hii?")) {
-        window.showLoader("INAFUTA MOD...");
+        window.showLoader("LOADING...");
         database.ref(`buses/${catId}/${busKey}`).remove()
         .then(() => {
             alert("Mod imefutwa kikamilifu!");
@@ -1025,7 +1025,7 @@ window.uploadBus = function() {
         statusDiv.style.display = "block";
         statusDiv.textContent = "Inachakata picha katika ubora wa hali ya juu (HD)...";
     }
-    window.showLoader("UNAPAKIA MOD MPYA...");
+    window.showLoader("LOADING...");
 
     const file = fileInput.files[0];
 
@@ -1067,7 +1067,7 @@ window.deleteCategory = function(rawId) {
     
     let categoryId = rawId.trim().toLowerCase().replace(/\s+/g, '-');
 
-    window.showLoader("INAFUTA CATEGORY...");
+    window.showLoader("LOADING...");
     database.ref('categories/' + categoryId).once('value')
     .then((snapshot) => {
         if (!snapshot.exists()) {
@@ -1112,7 +1112,7 @@ window.clearEntireDatabase = function() {
 
     let confirmationText = prompt("ONYO KALI: Hii itafuta Categories zote na Mabasi yote!\n\nKama una uhakika, andika neno FUTA:");
     if (confirmationText === "FUTA") {
-        window.showLoader("INASAFISHA DATABASE...");
+        window.showLoader("LOADING...");
         database.ref().remove().then(() => {
             alert("Database yote imesafishwa kikamilifu!");
             window.hideLoader();
